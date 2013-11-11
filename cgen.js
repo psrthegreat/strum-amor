@@ -2,7 +2,7 @@ var types = ['maj', 'min', 'dim', 'aug'];
 var NUM_NOTES = 12
 var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 var NUM_OCTAVES = 5;
-var TRIAD_LENGTH = 3;
+
 //used to generate all inversions of a chord. As an example, for a C major
 //[C,E,G], this will return [[C, E, G], [E, G, C], and [G, C, E]] 
 function generateAllInversions(tonic){
@@ -74,7 +74,7 @@ function convertToString(chordarr){
 function display(root, type, results){
 	var resultsStr = [];
 	for(var i = 0; i < NUM_OCTAVES; i++){
-		for(var j =0; j< TRIAD_LENGTH; j++){
+		for(var j =0; j< results[i].length; j++){
 			resultsStr.push({name:(i+1)+root+type+j, chord:convertToString(results[i][j])});	
 		}
 	}
@@ -118,5 +118,4 @@ if(process.argv.length <= 2){
 }else{
 	generateChord(process.argv[2], process.argv[3]);
 }
-
 
