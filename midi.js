@@ -3,18 +3,10 @@ var jsmidgen = require('jsmidgen');
 
 var NOTE_DURATION = 1000;
 
-Midi = function(notes, filename) {
-	this.file = new jsmidgen.File();
-	this.track = new jsmidgen.Track();
-	this.file.addTrack(this.track);
-
-	this.time = 0;
-	if (typeof notes !== "undefined") {
-		this.addChord(notes, NOTE_DURATION);
-		if (typeof filename !== "undefined") {
-			this.writeFile(filename);
-		}
-	}
+Midi = function() {
+	var d = new Date();
+	this.t = d.getTime();
+	fs.mkdirSync("midi_files/"+this.t);
 };
 
 // notes is an array of notes, e.g. ['c4, 'e4', 'g4']
@@ -30,8 +22,22 @@ Midi.prototype.addChord = function(notes, duration) {
 	}
 };
 
-Midi.prototype.writeFile = function(filename) {
-	fs.writeFileSync(filename, this.file.toBytes(), 'binary');
+Midi.prototype.writeFile = function(chordname) {
+	fs.writeFileSync("midi_files/"+this.t+"/"+chordname+".mid", this.file.toBytes(), 'binary');
+};
+
+Midi.prototype.newFile = function(notes, chordname) {
+	this.file = new jsmidgen.File();
+	this.track = new jsmidgen.Track();
+	this.file.addTrack(this.track);
+
+	this.time = 0;
+	if (typeof notes !== "undefined") {
+		this.addChord(notes, NOTE_DURATION);
+		if (typeof chordname !== "undefined") {
+			this.writeFile(chordname);
+		}
+	}
 };
 
 module.exports = Midi;

@@ -1,6 +1,6 @@
 var types = ['maj', 'min', 'dim', 'aug'];
-var NUM_NOTES = 12
-var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+var NUM_NOTES = 12;
+var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 var NUM_OCTAVES = 5;
 
 //used to generate all inversions of a chord. As an example, for a C major
@@ -9,7 +9,7 @@ function generateAllInversions(tonic){
 	var all = [];
 	var len = tonic.length;
 	for (var i = 0; i < len; i++){
-		all.push(tonic.slice(0))//move first element to last
+		all.push(tonic.slice(0));//move first element to last
 		tonic.move(0,-1);
 		tonic[tonic.length-1] += 12;
 	}
@@ -39,30 +39,30 @@ function generateBase(rootStr, typeStr){
 	var root = notes.indexOf(rootStr);
 	var result = [];
 	var c = { 'root' : root, 'majthird': (root + 4)%NUM_NOTES, 'minthird': (root + 3)%NUM_NOTES, 'perfectfifth' :(root + 7)%NUM_NOTES, 'dimfifth':(root + 6)%NUM_NOTES, 'augfifth':(root + 8)%NUM_NOTES};
-	result.push(c['root']);
+	result.push(c.root);
 
 	switch(type)
 	{
 		case 0: // major
-			result.push(c['majthird'], c['perfectfifth']);
+			result.push(c.majthird, c.perfectfifth);
 			break;
 		case 1: //minor
-			result.push(c['minthird'], c['perfectfifth']);
+			result.push(c.minthird, c.perfectfifth);
 			break;
 		case 2: //minor dim
-			result.push(c['minthird'], c['dimfifth']);
+			result.push(c.minthird, c.dimfifth);
 			break;
 		case 3: //major aug
-			result.push(c['majthird'], c['augfifth']);
+			result.push(c.majthird, c.augfifth);
 			break;
 		default:
-			throw 'Not a valid type'
+			throw 'Not a valid type';
 	}
 	return result;
 }
 
 function convertToString(chordarr){
-	var resultStr = []
+	var resultStr = [];
 	chordarr.forEach(function(num){
 		var octaveStr = String(~~(num / NUM_NOTES));
 		var letter = notes[num%NUM_NOTES];
@@ -71,21 +71,21 @@ function convertToString(chordarr){
 	return resultStr;
 }
 
-function display(root, type, results){
+function outputResults(root, type, results){
 	var resultsStr = [];
 	for(var i = 0; i < NUM_OCTAVES; i++){
 		for(var j =0; j< results[i].length; j++){
 			resultsStr.push({name:(i+1)+root+type+j, chord:convertToString(results[i][j])});	
 		}
 	}
-	console.log(resultsStr);
+	return resultsStr;
 }
 
 //generates from the root, and type, all possible variations of the chord
 function generateChord(root, type){
 	var base = generateBase(root, type); 
 	var results = generateAllOctaves(base);
-	display(root, type, results);
+	return outputResults(root, type, results);
 	//console.log(results);
 }
 
@@ -109,13 +109,18 @@ Array.prototype.move = function (old_index, new_index) {
 };
 
 //if no arguments provided, generate all chords, along with their inversions
-if(process.argv.length <= 2){
-	types.forEach(function(type){
-		notes.forEach(function(note){
-			generateChord(note, type);
+ChordGenerator = function(note, type) {
+	var output = [];
+	if (typeof note == "undefined" || typeof type == "undefined") {
+		types.forEach(function(type){
+			notes.forEach(function(note){
+				output.push(generateChord(note, type));
+			});
 		});
-	});
-}else{
-	generateChord(process.argv[2], process.argv[3]);
-}
+	} else {
+		output.push(generateChord(note, type));
+	}
+	return output;
+};
 
+module.exports = ChordGenerator;
