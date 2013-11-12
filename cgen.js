@@ -1,4 +1,4 @@
-var types = ['maj', 'min', 'dim', 'aug'];
+var types = ['maj', 'min', 'dim', 'aug', 'maj7', 'min7'];
 var NUM_NOTES = 12;
 var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 var NUM_OCTAVES = 5;
@@ -25,9 +25,9 @@ function generateOctave(chord, octave){
 }
 
 //generates all of the base chord in all the octaves
-function generateAllOctaves(chord){
+function generateAllOctaves(chord, start, end){
 	var list = [];
-	for (var octave = 1; octave <=  NUM_OCTAVES; octave++){
+	for (var octave = start; octave <  end; octave++){
 		list.push(generateOctave(chord.slice(0), octave));	
 	}
 	return list;
@@ -38,7 +38,7 @@ function generateBase(rootStr, typeStr){
 	var type = types.indexOf(typeStr);
 	var root = notes.indexOf(rootStr);
 	var result = [];
-	var c = { 'root' : root, 'majthird': (root + 4)%NUM_NOTES, 'minthird': (root + 3)%NUM_NOTES, 'perfectfifth' :(root + 7)%NUM_NOTES, 'dimfifth':(root + 6)%NUM_NOTES, 'augfifth':(root + 8)%NUM_NOTES};
+	var c = { 'root' : root, 'majthird': (root + 4)%NUM_NOTES, 'minthird': (root + 3)%NUM_NOTES, 'perfectfifth' :(root + 7)%NUM_NOTES, 'dimfifth':(root + 6)%NUM_NOTES, 'augfifth':(root + 8)%NUM_NOTES, 'majorseventh':(root + 11)%NUM_NOTES , 'minorseventh': (root + 10)%NUM_NOTES};
 	result.push(c.root);
 
 	switch(type)
@@ -54,6 +54,12 @@ function generateBase(rootStr, typeStr){
 			break;
 		case 3: //major aug
 			result.push(c.majthird, c.augfifth);
+			break;
+		case 4: //maj7
+			result.push(c.majthird, c.perfectfifth, c.majorseventh);
+			break;
+		case 5: //min7
+			result.push(c.minthird, c.perfectfifth, c.minorseventh);
 			break;
 		default:
 			throw 'Not a valid type';
@@ -71,21 +77,21 @@ function convertToString(chordarr){
 	return resultStr;
 }
 
-function outputResults(root, type, results){
+function outputResults(root, type, results, start, end){
 	var resultsStr = [];
-	for(var i = 0; i < NUM_OCTAVES; i++){
+	for(var i = 0; i < results.length; i++){
 		for(var j =0; j< results[i].length; j++){
-			resultsStr.push({name:(i+1)+root+type+j, chord:convertToString(results[i][j])});	
+			resultsStr.push({name:(i+start)+root+type+j, chord:convertToString(results[i][j])});	
 		}
 	}
 	return resultsStr;
 }
 
 //generates from the root, and type, all possible variations of the chord
-function generateChord(root, type){
+function generateChord(root, type, start, end){
 	var base = generateBase(root, type); 
-	var results = generateAllOctaves(base);
-	return outputResults(root, type, results);
+	var results = generateAllOctaves(base, start, end);
+	return outputResults(root, type, results, start, end);
 	//console.log(results);
 }
 
@@ -109,16 +115,18 @@ Array.prototype.move = function (old_index, new_index) {
 };
 
 //if no arguments provided, generate all chords, along with their inversions
-ChordGenerator = function(note, type) {
+ChordGenerator = function(note, type, startoctave, endoctave) {
 	var output = [];
+	startoctave= typeof startoctave !== 'undefined' ? startoctave : 1;
+	endoctave = typeof endoctave !== 'undefined' ? endoctave : 2;
 	if (typeof note == "undefined" || typeof type == "undefined") {
 		types.forEach(function(type){
 			notes.forEach(function(note){
-				output.push(generateChord(note, type));
+				output.push(generateChord(note, type, 1, NUM_OCTAVES));
 			});
 		});
 	} else {
-		output.push(generateChord(note, type));
+		output.push(generateChord(note, type, parseInt(startoctave), parseInt(endoctave)));
 	}
 	return output;
 };

@@ -6,6 +6,7 @@ var NOTE_DURATION = 1000;
 Midi = function() {
 	var d = new Date();
 	this.t = d.getTime();
+	fs.mkdirSync("midi_files/");
 	fs.mkdirSync("midi_files/"+this.t);
 };
 
