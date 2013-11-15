@@ -574,3 +574,7 @@ min6G2.wav
 min6Gsh0.wav
 min6Gsh1.wav
 min6Gsh2.wav
+maj3A0.wav
+maj3A1.wav
+maj3A2.wav
+maj3Ash0.wav
