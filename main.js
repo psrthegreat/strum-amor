@@ -1,5 +1,5 @@
 var ChordGenerator = require('./cgen.js');
-var MidiGenerator = require('./midi.js');
+var MidiGenerator = require('./idi.js');
 
 var chords = ChordGenerator(process.argv[2], process.argv[3], process.argv[4], process.argv[5]);
 var midi = new MidiGenerator();
