@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir ${1}wav
-for sfile in midi_files/soundfiles/*.sf2
+for sfile in midi_files/soundfonts/*.sf2
 do
 	dir=${1}wav/${sfile##*/}
 	dir=${dir%.*}
@@ -10,6 +10,6 @@ do
 	do
 		ofile=${file/%mid/wav}
 		ofile=${dir}/${ofile##*/}
-		FluidSynth/fluidsynth.exe -F "$ofile" -i -n "$sfile" "$file"
+		FluidSynth/fluidsynth -F $ofile -i -n -T wav $sfile $file
 	done
 done
