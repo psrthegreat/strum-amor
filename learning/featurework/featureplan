@@ -1,1 +1,1 @@
-lx: Loudness
+mfcc: MFCC blockSize=512, stepSize=256, CepsNbCoeffs=11 
