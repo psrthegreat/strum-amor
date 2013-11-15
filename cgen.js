@@ -1,4 +1,4 @@
-var types = ['maj', 'min', 'dim', 'aug', 'maj7', 'min7'];
+var types = ['maj', 'min']; //, 'dim', 'aug', 'maj7', 'min7'];
 var NUM_NOTES = 12;
 var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 var NUM_OCTAVES = 5;
@@ -81,7 +81,8 @@ function outputResults(root, type, results, start, end){
 	var resultsStr = [];
 	for(var i = 0; i < results.length; i++){
 		for(var j =0; j< results[i].length; j++){
-			resultsStr.push({name:(i+start)+root+type+j, chord:convertToString(results[i][j])});	
+			//resultsStr.push({name:(i+start)+root+type+j, chord:convertToString(results[i][j])});	
+			resultsStr.push({name:type+"-"+(i+start)+root+j, chord:convertToString(results[i][j])});
 		}
 	}
 	return resultsStr;
@@ -117,8 +118,8 @@ Array.prototype.move = function (old_index, new_index) {
 //if no arguments provided, generate all chords, along with their inversions
 ChordGenerator = function(note, type, startoctave, endoctave) {
 	var output = [];
-	startoctave= typeof startoctave !== 'undefined' ? startoctave : 1;
-	endoctave = typeof endoctave !== 'undefined' ? endoctave : 2;
+	startoctave= typeof startoctave !== 'undefined' ? startoctave : 3;
+	endoctave = typeof endoctave !== 'undefined' ? endoctave : 7;
 	if (typeof note == "undefined" || typeof type == "undefined") {
 		types.forEach(function(type){
 			notes.forEach(function(note){
