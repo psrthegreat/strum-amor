@@ -90,7 +90,7 @@ function outputResults(root, type, results, start, end){
 	for(var i = 0; i < results.length; i++){
 		for(var j =0; j< results[i].length; j++){
 			//resultsStr.push({name:(i+start)+root+type+j, chord:convertToString(results[i][j])});	
-			resultsStr.push({name:type+"-"+(i+start)+root+j, chord:convertToString(results[i][j])});
+			resultsStr.push({name:type+(i+start)+root+j, chord:convertToString(results[i][j])});
 		}
 	}
 	return resultsStr;
