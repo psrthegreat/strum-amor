@@ -131,7 +131,7 @@ ChordGenerator = function(note, type, startoctave, endoctave) {
 	if (typeof note == "undefined" || typeof type == "undefined") {
 		types.forEach(function(type){
 			notes.forEach(function(note){
-				output.push(generateChord(note, type, 1, NUM_OCTAVES));
+				output.push(generateChord(note, type, startoctave, endoctave));
 			});
 		});
 	} else {
