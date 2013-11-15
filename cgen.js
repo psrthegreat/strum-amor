@@ -7,8 +7,7 @@ var NUM_OCTAVES = 5;
 //[C,E,G], this will return [[C, E, G], [E, G, C], and [G, C, E]] 
 function generateAllInversions(tonic){
 	var all = [];
-	var len = tonic.length;
-	for (var i = 0; i < len; i++){
+	for (var i = 0; i < tonic.length; i++){
 		all.push(tonic.slice(0));//move first element to last
 		tonic.move(0,-1);
 		tonic[tonic.length-1] += 12;
@@ -38,7 +37,16 @@ function generateBase(rootStr, typeStr){
 	var type = types.indexOf(typeStr);
 	var root = notes.indexOf(rootStr);
 	var result = [];
-	var c = { 'root' : root, 'majthird': (root + 4)%NUM_NOTES, 'minthird': (root + 3)%NUM_NOTES, 'perfectfifth' :(root + 7)%NUM_NOTES, 'dimfifth':(root + 6)%NUM_NOTES, 'augfifth':(root + 8)%NUM_NOTES, 'majorseventh':(root + 11)%NUM_NOTES , 'minorseventh': (root + 10)%NUM_NOTES};
+	var c = {
+		'root' : root,
+		'majthird': (root + 4)%NUM_NOTES,
+		'minthird': (root + 3)%NUM_NOTES,
+		'perfectfifth' :(root + 7)%NUM_NOTES,
+		'dimfifth':(root + 6)%NUM_NOTES,
+		'augfifth':(root + 8)%NUM_NOTES,
+		'majorseventh':(root + 11)%NUM_NOTES,
+		'minorseventh': (root + 10)%NUM_NOTES
+	};
 	result.push(c.root);
 
 	switch(type)
@@ -127,7 +135,7 @@ ChordGenerator = function(note, type, startoctave, endoctave) {
 			});
 		});
 	} else {
-		output.push(generateChord(note, type, parseInt(startoctave), parseInt(endoctave)));
+		output.push(generateChord(note, type, parseInt(startoctave, 10), parseInt(endoctave, 10)));
 	}
 	return output;
 };
