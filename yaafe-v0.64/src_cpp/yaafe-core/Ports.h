@@ -1,4 +1,4 @@
-/**
+/*
  * Yaafe
  *
  * Copyright (c) 2009-2010 Institut Télécom - Télécom Paristech
@@ -59,13 +59,13 @@ public:
 template<class T>
 void Ports<T>::add(const T& val)
 {
-	push_back(Port<T>("",val));
+	this->push_back(Port<T>("",val));
 }
 
 template<class T>
 void Ports<T>::add(const std::string& name, const T& val)
 {
-	push_back(Port<T>(name,val));
+	this->push_back(Port<T>(name,val));
 }
 
 template<class T>
