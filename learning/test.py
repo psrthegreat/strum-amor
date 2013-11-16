@@ -31,4 +31,6 @@ for example in examples:
 	feats = extractFeatures(data);
 	print feats
 
+
+
 c.visualize();
