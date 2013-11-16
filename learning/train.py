@@ -15,26 +15,32 @@ def loadData(path, allfile, training, testing):
 [allData, trainData, testData] = loadData('./csvs/', 'list', 'list', 'list');
 
 #setup the feature extractor
+print "Setting up feature extractor..."
 k = 10
 fe = FeatExtractor();
 fe.cluster(allData, 10);
 
 #extract training features
+print "Extracting Training Features..."
 ytrain = trainData['labels'];
 traindata = trainData['data'];
 xtrain = fe.extractAll(traindata);
 
 
 #perform svm training
+print "Performing SVM Training..."
 clf = svm.SVC()
 clf.fit(xtrain, ytrain);
 
 #extract testing features
+print "Extracting test features..."
 ytest = testData['labels']
 testdata = testData['data']
-xtest = fe.extractAll(xtest);
+xtest = fe.extractAll(testdata);
 
 #test svm on test set
+print "Predicting Test Set"
 ypredict = clf.predict(xtest);
 
-error = sum(ypredict == ytest)*1.0/ytest.shape[0] 
+error = sum(ypredict == ytest)*1.0/ytest.shape[0]
+print error;
