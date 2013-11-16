@@ -22,7 +22,8 @@ class DataGen(object):
 		if "min" in line:
 			return 1;
 
-	def loadAllData(self, filename):
+	#load Unlabeled Data
+	def loadUnlabeledData(self, filename):
 		lines = open(self.path+filename, 'r').read().splitlines();
 		num = len(lines)
 		first = True;
@@ -39,33 +40,21 @@ class DataGen(object):
 		self.scaled = True;
 		return A;
 
-	def loadTraining(self, filename):
+	#load labeled data
+	def loadLabeledData(self, filename):
 		assert self.scaled;
 		lines = open(self.path+filename, 'r').read().splitlines();
 		numtrain = len(lines)
 		first = True;
 		dataset = [];
-		labels = []
+		labels = np.empty(numtrain);
 		for i in range(numtrain):
 			line = lines[i];
 			r = self.csvToArr(line);
 			label = self.getLabel(line);
-			labels.append(label);
+			labels[i] = label;
 			dataset.append(r);
 		A = np.array(dataset);
 		A = self.scaler.transform(A);
 		return {'data': A, 'labels': labels};
 
-	def loadTesting(self, filename):
-		assert self.scaled;
-		lines = open(self.path+filename, 'r').read().splitlines();
-		numtest = len(lines);
-		first = True;
-		dataset = [];
-		for i in range(numtest):
-			line = lines[i];
-			r = self.csvToArr(line);
-			dataset.append(r);
-		A = np.array(dataset)
-		A = self.scaler.transform(A);
-		return A;
