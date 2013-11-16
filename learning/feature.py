@@ -12,6 +12,7 @@ class FeatExtractor(object):
 		self.k = k;
 		c = Cluster(data, self.k);
 		c.runKMeans();
+		#c.visualize();
 		self.pca = c.getPCA();
 		self.centroids = c.getCentroids();
 
@@ -19,8 +20,8 @@ class FeatExtractor(object):
 		assert self.clustered;
 		featureMat = np.empty([data.shape[0], self.k])
 		for i in range(data.shape[0]):
-			currpatch = pca.transform(data[i, :]).ravel()
-			diff = currpatch - centroids
+			currpatch = self.pca.transform(data[i, :]).ravel()
+			diff = currpatch - self.centroids
 			distances = np.sum(diff ** 2, axis = 1)
 			distances = np.sqrt(distances)
 			avgDist = np.average(distances)
@@ -39,9 +40,7 @@ class FeatExtractor(object):
 		first = True;
 		for i in range(len(examples)):
 			example = examples[i];
-			data = example['data'];
-			feats = extractFeatures(data).reshape(1, -1);
-			print feats.shape;
+			feats = self.extractSingle(example).reshape(1, -1);
 			if first:
 				X = feats;
 				first = False;

@@ -1,5 +1,6 @@
 #extracts features from data
 import numpy as np
+from sklearn import preprocessing
 
 class DataGen(object):
 
@@ -7,7 +8,8 @@ class DataGen(object):
 	# usage DataGen('./csvs/');
 	def __init__(self,path):
 		self.path = path;
-
+		self.scaler = None;
+		self.scaled = False;
 	#method to make a numpy array from a csv file
 	def csvToArr(self, name):
 		fname = self.path + name;
@@ -20,13 +22,11 @@ class DataGen(object):
 		if "min" in line:
 			return 1;
 
-	#method to read all csvs. A file specifying the list of 
-	#all csvs is given. It must be in the same path as the csv files.
-	def getUnlabeled(self, filename):
+	def loadAllData(self, filename):
 		lines = open(self.path+filename, 'r').read().splitlines();
-		numtrain = len(lines)
+		num = len(lines)
 		first = True;
-		for i in range(numtrain):
+		for i in range(num):
 			line = lines[i];
 			r =  self.csvToArr(line);
 			if(first):
@@ -34,18 +34,38 @@ class DataGen(object):
 				A = r;
 			else:
 				A = np.append(A, r, axis = 0)
-
+		self.scaler = preprocessing.StandardScaler().fit(A);
+		A = self.scaler.transform(A);
+		self.scaled = True;
 		return A;
 
-	def getLabeled(self, filename):
+	def loadTraining(self, filename):
+		assert self.scaled;
 		lines = open(self.path+filename, 'r').read().splitlines();
 		numtrain = len(lines)
 		first = True;
 		dataset = [];
+		labels = []
 		for i in range(numtrain):
 			line = lines[i];
 			r = self.csvToArr(line);
 			label = self.getLabel(line);
-			example = {'label':label, 'data':r};
-			dataset.append(example);
-		return dataset;
+			labels.append(label);
+			dataset.append(r);
+		A = np.array(dataset);
+		A = self.scaler.transform(A);
+		return {'data': A, 'labels': labels};
+
+	def loadTesting(self, filename):
+		assert self.scaled;
+		lines = open(self.path+filename, 'r').read().splitlines();
+		numtest = len(lines);
+		first = True;
+		dataset = [];
+		for i in range(numtest):
+			line = lines[i];
+			r = self.csvToArr(line);
+			dataset.append(r);
+		A = np.array(dataset)
+		A = self.scaler.transform(A);
+		return A;
