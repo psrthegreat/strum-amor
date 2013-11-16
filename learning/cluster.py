@@ -2,18 +2,12 @@ import numpy as np
 import pylab as pl
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import scale
-
-from datagen import DataGen
 
 class Cluster(object):
-
-	def __init__(self, k):
+	def __init__(self, data, k):
 		self.kmeans = None;
 		self.numCategories = k;
-		dgen = DataGen('./csvs/');
-		data = dgen.getUnlabeled('list');
-		self.data = scale(data);
+		self.data = data;
 		self.n_samples, self.n_features = data.shape;
 		self.trained = False;
 		self.reduced_data = None;
@@ -23,15 +17,11 @@ class Cluster(object):
 		assert self.trained;
 		return self.kmeans.cluster_centers_;
 
-	def getLabels(self):
-		assert self.trained;
-		return [];
-
 	def getPCA(self):
 		assert self.trained;
 		return self.pca;
 
-	def runKmeans(self):
+	def runKMeans(self):
 		self.pca = PCA(n_components=2);
 		self.pca.fit(self.data);
 		self.reduced_data =self.pca.fit_transform(self.data)
