@@ -25,12 +25,21 @@ def extractFeatures(data):
 
 d = DataGen('./csvs/');
 examples =  d.getLabeled('list');
-for example in examples:
+first = True;
+y = np.ones(len(examples));
+for i in range(len(examples)):
+	example = examples[i];
 	label = example['label'];
 	data = example['data'];
-	feats = extractFeatures(data);
-	print feats
-
-
+	feats = extractFeatures(data).reshape(1, -1);
+	print feats.shape;
+	if first:
+		X = feats;
+		first = False;
+	else:
+		X = np.append(X, feats, axis = 0);
+	y[i] = label
+print X.shape;
+print y;
 
 c.visualize();
