@@ -11,14 +11,15 @@ def loadData(path, allfile, training, testing):
 	testData = dgen.loadLabeledData(testing);
 	return [allData, trainData, testData];
 
+print "Getting the data"
 #get the data
 [allData, trainData, testData] = loadData('./csvs/', 'list', 'list', 'list');
 
 #setup the feature extractor
 print "Setting up feature extractor..."
-k = 10
+k = 20;
 fe = FeatExtractor();
-fe.cluster(allData, 10);
+fe.cluster(allData, k);
 
 #extract training features
 print "Extracting Training Features..."
