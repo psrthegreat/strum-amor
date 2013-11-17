@@ -1,141 +1,100 @@
-\documentclass[conference]{IEEEtran}
-
-% *** CITATION PACKAGES ***
-%
-%\usepackage{cite}
-% cite.sty was written by Donald Arseneau
-% V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
-% \cite{} output to follow that of IEEE. Loading the cite package will
-% result in citation numbers being automatically sorted and properly
-% "compressed/ranged". e.g., [1], [9], [2], [7], [5], [6] without using
-% cite.sty will become [1], [2], [5]--[7], [9] using cite.sty. cite.sty's
-% \cite will automatically add leading space, if needed. Use cite.sty's
-% noadjust option (cite.sty V3.8 and later) if you want to turn this off.
-% cite.sty is already installed on most LaTeX systems. Be sure and use
-% version 4.0 (2003-05-27) and later if using hyperref.sty. cite.sty does
-% not currently provide for hyperlinked citations.
-% The latest version can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/cite/
-% The documentation is contained in the cite.sty file itself.
-
-% *** MATH PACKAGES ***
-%
-%\usepackage[cmex10]{amsmath}
-% A popular package from the American Mathematical Society that provides
-% many useful and powerful commands for dealing with mathematics. If using
-% it, be sure to load this package with the cmex10 option to ensure that
-% only type 1 fonts will utilized at all point sizes. Without this option,
-% it is possible that some math symbols, particularly those within
-% footnotes, will be rendered in bitmap form which will result in a
-% document that can not be IEEE Xplore compliant!
-%
-% Also, note that the amsmath package sets \interdisplaylinepenalty to 10000
-% thus preventing page breaks from occurring within multiline equations. Use:
-%\interdisplaylinepenalty=2500
-% after loading amsmath to restore such page breaks as IEEEtran.cls normally
-% does. amsmath.sty is already installed on most LaTeX systems. The latest
-% version and documentation can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/required/amslatex/math/
-
-% *** SPECIALIZED LIST PACKAGES ***
-%
-%\usepackage{algorithmic}
-% algorithmic.sty was written by Peter Williams and Rogerio Brito.
-% This package provides an algorithmic environment fo describing algorithms.
-% You can use the algorithmic environment in-text or within a figure
-% environment to provide for a floating algorithm. Do NOT use the algorithm
-% floating environment provided by algorithm.sty (by the same authors) or
-% algorithm2e.sty (by Christophe Fiorio) as IEEE does not use dedicated
-% algorithm float types and packages that provide these will not provide
-% correct IEEE style captions. The latest version and documentation of
-% algorithmic.sty can be obtained at:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/algorithms/
-% There is also a support site at:
-% http://algorithms.berlios.de/index.html
-% Also of interest may be the (relatively newer and more customizable)
-% algorithmicx.sty package by Szasz Janos:
-% http://www.ctan.org/tex-archive/macros/latex/contrib/algorithmicx/
-
-% correct bad hyphenation here
-% \hyphenation{op-tical net-works semi-conduc-tor}
-
-\begin{document}
+\documentclass{article}
 
 \title{Chord Recognition}
 
-% author names and affiliations
-% use a multiple column layout for up to three different
-% affiliations
-\author{\IEEEauthorblockN{Brad Girardeau}
-% \IEEEauthorblockA{School of Electrical and\\Computer Engineering\\
-% Georgia Institute of Technology\\
-% Atlanta, Georgia 30332--0250\\
-% Email: http://www.michaelshell.org/contact.html}
-\and
-\IEEEauthorblockN{Toki Migimatsu}
-\and
-\IEEEauthorblockN{Pranav Rajpurkar}
-}
+\author{Brad Girardeau
+\and      Toki Migimatsu
+\and      Pranav Rajpurkar}
 
-% make the title area
+\begin{document}
+
 \maketitle
 
-\begin{abstract}
-
-The abstract goes here.
-
-\end{abstract}
-
 \section{Introduction}
+\paragraph{}
+Recognizing chords in popular music is a multifaceted challenge, involving segmenting signals of 
+different instruments, determining the location of chord changes, and performing chord or pitch analysis. This
+project focuses on the last step of this process by recognizing and classifying chords. A learning system is
+trained on segmented computer generated chords representing a variety of instruments. 
 
-This demo file is intended to serve as a ``starter file''
-for IEEE conference papers produced under \LaTeX\ using
-IEEEtran.cls version 1.7 and later.
+\section{Data Generation}
+\paragraph{}
+Chord data for the learning system is initially created programmatically. The data set consists of each inversion, octave,
+and major or minor type of every chord, giving 288 examples. A MIDI file containing the pitches for each chord type is generated 
+in Python. Audio data is then created by sythesizing the MIDI files using a given instrument. This allows flexibility in the duration
+and instrument type of the resulting data set. Training and testing data is generated for several instruments, though for simplicity only
+one instrument dataset is currently being used.
 
-I wish you the best of success.
+\paragraph{}
+After exploring results using computer sythesized MIDI chords, non-computer generated audio data will be used. Chords will be recorded played on instruments, and
+eventually databases of annotated popular music like the McGill billboard corpus will be incorporated. A combination of these datasets will allow creation of a robust,
+accurate chord recognition system.
 
-\hfill mds
- 
-\hfill January 11, 2007
+\section{Feature Extraction}
+\paragraph{}
+The choice of features greatly influences the success of musical information retrieval algorithms. An audio sample is loaded and divided into
+frames of a given window size. A feature extraction engine can then compute a variety of metrics or characteristics of each frame. The results
+can be used independently or concatenated with the other frames from the sample to describe a feature vector. In this system, the Yaafe python
+package was used to generate MFCC features. While MFCC are not optimal for chord recognition as MFCC discards much of the tonal pitch data and
+focuses on timbre, it has been effective in speech recognition as well as other music information retrieval tasks, such as artist or genre classification and pitch detection.
+As such, MFCC features are useful as part of a baseline system before further feature exploration.
 
-\subsection{Subsection Heading Here}
-Subsection text here.
+\paragraph{}
+The next step is extracting pitch based features. In particular, the chroma of a pitch refers to the root pitch class that the note belongs to, invarient to octave.
+For example, the C chroma class contains the C pitch in each octave. Chroma features are ideal for chord recognition because a chord type is also invarient to octave shifts, determined
+only by the chroma of the contained notes.  The Chroma Toolbox is a Matlab toolkit developed by Meinard M\"uller and Sebastian Ewert that calculates advanced pitch and chroma based features.
+The Chroma Toolbox inputs WAV audio files and divides them into frames to compute the energy in each MIDI pitch for every frame. It can then calculate the energy in a chroma from the energy in the corresponding
+pitch bins. More complicated approaches are also supported and may be explored after learning with basic chroma features.
 
+\paragraph{}
+After features are computed for each frame, they can be combined to form a feature vector for a collection of frames or used independently. Training with individual frames does not allow learning about interactions between
+frames in a given chord, but gives a lower dimensional feature vector, so less data is needed. However, since the window of each frame is short, it is useful to concatenate chroma vectors for several frames into one higher
+dimensional feature vector. Concatenating the features is chosen as the first approach, but training on individual frames will also be attempted to see if it improves performance. 
 
-\subsubsection{Subsubsection Heading Here}
-Subsubsection text here.
+\section{Model Training and Testing}
+To begin experimenting with classification systems, the chord recognition problem is simplified to the binary classification problem of separating major chords from
+minor chords. An SVM with RBF kernel trains using features extracted from one instrument's chord dataset. It has high training error, suggesting the data is not
+seperable using the given features.
 
-\section{Conclusion}
-The conclusion goes here.
-
-% use section* for acknowledgement
-\section*{Acknowledgment}
-
-
-The authors would like to thank...
-
-% references section
-
-% can use a bibliography generated by BibTeX as a .bbl file
-% BibTeX documentation can be easily obtained at:
-% http://www.ctan.org/tex-archive/biblio/bibtex/contrib/doc/
-% The IEEEtran BibTeX style support page is at:
-% http://www.michaelshell.org/tex/ieeetran/bibtex/
-%\bibliographystyle{IEEEtran}
-% argument is your BibTeX string definitions and bibliography database(s)
-%\bibliography{IEEEabrv,../bib/paper}
-%
-% <OR> manually copy in the resultant .bbl file
-% set second argument of \begin to the number of references
-% (used to reserve space for the reference number labels box)
 \begin{thebibliography}{1}
-
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
 
 \end{thebibliography}
 
 \end{document}
 
 
+\iffalse
+
+Motivated by the idea of transcribing songs into sheet music, we
+propose to build a chord recognition system. Transcribing songs is a
+multifaceted challenge, involving segmenting signals of different
+instruments, determining the location of chord changes, and performing
+chord or pitch analysis. Our project will contribute to the last steps
+of this process by recognizing and classifying chords.
+\paragraph{}
+To create such a system, we intend to proceed in stages, building in
+complexity. Initial investigation will involve training with MIDI
+chord data, free from other voices or background noise. We then plan
+to collect audio recordings of a subset of chords being played on a
+piano, guitar, or violin to create a more substantial initial training
+data set. We would finally like to solve the challenging task of
+performing chord analysis on pop songs, using training data from the
+McGill Billboard corpus.
+\paragraph{}
+As musicians, we see significant value in an automated tool to
+determine chords from audio. In both pop and classical music, knowing
+the progressions of chords underlying the melodies is an essential
+part of understanding, playing, and building on the music. However,
+analyzing chords by hand can be a time consuming process. An automated
+tool for this process would save time when learning and analyzing new
+songs, and it would allow the development of new interactive musical
+applications.
+\paragraph{}
+There is a strong research community in the Music Information
+Retrieval field, of which chord recognition is one component. One
+category of The Music Information Retrieval Evaluation eXchange
+(MIREX) invites researchers to submit chord recognition systems for
+comparison and analysis. While progress has been made using a variety
+of machine learning system, chord recognition in popular music is a
+complex task, with further research and improvement necessary.
+\fi
