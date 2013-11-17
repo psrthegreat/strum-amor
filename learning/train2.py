@@ -21,7 +21,7 @@ xtest  = testData['data'];
 
 #perform svm training
 print "Performing SVM Training..."
-clf = svm.SVC(gamma = 1.25, C = 100)
+clf = svm.SVC(gamma = 1, C = 100)
 clf.fit(xtrain, ytrain);
 
 #test svm performance
