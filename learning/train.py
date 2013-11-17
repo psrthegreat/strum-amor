@@ -13,11 +13,11 @@ def loadData(path, allfile, training, testing):
 
 print "Getting the data"
 #get the data
-[allData, trainData, testData] = loadData('./csvs/', 'list', 'list', 'list');
+[allData, trainData, testData] = loadData('./chroma/', 'list', 'train', 'test');
 
 #setup the feature extractor
 print "Setting up feature extractor..."
-k = 20;
+k = 10;
 fe = FeatExtractor();
 fe.cluster(allData, k);
 
@@ -27,10 +27,9 @@ ytrain = trainData['labels'];
 traindata = trainData['data'];
 xtrain = fe.extractAll(traindata);
 
-
 #perform svm training
 print "Performing SVM Training..."
-clf = svm.SVC()
+clf = svm.SVC(gamma = 1.25, C = 100)
 clf.fit(xtrain, ytrain);
 
 #extract testing features
@@ -39,9 +38,9 @@ ytest = testData['labels']
 testdata = testData['data']
 xtest = fe.extractAll(testdata);
 
-#test svm on test set
-print "Predicting Test Set"
-ypredict = clf.predict(xtest);
+#test svm performance
+accuracy = clf.score(xtrain, ytrain);
+print "Accuracy on training set: %f" %( accuracy )
 
-error = sum(ypredict == ytest)*1.0/ytest.shape[0]
-print error;
+accuracy = clf.score(xtest, ytest)
+print "Accuracy on testing set: %f" %( accuracy )

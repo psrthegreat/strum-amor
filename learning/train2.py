@@ -4,28 +4,29 @@ from feature import FeatExtractor
 from datagen import DataGen
 from sklearn import svm
 import numpy as np
-print "Getting the data..."
-#get the data
-dgen = DataGen('./csv/');
-#data = dgen.loadSimpleData('files_zcr.txt');
-#data = dgen.loadSimpleData('files_ms.txt');
-data = dgen.loadSimpleData('files_obsi.txt');
 
-#data =  np.concatenate((data1, data2, data3), axis=1)
-ytrain = dgen.getSimpleLabel('files_zcr.txt');
-xtrain = data;
+def loadData(path, allfile, training, testing):
+	dgen = DataGen(path);
+	trainData = {'data': dgen.loadSimpleData(training), 'labels' : dgen.getSimpleLabel(training)};
+	testData = {'data': dgen.loadSimpleData(testing), 'labels' : dgen.getSimpleLabel(testing)};
+	return [trainData, testData];
 
+print "Loading the data..."
+[trainData, testData] = loadData('./chroma/', 'list', 'train', 'test');
+
+ytrain = trainData['labels'];
+xtrain = trainData['data'];
+ytest  = testData['labels'];
+xtest  = testData['data'];
 
 #perform svm training
 print "Performing SVM Training..."
-clf = svm.SVC()
+clf = svm.SVC(gamma = 1.25, C = 100)
 clf.fit(xtrain, ytrain);
 
-#test svm on test set
-print "Predicting Test Set"
-ypredict = clf.predict(xtrain);
+#test svm performance
+accuracy = clf.score(xtrain, ytrain);
+print "Accuracy on training set: %f" %( accuracy )
 
-error = sum(ypredict == ytrain)*1.0/ytrain.shape[0]
-print error;
-
-
+accuracy = clf.score(xtest, ytest)
+print "Accuracy on testing set: %f" %( accuracy )
