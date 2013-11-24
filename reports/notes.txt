@@ -1,5 +1,0 @@
-Parameters to adjust
----------------------
-N dimensions vs 2 (PCA)
-k randomly set to 10
-RBF kernel
