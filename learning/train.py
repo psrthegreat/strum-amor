@@ -1,7 +1,7 @@
 #implements the training pipeline
 from data import Dataset
-from framemodel import SVM
-import model
+from model import SVM
+import mixer
 
 print "Loading the data..."
 data      = Dataset("../features/chroma")
@@ -14,9 +14,18 @@ ytest  = testData['labels']
 xtest  = testData['examples']
 
 print "Training Concatenation-SVM model..."
-mod = model.Concatenate(SVM(gamma = 1, C = 100))
-mod.train(xtrain, ytrain)
+model = mixer.Concatenate(SVM(gamma = 1, C = 100))
+model.train(xtrain, ytrain)
 
 print "Scoring model..."
-print "Accuracy on training set: %f" %( mod.score(xtrain, ytrain) )
-print "Accuracy on testing set: %f" %( mod.score(xtest, ytest) )
+print "Accuracy on training set: %f" %( model.score(xtrain, ytrain) )
+print "Accuracy on testing set: %f" %( model.score(xtest, ytest) )
+
+print
+print "Training MiddleFrame-SVM model..."
+model = mixer.MiddleFrame(SVM(gamma = 1, C = 100))
+model.train(xtrain, ytrain)
+
+print "Scoring model..."
+print "Accuracy on training set: %f" %( model.score(xtrain, ytrain) )
+print "Accuracy on testing set: %f" %( model.score(xtest, ytest) )
