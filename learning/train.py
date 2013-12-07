@@ -1,6 +1,6 @@
 #implements the training pipeline
 from data import Dataset
-from model import SVM
+from model import SVM, Softmax
 import mixer
 
 print "Loading the data..."
@@ -22,8 +22,8 @@ print "Accuracy on training set: %f" %( model.score(xtrain, ytrain) )
 print "Accuracy on testing set: %f" %( model.score(xtest, ytest) )
 
 print
-print "Training MiddleFrame-SVM model..."
-model = mixer.MiddleFrame(SVM(gamma = 1, C = 100))
+print "Training MiddleFrame-Softmax model..."
+model = mixer.MiddleFrame(Softmax())
 model.train(xtrain, ytrain)
 
 print "Scoring model..."

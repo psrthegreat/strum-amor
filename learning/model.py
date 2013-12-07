@@ -4,6 +4,9 @@ models use single frame vectors as features, predicting a chord
 for a frame from a vector of features.
 
 """
+from sklearn import svm
+from sklearn.linear_model import LogisticRegression
+
 class Model(object):
     def __init__(self, **model_args):
         """
@@ -38,9 +41,8 @@ class SVM(Model):
     Usage Example: 
 
     """
-    from sklearn import svm
     def __init__(self, **model_args):
-        self.svm      = svm.SVC(**svm_args) 
+        self.svm      = svm.SVC(**model_args) 
 
     def fit(self, frames, labels):
         self.svm.fit(frames, labels)
@@ -56,7 +58,6 @@ class Softmax(Model):
     Usage Example: Softmax(C=C, tol=0.01)
 
     """
-    from sklearn.linear_model import LogisticRegression
     def __init__(self, **model_args):
         self.softmax = LogisticRegression(**model_args)
 
