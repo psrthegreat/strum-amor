@@ -5,26 +5,40 @@ for a frame from a vector of features.
 
 """
 class Model(object):
-    #initializes with model parameters
     def __init__(self, **model_args):
+        """
+        Initializes with model parameters.
+
+        """
         pass
 
-    #Fits the model to data
     def fit(self, frames, labels):
+        """
+        Fits the model to data.
+
+        """
         pass
 
-    #Predicts outputs for models
     def predict(self, frames):
+        """
+        Predicts outputs for models.
+
+        """
         pass
 
-    #returns mean accuracy of predictions on frames
     def score(self, frames, labels):
-        return self.svm.score(frames, labels)
+        """
+        Returns mean accuracy of predictions on frames.
 
+        """
+        pass
 
 class SVM(Model):
+    """
+    Usage Example: 
+
+    """
     from sklearn import svm
-    #Usage Example: 
     def __init__(self, **model_args):
         self.svm      = svm.SVC(**svm_args) 
 
@@ -38,8 +52,11 @@ class SVM(Model):
         return self.svm.score(frames, labels)
 
 class Softmax(Model):
+    """
+    Usage Example: Softmax(C=C, tol=0.01)
+
+    """
     from sklearn.linear_model import LogisticRegression
-    #Usage Example: Softmax(C=C, tol=0.01)
     def __init__(self, **model_args):
         self.softmax = LogisticRegression(**model_args)
 
@@ -52,10 +69,10 @@ class Softmax(Model):
     def score(self, frames, labels):
         return self.softmax.score(frames, labels)
 
-    """ Returns the probability of the sample for each class in the model
-        [n_samples, n_classes]
-    """
     def probs(self, frames):
+        """ Returns the probability of the sample for each class in the model
+        [n_samples, n_classes]
+        """
         return self.softmax.predict_proba(frames) 
 
 class GaussianMixture(Model):
