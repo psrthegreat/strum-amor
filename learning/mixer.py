@@ -137,13 +137,6 @@ def flatten_labels(examples, labels):
                                            in itertools.izip(labels, examples))
     return (frames, list(labels))
 
-def maxchord(examples):
-    """
-    Finds the most predicted chord for each example
-
-    """
-    return [stats.mode(argmax(example, 1)) for example in examples]
-
 class MaxCount(Mixer):
     """
     Extends Mixer to combine frame predictions by using the most predicted 
@@ -162,14 +155,7 @@ class MaxCount(Mixer):
         Predicts a chord for each example.
 
         """
-        return self.model.predict(maxchord(example))
-
-    def score(self, examples, labels):
-        """
-        Accuracy of prediction of given examples.
-
-        """
-        return self.model.score(maxchord(examples), labels)
+        return [stats.mode(self.model.predict(example)) for example in examples]
 
 class NaiveBayes(Mixer):
     """
