@@ -42,11 +42,14 @@ class Mixer(object):
         """
         pass
 
+    def score(self, examples, labels):
+        return mean(equal(self.predict(examples), labels))
+
 
 def middle_frame(examples):
     """
     Extracts the middle element of each array in a list of arrays.
-    
+
     """
     return [example[len(example) / 2] for example in examples]
 
