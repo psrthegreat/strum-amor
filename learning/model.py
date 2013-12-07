@@ -4,7 +4,9 @@ models use single frame vectors as features, predicting a chord
 for a frame from a vector of features.
 
 """
-import sklearn
+import sklearn.svm
+import sklearn.linear_model
+import sklearn.lda
 
 class SKModel(object):
     def __init__(self, skclass, **params):
@@ -41,8 +43,7 @@ class SVM(SKModel):
 
     """
     def __init__(self, **params):
-        super(self, SKModel).__init__(sklearn.svm, **params)
-        self.svm      = svm.SVC(**model_args) 
+        super(SVM, self).__init__(sklearn.svm, **params)
 
 class Softmax(SKModel):
     """
@@ -50,7 +51,7 @@ class Softmax(SKModel):
 
     """
     def __init__(self, **params):
-        super(self, SKModel).__init__(sklearn.linear_model.LogisticRegression,
+        super(Softmax, self).__init__(sklearn.linear_model.LogisticRegression,
                                       **params)
     def probs(self, frames):
         """
@@ -60,13 +61,13 @@ class Softmax(SKModel):
         """
         return self.skmodel.predict_proba(frames) 
 
-class GaussianMixture(SKModel):
+class Gaussian(SKModel):
     """
-    Gaussian mixture.
+    Gaussian.
 
     """
     def __init__(self, **params):
-        super(self, SKModel).__init__(sklearn.lda.LDA, **params)
+        super(Gaussian, self).__init__(sklearn.lda.LDA, **params)
 
     def probs(self, frames):
         return self.skmodel.predict_proba(frames)

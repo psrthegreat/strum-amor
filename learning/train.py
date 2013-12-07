@@ -1,31 +1,30 @@
-#implements the training pipeline
-from data import Dataset
-from model import SVM, Softmax
-import mixer
+"""
+Implements the training pipeline.
 
-print "Loading the data..."
-data      = Dataset("../features/chroma")
-trainData = data.loadList("train")
-testData  = data.loadList("test")
+Usage:
 
-ytrain = trainData['labels']
-xtrain = trainData['examples']
-ytest  = testData['labels']
-xtest  = testData['examples']
+  >>> model = Concatenate(SVM(gamma = 1, C = 100))
+  >>> model.train(xtrain, ytrain)
+  >>> score = model.score(xtest, ytest)
 
-print "Training Concatenation-SVM model..."
-model = mixer.Concatenate(SVM(gamma = 1, C = 100))
-model.train(xtrain, ytrain)
+  >>> model = MiddleFrame(Softmax())
+  >>> model.train(xtrain, ytrain)
+  >>> score = model.score(xtest, ytest)
 
-print "Scoring model..."
-print "Accuracy on training set: %f" %( model.score(xtrain, ytrain) )
-print "Accuracy on testing set: %f" %( model.score(xtest, ytest) )
+"""
+import data
+from model import *
+from mixer import *
 
-print
-print "Training MiddleFrame-Softmax model..."
-model = mixer.MiddleFrame(Softmax())
-model.train(xtrain, ytrain)
+if "__main__" in __name__ :
+    print "Loading data from ../features/chroma ..."
+    data_loader = data.Dataset("../features/chroma")
+    trainData   = data_loader.loadList("train")
+    testData    = data_loader.loadList("test")
 
-print "Scoring model..."
-print "Accuracy on training set: %f" %( model.score(xtrain, ytrain) )
-print "Accuracy on testing set: %f" %( model.score(xtest, ytest) )
+    ytrain = trainData['labels']
+    xtrain = trainData['examples']
+    ytest  = testData['labels']
+    xtest  = testData['examples']
+
+    print "Data loaded."
