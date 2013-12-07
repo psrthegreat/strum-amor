@@ -1,0 +1,17 @@
+Pre-Milestone
+- svm classifier on different reps of features
+	- MFCC
+		- chroma
+		- realizing chroma was better
+		- trained svm on chroma, concat, middle frame, and mode.
+		- good results by overfitting the svm. Chroma was a good representation
+		  of the features. Chroma was seen to be independent of octaves. 
+
+Checkpoint 1
+Wanted to be able to handle wave files of different lengths.
+- softmax regresssion, better than svm since no n^2.  
+- combine softmax results with p(y|x) naive bayes model.
+
+Checkpoint 2
+Mixture of Gaussians with labelled zi's. Putting together with hidden
+markov model, viterbi decoding to figure out most likely sequence.
