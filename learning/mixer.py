@@ -6,6 +6,7 @@ to predict a single chord for the entire example.
 
 """
 import itertools
+from scipy import stats
 
 class Mixer(object):
     """
@@ -97,7 +98,7 @@ class Concatenate(Mixer):
     def train(self, examples, labels):
         """
         Trains a model given labeled examples.
-        
+
         """
         self.model.fit(concatenate(examples), labels)
 
@@ -115,13 +116,39 @@ class Concatenate(Mixer):
         """
         return self.model.score(concatenate(examples), labels)
 
+def maxchord(examples):
+    """
+    Finds the most predicted chord for each example
+
+    """
+    return [stats.mode(example, axis=1) for example in examples]
+
 class MaxCount(Mixer):
     """
     Extends Mixer to combine frame predictions by using the most predicted 
     chord.
 
     """
-    pass
+    def train(self, examples, labels):
+        """
+        Trains a model given labeled examples.
+
+        """
+        self.model.fit(maxchord(examples), labels)
+
+    def predict(self, examples):
+        """
+        Predicts a chord for each example.
+
+        """
+        return self.model.predict(maxchord(example))
+
+    def score(self, examples, labels):
+        """
+        Accuracy of prediction of given examples.
+
+        """
+        return self.model.score(maxchord(examples), labels)
 
 class NaiveBayes(Mixer):
     """
