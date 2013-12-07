@@ -5,9 +5,9 @@ example. The mixers combine results from different models for each frame
 to predict a single chord for the entire example.
 
 """
-import itertools
+from itertools import chain, izip, repeat
 from scipy import stats
-import numpy
+import numpy as np
 
 class Mixer(object):
     """
@@ -48,8 +48,7 @@ class Mixer(object):
         Computes the mean accuracy of the predictions against the labels.
 
         """
-        return mean(equal(self.predict(examples), labels))
-
+        return np.mean(np.equal(self.predict(examples), labels))
 
 def middle_frame(examples):
     """
@@ -95,7 +94,7 @@ def concatenate(examples):
         return [example.reshape(example.shape[0] * example.shape[1])
                 for example in examples]
     except AttributeError:
-        return [list(itertools.chain.from_iterable(example))
+        return [list(chain.from_iterable(example))
                 for example in examples]
 
 class Concatenate(Mixer):
@@ -131,10 +130,9 @@ def flatten_labels(examples, labels):
     labels for each frame.
 
     """
-    frames = numpy.vstack(examples)
-    labels = itertools.chain.from_iterable(itertools.repeat(label, len(example))
-                                           for (label, example)
-                                           in itertools.izip(labels, examples))
+    frames = np.vstack(examples)
+    labels = chain.from_iterable(repeat(label, len(example))
+                                 for (label, example) in izip(labels, examples))
     return (frames, list(labels))
 
 class MaxCount(Mixer):
@@ -148,7 +146,7 @@ class MaxCount(Mixer):
         Trains a model given labeled examples.
 
         """
-        self.mode.train(*flatten_labels(examples, labels))
+        self.model.train(*flatten_labels(examples, labels))
 
     def predict(self, examples):
         """
@@ -157,10 +155,15 @@ class MaxCount(Mixer):
         """
         return [stats.mode(self.model.predict(example)) for example in examples]
 
-class NaiveBayes(Mixer):
+class ReverseNaiveBayes(Mixer):
     """
     Extends Mixer to use a Naive Bayes approach to combine frame probabilities
     for each chord.
 
     """
-    pass
+    def train(self, examples, labels):
+        self.model.fit(*flatten_labels(examples, labels))
+
+    def predict(self, examples):
+        return [np.argmax(np.sum(np.log(self.model.probs(example)),
+                                 axis = 0)) for example in examples]
