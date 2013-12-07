@@ -44,6 +44,10 @@ class Mixer(object):
         pass
 
     def score(self, examples, labels):
+        """
+        Computes the mean accuracy of the predictions against the labels.
+
+        """
         return mean(equal(self.predict(examples), labels))
 
 
@@ -64,7 +68,7 @@ class MiddleFrame(Mixer):
     def train(self, examples, labels):
         """
         Trains a model given labeled examples.
-        
+
         """
         self.model.fit(middle_frame(examples), labels)
 
@@ -138,7 +142,7 @@ def maxchord(examples):
     Finds the most predicted chord for each example
 
     """
-    return [stats.mode(example, axis=1) for example in examples]
+    return [stats.mode(argmax(example, 1)) for example in examples]
 
 class MaxCount(Mixer):
     """
@@ -151,7 +155,7 @@ class MaxCount(Mixer):
         Trains a model given labeled examples.
 
         """
-        self.model.fit(maxchord(examples), labels)
+        self.mode.train(*flatten_labels(examples, labels))
 
     def predict(self, examples):
         """
