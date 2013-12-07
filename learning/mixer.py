@@ -7,6 +7,7 @@ to predict a single chord for the entire example.
 """
 import itertools
 from scipy import stats
+import numpy
 
 class Mixer(object):
     """
@@ -87,7 +88,8 @@ def concatenate(examples):
 
     """
     try:
-        examples.reshape(examples.shape[0], examples.shape[1] * examples.shape[2])
+        return [example.reshape(example.shape[0] * example.shape[1])
+                for example in examples]
     except AttributeError:
         return [list(itertools.chain.from_iterable(example))
                 for example in examples]
@@ -118,6 +120,18 @@ class Concatenate(Mixer):
 
         """
         return self.model.score(concatenate(examples), labels)
+
+def flatten_labels(examples, labels):
+    """
+    Flatten dataset into list of feature vectors with corresponding
+    labels for each frame.
+
+    """
+    frames = numpy.vstack(examples)
+    labels = itertools.chain.from_iterable(itertools.repeat(label, len(example))
+                                           for (label, example)
+                                           in itertools.izip(labels, examples))
+    return (frames, list(labels))
 
 def maxchord(examples):
     """
