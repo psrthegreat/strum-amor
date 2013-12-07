@@ -155,7 +155,7 @@ class MaxCount(Mixer):
         """
         return [stats.mode(self.model.predict(example)) for example in examples]
 
-class ReverseNaiveBayes(Mixer):
+class NaiveBayes(Mixer):
     """
     Extends Mixer to use a Naive Bayes approach to combine frame probabilities
     for each chord.

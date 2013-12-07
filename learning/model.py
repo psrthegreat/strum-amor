@@ -4,81 +4,70 @@ models use single frame vectors as features, predicting a chord
 for a frame from a vector of features.
 
 """
-from sklearn import svm
-from sklearn.linear_model import LogisticRegression
+import sklearn
 
-class Model(object):
-    def __init__(self, **model_args):
+class SKModel(object):
+    def __init__(self, skclass, **params):
         """
-        Initializes with model parameters.
+        Initializes scikit learn model with given parameters.
 
         """
-        pass
+        self.skmodel = skclass(**params)
 
     def fit(self, frames, labels):
         """
         Fits the model to data.
 
         """
-        pass
+        self.skmodel.fit(frames, labels)
 
     def predict(self, frames):
         """
-        Predicts outputs for models.
+        Predicts outputs for model.
 
         """
-        pass
+        return self.skmodel.predict(frames)
 
     def score(self, frames, labels):
         """
         Returns mean accuracy of predictions on frames.
 
         """
-        pass
+        return self.skmodel.score(frames, labels)
 
-class SVM(Model):
+class SVM(SKModel):
     """
-    Usage Example: 
+    Usage Example: SVM(C=1, gamma = 0)
 
     """
-    def __init__(self, **model_args):
+    def __init__(self, **params):
+        super(self, SKModel).__init__(sklearn.svm, **params)
         self.svm      = svm.SVC(**model_args) 
 
-    def fit(self, frames, labels):
-        self.svm.fit(frames, labels)
-
-    def predict(self, frames):
-        return self.svm.predict(frames)
-
-    def score(self, frames, labels):
-        return self.svm.score(frames, labels)
-
-class Softmax(Model):
+class Softmax(SKModel):
     """
-    Usage Example: Softmax(C=C, tol=0.01)
+    Usage Example: Softmax(tol=0.01)
 
     """
-    def __init__(self, **model_args):
-        self.softmax = LogisticRegression(**model_args)
-
-    def fit(self, frames, labels):
-        self.softmax.fit(frames, labels);
-       
-    def predict(self, frames):
-        return self.softmax.predict(frames)
-
-    def score(self, frames, labels):
-        return self.softmax.score(frames, labels)
-
+    def __init__(self, **params):
+        super(self, SKModel).__init__(sklearn.linear_model.LogisticRegression,
+                                      **params)
     def probs(self, frames):
-        """ Returns the probability of the sample for each class in the model
-        [n_samples, n_classes]
         """
-        return self.softmax.predict_proba(frames) 
+        Returns the probability of the sample for each class in the model
+        [n_samples, n_classes]
 
-class GaussianMixture(Model):
+        """
+        return self.skmodel.predict_proba(frames) 
+
+class GaussianMixture(SKModel):
     """
     Gaussian mixture.
+
     """
-    pass
+    def __init__(self, **params):
+        super(self, SKModel).__init__(sklearn.lda.LDA, **params)
+
+    def probs(self, frames):
+        return self.skmodel.predict_proba(frames)
 
