@@ -100,8 +100,8 @@ class HMMGaussian(SKModel):
         #force this to be a diagonal matrix later
         covar = self.model.get_covar()
         n_components = len(np.unique(labels))
-        #transmat = np.zeros([n_components, n_components]) + 1.0/n_components
-        transmat = np.identity(n_components);
+        transmat = np.zeros([n_components, n_components]) + 1.0/n_components
+        #transmat = np.identity(n_components);
         params = {'n_components' : n_components,
                   'startprob' : [1.0/n_components] * n_components,
                   'transmat' : transmat,

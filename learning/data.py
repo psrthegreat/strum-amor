@@ -6,7 +6,7 @@ import os
 import numpy
 import scipy.io
 
-chords = ["A", "Ash", "B", "C", "Csh", "D", "Dsh", "E", "F", "Fsh", "G", "Gsh"]
+chords = ["C", "Csh", "D", "Dsh", "E", "F", "Fsh", "G", "Gsh","A", "Ash", "B" ]
 
 class Dataset(object):
 
