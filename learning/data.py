@@ -5,8 +5,8 @@ Loads features from files.
 import os
 import numpy
 import scipy.io
-
-chords = ["C", "Csh", "D", "Dsh", "E", "F", "Fsh", "G", "Gsh","A", "Ash", "B" ]
+import re
+import chord
 
 class Dataset(object):
 
@@ -56,22 +56,11 @@ class Dataset(object):
         depending on 'self.chords'.
 
         """
-        # major or minor?
-        m_type = 0;
-        if "min" in name:
-            m_type = 1;
-
-        # return here for major vs minor
-        if not self.chords:
-            return m_type;
-
-        # get chord with 'sh' (Ash, Gsh...)
-        chord = name[4:7]
-        if chord in chords:
-            return chords.index(chord) + m_type * 12
-
-        # get natural chord (A, B, ..)
-        return chords.index(chord[0]) + m_type * 12
+        # name looks like: maj3Ash0_chroma.mat
+        match = re.match('(maj|min)\d([A-G](?:sh)?)', name)
+        # convert name into the form: A#maj
+        chordname = match.group(2).replace('sh', '#') + match.group(1)
+        return chord.encode(chordname)
 
     def loadList(self, filename):
         """
