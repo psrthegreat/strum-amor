@@ -99,9 +99,10 @@ class HMMGaussian(SKModel):
         means = self.model.get_means()
         #force this to be a diagonal matrix later
         covar = self.model.get_covar()
+        #covar = np.tied(covar, np.identity(covar.shape[0]))
         n_components = len(np.unique(labels))
-        transmat = np.zeros([n_components, n_components]) + 1.0/n_components
-        #transmat = np.identity(n_components);
+        #transmat = np.zeros([n_components, n_components]) + 1.0/n_components
+        transmat = np.identity(n_components);
         params = {'n_components' : n_components,
                   'startprob' : [1.0/n_components] * n_components,
                   'transmat' : transmat,
@@ -116,4 +117,12 @@ class HMMGaussian(SKModel):
         #self.skmodel.fit([frames]);
         # set means, covariances
         self.skmodel.means_ = means
+        #full - 96.6
         self.skmodel.covars_ = np.array(list(itertools.repeat(covar, n_components)))
+        #tied - 96.6
+        #self.skmodel.covars_ = covar
+        #diag 94.9
+        #self.skmodel.covars_ = np.array([np.diag(covar)]* n_components)
+        #spherical - 91.5
+        #self.skmodel.covars_ = (np.ones(n_components) * np.mean(np.diag(covar))).reshape(-1, 1)
+        print self.skmodel.covars_

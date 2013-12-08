@@ -16,6 +16,11 @@ Checkpoint 2
 Mixture of Gaussians with labelled zi's. Putting together with hidden
 markov model, viterbi decoding to figure out most likely sequence. 
 
+Checkpoint 3
+Hidden markov model with constraint of same chord achieves 96% accuracy single
+instrument. Seeing tied covariances performs better than spherical and diagonal.
+
+-Timbre invariant features taking mfcc inverse.
 
 Notes
 - Used mfcc as baseline. Have performed well in other music analysis tasks.

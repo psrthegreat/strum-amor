@@ -146,7 +146,7 @@ class MaxCount(Mixer):
         Trains a model given labeled examples.
 
         """
-        self.model.fit(*flatten_labels(examples, labels))
+        return self.model.fit(*flatten_labels(examples, labels))
 
     def predict(self, examples):
         """

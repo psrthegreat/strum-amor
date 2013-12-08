@@ -2,9 +2,19 @@
 from sklearn.metrics import confusion_matrix
 from scipy import stats
 import pylab as pl
+import numpy as np
 execfile("train.py")
+
 model = HMM(HMMGaussian())
-model.train(xtrain, ytrain)
+
+covars = model.train(xtrain, ytrain)
+"""
+frames, labels = flatten_labels(xtest, ytest)
+p = model.model.predict(frames[0:80])
+print p
+#:cm = confusion_matrix(p, labels[0:80])
+
+"""
 print "frame level"
 start = 1
 end = len(ytest)
