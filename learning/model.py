@@ -4,6 +4,9 @@ models use single frame vectors as features, predicting a chord
 for a frame from a vector of features.
 
 """
+import itertools
+
+import numpy as np
 import sklearn.svm
 import sklearn.linear_model
 import sklearn.lda
@@ -17,12 +20,12 @@ class SKModel(object):
         """
         self.skmodel = skclass(**params)
 
-    def fit(self, frames, labels):
+    def fit(self, frames, labels, **kwargs):
         """
         Fits the model to data.
 
         """
-        self.skmodel.fit(frames, labels)
+        self.skmodel.fit(frames, labels, **kwargs)
 
     def predict(self, frames):
         """
@@ -73,18 +76,41 @@ class LDA(SKModel):
     def probs(self, frames):
         return self.skmodel.predict_proba(frames)
 
-class HMMGaussian(SKModel):
-	"""
-	HMM Gaussian Model
-	"""
-	def __init__(self, model = None, **params):
-		super(HMMGaussian, self).__init__(sklearn.hmm.GaussianHMM, **params)
-		if model is None:
-			model = LDA()
-		self.model = model
+    def get_means(self):
+        return self.skmodel.means_
 
-	def fit(self, frames, labels):
-		self.model.fit(frames, labels)
-		params = {'means' : self.model.get_means(),
-					'covars' : self.model.get_covars()}
-		self.skmodel.set_params(**params)
+    def get_covar(self):
+        return self.skmodel.covariance_
+
+class HMMGaussian(SKModel):
+    """
+    HMM Gaussian Model
+    
+
+    """
+    def __init__(self, model = None, **params):
+        super(HMMGaussian, self).__init__(sklearn.hmm.GaussianHMM, **params)
+        if model is None:
+            model = LDA()
+        self.model = model
+        
+    def fit(self, frames, labels):
+        # train LDA for means, covariance.
+        self.model.fit(frames, labels, store_covariance = True)
+        means = self.model.get_means()
+        covar = self.model.get_covar()
+
+        # reinitialize HMM with new parameters.
+        n_components = len(np.unique(labels))
+        transmat = np.zeros([n_components, n_components]) + 1.0/n_components
+        params = {'n_components' : n_components,
+                  'startprob' : [1.0/n_components] * n_components,
+                  'transmat' : transmat,
+                  'covariance_type' : 'full',
+                  'params' : ''
+        }
+        self.skmodel = type(self.skmodel)(**params)
+
+        # set means, covariances
+        self.skmodel.means_ = means
+        self.skmodel.covars_ = np.array(list(itertools.repeat(covar, n_components)))
