@@ -5,9 +5,20 @@ example. The mixers combine results from different models for each frame
 to predict a single chord for the entire example.
 
 """
-from itertools import chain, izip, repeat
+from itertools import chain, izip, repeat, imap
 from scipy import stats
 import numpy as np
+
+def flatten_labels(examples, labels):
+    """
+    Flatten dataset into list of feature vectors with corresponding
+    labels for each frame.
+
+    """
+    frames = np.vstack(examples)
+    labels = chain.from_iterable(repeat(label, len(example))
+                                 for (label, example) in izip(labels, examples))
+    return (frames, list(labels))
 
 class Mixer(object):
     """
@@ -30,18 +41,19 @@ class Mixer(object):
     def train(self, examples, labels):
         """
         Trains a model given labeled examples. Should be implemented by
-        subclasses.
+        subclasses. By default fits a flattened vector of all examples and labels.
 
         """
-        pass
+        self.fit(*flatten_labels(examples, labels))
 
     def predict(self, examples):
         """
         Predicts chords for examples. Must be called after train(). Should
-        be implemented by subclasses.
+        be implemented by subclasses. By default returns a list of list of
+        frame predictions.
 
         """
-        pass
+        return [self.model.predict(example) for example in examples]
 
     def score(self, examples, labels):
         """
@@ -124,38 +136,18 @@ class Concatenate(Mixer):
         """
         return self.model.score(concatenate(examples), labels)
 
-def flatten_labels(examples, labels):
-    """
-    Flatten dataset into list of feature vectors with corresponding
-    labels for each frame.
-
-    """
-    frames = np.vstack(examples)
-    labels = chain.from_iterable(repeat(label, len(example))
-                                 for (label, example) in izip(labels, examples))
-    return (frames, list(labels))
-
 class MaxCount(Mixer):
     """
     Extends Mixer to combine frame predictions by using the most predicted 
     chord.
 
     """
-    def train(self, examples, labels):
-        """
-        Trains a model given labeled examples.
-
-        """
-        return self.model.fit(*flatten_labels(examples, labels))
-
     def predict(self, examples):
         """
         Predicts a chord for each example.
 
         """
-        from chords import *
-        print [map(decode, np.unique(self.model.predict(example))) for example in examples]
-        return stats.mode([self.model.predict(example) for example in examples],
+        return stats.mode(super(MaxCount, self).predict(examples),
                           axis = 1)[0].squeeze()
 
 class NaiveBayes(Mixer):
@@ -164,9 +156,6 @@ class NaiveBayes(Mixer):
     for each chord.
 
     """
-    def train(self, examples, labels):
-        self.model.fit(*flatten_labels(examples, labels))
-
     def predict(self, examples):
         return [np.argmax(np.sum(np.log(self.model.probs(example)),
                                  axis = 0)) for example in examples]
@@ -179,9 +168,6 @@ class HMM(Mixer):
     def train(self, examples, labels):
         self.model.fit(np.vstack(examples), np.hstack(labels))
 
-    def predict(self, examples):
-        return [self.model.predict(example) for example in examples]
-
     def score(self, examples, labels):
         return np.mean(np.equal(np.vstack(self.predict(examples)),
                                 np.vstack(labels)));
@@ -192,17 +178,12 @@ class SegmentHMM(HMM):
 
     """
     def train(self, examples, labels):
-        data = [flatten_labels(example, label) for example, label in
-                izip(examples, labels)]
-        super(SegmentHMM, self).train([example for example, label in data],
-                               [label for example, label in data])
+        examples, labels = zip(*imap(flatten_labels, examples, labels))
+        super(SegmentHMM, self).train(examples, labels)
 
     def predict(self, examples):
-        return super(SegmentHMM, self).predict([np.vstack(example) for example
-                                              in examples])
+        return super(SegmentHMM, self).predict(imap(np.vstack, examples))
 
     def score(self, examples, labels):
-        data = [flatten_labels(example, label) for example, label in
-                izip(examples, labels)]
-        return super(SegmentHMM, self).score([example for example, label in data],
-                                             [label for example, label in data])
+        examples, labels = zip(*imap(flatten_labels, examples, labels))
+        return super(SegmentHMM, self).score(examples, labels)
