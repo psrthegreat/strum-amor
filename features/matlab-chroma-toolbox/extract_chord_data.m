@@ -1,8 +1,12 @@
-input_dir = '../wav/files';
-output_dir = '../wav/features';
+%input_dir = '../wav/files';
+input_dir = '../../wav-files/Scc1t2_Piano_1/'
+output_dir = '../chroma';
 dirFileNames = dir(input_dir);
 
 for n=3:size(dirFileNames,1)
+    if strcmp(dirFileNames(n).name, 'files.txt')
+        continue
+    end
     % WAV to audio
     %%%%%%%%%%%%%%%%%
     clear parameter;
@@ -14,8 +18,8 @@ for n=3:size(dirFileNames,1)
     %%%%%%%%%%%%%%%%%
     clear parameter
     % save pitch features?
-    parameter.save = 1;
-    parameter.saveDir = output_dir;
+    %parameter.save = 1;
+    %parameter.saveDir = output_dir;
 
     parameter.winLenSTMSP = 4410;
     parameter.fs = sideinfo.wav.fs;
@@ -26,21 +30,21 @@ for n=3:size(dirFileNames,1)
 
     % pitch to chroma
     %%%%%%%%%%%%%%%%%%%%%
-    clear parameter
-    parameter.vis = 0;
-    % save chroma features?
-    parameter.save = 1;
-    parameter.save_dir = output_dir;
-    parameter.save_filename = dirFileNames(n).name(1:end-4);
-    [f_chroma_norm,sideinfo] = pitch_to_chroma(f_pitch,parameter,sideinfo);
+     clear parameter
+     parameter.vis = 0;
+     % save chroma features?
+     parameter.save = 1;
+     parameter.save_dir = strcat(output_dir, '_pitch/');
+     parameter.save_filename = dirFileNames(n).name(1:end-4);
+     [f_chroma_norm,sideinfo] = pitch_to_chroma(f_pitch,parameter,sideinfo);
 
     % pitch to CRP
     %%%%%%%%%%%%%%%
     clear parameter
     % save CRP features?
     parameter.save = 1;
-    parameter.save_dir = strcat(output_dir, '/crp');
-    parameter.save_filename = dirFileNames(n).name(1:end-4);
+    parameter.saveDir = strcat(output_dir, '_crp/');
+    parameter.saveFilename = dirFileNames(n).name(1:end-4);
     [f_chroma_CRP,sideinfo] = pitch_to_CRP(f_pitch,parameter,sideinfo);
 
 end
