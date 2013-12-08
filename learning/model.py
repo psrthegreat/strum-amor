@@ -125,4 +125,4 @@ class HMMGaussian(SKModel):
         #self.skmodel.covars_ = np.array([np.diag(covar)]* n_components)
         #spherical - 91.5
         #self.skmodel.covars_ = (np.ones(n_components) * np.mean(np.diag(covar))).reshape(-1, 1)
-        print self.skmodel.covars_
+        #print self.skmodel.covars_
