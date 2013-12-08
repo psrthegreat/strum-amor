@@ -7,16 +7,16 @@ for n=3:size(dirFileNames,1)
     %%%%%%%%%%%%%%%%%
     clear parameter;
     parameter.message = 1;
-    
+
     [f_audio,sideinfo] = wav_to_audio('', input_dir, dirFileNames(n).name, parameter);
-   
+
     % audio to pitch
     %%%%%%%%%%%%%%%%%
     clear parameter
     % save pitch features?
     parameter.save = 1;
     parameter.saveDir = output_dir;
-    
+
     parameter.winLenSTMSP = 4410;
     parameter.fs = sideinfo.wav.fs;
     parameter.saveFilename = dirFileNames(n).name(1:end-4);
@@ -33,5 +33,14 @@ for n=3:size(dirFileNames,1)
     parameter.save_dir = output_dir;
     parameter.save_filename = dirFileNames(n).name(1:end-4);
     [f_chroma_norm,sideinfo] = pitch_to_chroma(f_pitch,parameter,sideinfo);
+
+    % pitch to CRP
+    %%%%%%%%%%%%%%%
+    clear parameter
+    % save CRP features?
+    parameter.save = 1;
+    parameter.save_dir = strcat(output_dir, '/crp');
+    parameter.save_filename = dirFileNames(n).name(1:end-4);
+    [f_chroma_CRP,sideinfo] = pitch_to_CRP(f_pitch,parameter,sideinfo);
 
 end
