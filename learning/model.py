@@ -77,8 +77,10 @@ class HMMGaussian(SKModel):
 	"""
 	HMM Gaussian Model
 	"""
-	def __init__(self, model, **params):
+	def __init__(self, model = None, **params):
 		super(HMMGaussian, self).__init__(sklearn.hmm.GaussianHMM, **params)
+		if model is None:
+			model = LDA()
 		self.model = model
 
 	def fit(self, frames, labels):
