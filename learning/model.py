@@ -85,6 +85,7 @@ class LDA(SKModel):
 class HMMGaussian(SKModel):
     """
     HMM Gaussian Model
+
     """
     def __init__(self, model = None, **params):
         if model is None:
@@ -106,12 +107,12 @@ class HMMGaussian(SKModel):
                   'transmat' : transmat,
                   'covariance_type': 'full',
                   'algorithm': 'viterbi',
-                  'means_prior': means,
-                  'covars_prior': list(itertools.repeat(covar, n_components)),
+                  #'means_prior': means,
+                  #'covars_prior': list(itertools.repeat(covar, n_components)),
                   'params' : ''
         }
         self.skmodel = sklearn.hmm.GaussianHMM(**params)
-        print frames[1,:].shape
+        #print frames[1,:].shape
         #self.skmodel.fit([frames]);
         # set means, covariances
         self.skmodel.means_ = means
