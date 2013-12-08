@@ -169,11 +169,38 @@ class NaiveBayes(Mixer):
         return [np.argmax(np.sum(np.log(self.model.probs(example)),
                                  axis = 0)) for example in examples]
 
-class HMM(MaxCount):
+class HMM(Mixer):
     """
-    Extends Mixer to work with HMM style models.
+    HMM. note input, predict and score are frame level!
 
     """
-    pass
+    def train(self, examples, labels):
+        self.model.fit(np.vstack(examples), np.hstack(labels))
 
+    def predict(self, examples):
+        return [self.model.predict(example) for example in examples]
 
+    def score(self, examples, labels):
+        return np.mean(np.equal(np.vstack(self.predict(examples)),
+                                np.vstack(labels)));
+
+class SegmentHMM(HMM):
+    """
+    SegmentHMM. note predict and score return frame level! (but input is segmented still)
+
+    """
+    def train(self, examples, labels):
+        data = [flatten_labels(example, label) for example, label in
+                izip(examples, labels)]
+        super(SegmentHMM, self).train([example for example, label in data],
+                               [label for example, label in data])
+
+    def predict(self, examples):
+        return super(SegmentHMM, self).predict([np.vstack(example) for example
+                                              in examples])
+
+    def score(self, examples, labels):
+        data = [flatten_labels(example, label) for example, label in
+                izip(examples, labels)]
+        return super(SegmentHMM, self).score([example for example, label in data],
+                                             [label for example, label in data])
