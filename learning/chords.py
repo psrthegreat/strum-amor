@@ -18,7 +18,7 @@ __types = { 'maj': [0,4,7],
 
 """ Codes for each chord, in the order (starting from 0):
     Cmaj, C#maj, ..., Bmaj, Cmin, C#min, ... etc. """
-__codes = [note + chord for note in __notes for chord in __types]
+__codes = [note + chord for chord in __types for note in __notes]
 
 def encode(name):
     """
