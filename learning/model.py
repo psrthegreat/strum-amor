@@ -85,32 +85,34 @@ class LDA(SKModel):
 class HMMGaussian(SKModel):
     """
     HMM Gaussian Model
-    
-
     """
     def __init__(self, model = None, **params):
-        super(HMMGaussian, self).__init__(sklearn.hmm.GaussianHMM, **params)
         if model is None:
             model = LDA()
         self.model = model
-        
+
+    #dont remove the uncommented lines
     def fit(self, frames, labels):
         # train LDA for means, covariance.
         self.model.fit(frames, labels, store_covariance = True)
         means = self.model.get_means()
+        #force this to be a diagonal matrix later
         covar = self.model.get_covar()
-
-        # reinitialize HMM with new parameters.
         n_components = len(np.unique(labels))
-        transmat = np.zeros([n_components, n_components]) + 1.0/n_components
+        #transmat = np.zeros([n_components, n_components]) + 1.0/n_components
+        transmat = np.identity(n_components);
         params = {'n_components' : n_components,
                   'startprob' : [1.0/n_components] * n_components,
                   'transmat' : transmat,
-                  'covariance_type' : 'full',
+                  'covariance_type': 'full',
+                  'algorithm': 'viterbi',
+                  'means_prior': means,
+                  'covars_prior': list(itertools.repeat(covar, n_components)),
                   'params' : ''
         }
-        self.skmodel = type(self.skmodel)(**params)
-
+        self.skmodel = sklearn.hmm.GaussianHMM(**params)
+        print frames[1,:].shape
+        #self.skmodel.fit([frames]);
         # set means, covariances
         self.skmodel.means_ = means
         self.skmodel.covars_ = np.array(list(itertools.repeat(covar, n_components)))

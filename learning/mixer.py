@@ -153,6 +153,7 @@ class MaxCount(Mixer):
         Predicts a chord for each example.
 
         """
+        print [self.model.predict(example) for example in examples]
         return [stats.mode(self.model.predict(example)) for example in examples]
 
 class NaiveBayes(Mixer):
