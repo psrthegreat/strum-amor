@@ -57,9 +57,9 @@ class Dataset(object):
 
         """
         # major or minor?
-        m_type = 1;
+        m_type = 0;
         if "min" in name:
-            m_type = 2;
+            m_type = 1;
 
         # return here for major vs minor
         if not self.chords:
@@ -68,10 +68,10 @@ class Dataset(object):
         # get chord with 'sh' (Ash, Gsh...)
         chord = name[4:7]
         if chord in chords:
-            return chords.index(chord) * m_type
+            return chords.index(chord) + m_type * 12
 
         # get natural chord (A, B, ..)
-        return chords.index(chord[0]) * m_type
+        return chords.index(chord[0]) + m_type * 12
 
     def loadList(self, filename):
         """

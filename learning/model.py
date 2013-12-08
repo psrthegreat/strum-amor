@@ -47,7 +47,7 @@ class SVM(SKModel):
 
     """
     def __init__(self, **params):
-        super(SVM, self).__init__(sklearn.svm, **params)
+        super(SVM, self).__init__(sklearn.svm.SVC, **params)
 
 class Softmax(SKModel):
     """
