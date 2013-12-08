@@ -7,6 +7,7 @@ to predict a single chord for the entire example.
 """
 from itertools import chain, izip, repeat
 from scipy import stats
+from sklearn.hmm import GaussianHMM
 import numpy as np
 
 class Mixer(object):
@@ -167,3 +168,16 @@ class NaiveBayes(Mixer):
     def predict(self, examples):
         return [np.argmax(np.sum(np.log(self.model.probs(example)),
                                  axis = 0)) for example in examples]
+
+class HMMGaussian(object):
+	def __init__(self, model, numChords=24, transmat = None):
+		if transmat is None:
+			transmat = np.zeros(numChords) + 1/numChords
+		GaussianHMM(n_components=numChords, startprob = None, transmat =
+				transmat)
+
+
+	def runViterbi(self):
+		predict(obs, 
+
+

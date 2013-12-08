@@ -7,6 +7,7 @@ for a frame from a vector of features.
 import sklearn.svm
 import sklearn.linear_model
 import sklearn.lda
+import sklearn.hmm
 
 class SKModel(object):
     def __init__(self, skclass, **params):
@@ -61,14 +62,27 @@ class Softmax(SKModel):
         """
         return self.skmodel.predict_proba(frames) 
 
-class Gaussian(SKModel):
+class LDA(SKModel):
     """
     Gaussian.
 
     """
     def __init__(self, **params):
-        super(Gaussian, self).__init__(sklearn.lda.LDA, **params)
+        super(LDA, self).__init__(sklearn.lda.LDA, **params)
 
     def probs(self, frames):
         return self.skmodel.predict_proba(frames)
 
+class HMMGaussian(SKModel):
+	"""
+	HMM Gaussian Model
+	"""
+	def __init__(self, model, **params):
+		super(HMMGaussian, self).__init__(sklearn.hmm.GaussianHMM, **params)
+		self.model = model
+
+	def fit(self, frames, labels):
+		self.model.fit(frames, labels)
+		params = {'means' : self.model.get_means(),
+					'covars' : self.model.get_covars()}
+		self.skmodel.set_params(**params)
