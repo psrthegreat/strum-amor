@@ -146,13 +146,15 @@ class MaxCount(Mixer):
         Trains a model given labeled examples.
 
         """
-        self.model.fit(*flatten_labels(examples, labels))
+        return self.model.fit(*flatten_labels(examples, labels))
 
     def predict(self, examples):
         """
         Predicts a chord for each example.
 
         """
+        from chords import *
+        print [map(decode, np.unique(self.model.predict(example))) for example in examples]
         return stats.mode([self.model.predict(example) for example in examples],
                           axis = 1)[0].squeeze()
 
