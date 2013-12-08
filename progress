@@ -24,3 +24,4 @@ Notes
 - confusion matrices
 - use 24s
 - VOICEBOX
+-change tolerance parameter lda
