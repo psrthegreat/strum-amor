@@ -21,12 +21,11 @@ Hidden markov model with constraint of same chord achieves 96% accuracy single
 instrument. Seeing tied covariances performs better than spherical and diagonal.
 
 -Timbre invariant features taking mfcc inverse.
+-confusion matrices
 
 Notes
 - Used mfcc as baseline. Have performed well in other music analysis tasks.
 - using different window sizes
 - using 24 bins for pcp
-- confusion matrices
-- use 24s
 - VOICEBOX
--change tolerance parameter lda
+

@@ -1,10 +1,10 @@
 %input_dir = '../wav/files';
-instruments = {'Piano_1', 'Violin_1'}
-input_dir = '../../wav-files/Scc1t2_'
+instruments = {'Piano_1', 'Violin', 'Nylon_Gt.2'};
+input_dir = '../../wav-files/Scc1t2_';
 output_dir = '../chroma_';
-dirFileNames = dir(input_dir);
 
-for i=1:size(instruments)
+for i=1:size(instruments,2)
+    dirFileNames = dir(strcat(input_dir, instruments{i}));
     for n=3:size(dirFileNames,1)
         if strcmp(dirFileNames(n).name, 'files.txt')
             continue
@@ -14,7 +14,7 @@ for i=1:size(instruments)
         clear parameter;
         parameter.message = 1;
 
-        instr_dir = strcat(input_dir, instruments{i}, '/')
+        instr_dir = strcat(input_dir, instruments{i}, '/');
         [f_audio,sideinfo] = wav_to_audio('', instr_dir, dirFileNames(n).name, parameter);
 
         % audio to pitch

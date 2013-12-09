@@ -22,11 +22,12 @@ b =  flatten_labels(xtest[start:end], ytest[start:end])[1]
 a = model.predict([xtest[start:end]])[0]
 cm = confusion_matrix(a, b)
 print model.score([xtest], [ytest])
-
+print model.score([xtrain], [ytrain]);
+"""
 pl.matshow(cm)
 pl.title('Confusion matrix')
 pl.colorbar()
 pl.ylabel('True label')
 pl.xlabel('Predicted label')
 pl.show()
-
+"""
