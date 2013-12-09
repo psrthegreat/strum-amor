@@ -1,6 +1,20 @@
-extends layout
-
-block content
-  h1= title
-  h3 Recognizing Chords Since 2013
-  
+doctype 5
+html
+    head
+        title= title
+        link(rel='stylesheet', href='/stylesheets/style.css')
+        script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
+        script(src='/javascripts/recorderjs/recorder.js')
+        script(src='/javascripts/demo.js')
+    body
+        input#record(type='button', value='Record')
+        input#stop(type='button', value='Stop')
+        a#save
+            input(type='button', value='Save')
+        canvas#canvas
+        audio#audio(controls='controls')
+            source(src='test.wav', type='audio/wav')
+        #byte_content
+            | hi
+        #byte_range
+            | hi2

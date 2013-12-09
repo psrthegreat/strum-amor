@@ -5,6 +5,7 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 var index = require('./routes/main');
+var fs = require('fs')
 //for tests
 //var tests = require('./routes/tests');
 //add any app-specific modules below
@@ -19,7 +20,7 @@ app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(require('stylus').middleware(__dirname + '/public'));
+//app.use(require('stylus').middleware(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
