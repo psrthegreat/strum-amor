@@ -24,6 +24,7 @@ parameter.vis = 0;
 parameter.save = saveFlag;
 parameter.save_dir = strcat(outputDir, 'chroma/');
 parameter.save_filename = wavFile(1:end-4);
+mkdir(parameter.save_dir);
 
 [chroma, sideinfo] = pitch_to_chroma(pitch, parameter, sideinfo);
 
@@ -33,6 +34,7 @@ clear parameter;
 parameter.save = saveFlag;
 parameter.saveDir = strcat(outputDir, 'crp/');
 parameter.saveFilename = wavFile(1:end-4);
+mkdir(parameter.saveDir);
 
 [crp, sideinfo] = pitch_to_CRP(pitch, parameter, sideinfo);
 
