@@ -15,7 +15,7 @@ for i=1:size(instruments,2)
         end
         chromaDir = strcat(instrOutputDir, 'chroma/');
         crpDir = strcat(instrOutputDir, 'crp/');
-        extract_chroma(instrInputDir, dirFileNames(n).name, 1, chroma)
-        extract_crp(instrInputDir, dirFileNames(n).name, 1, crp)
+        extract_chroma(instrInputDir, dirFileNames(n).name, 1, chromaDir)
+        extract_crp(instrInputDir, dirFileNames(n).name, 1, crpDir)
     end
 end

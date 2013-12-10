@@ -8,16 +8,10 @@ var fs = require('fs');
 var http = require('http');
 var exec = require('child_process').exec;
 
-
 var options = {
-  key: fs.readFileSync('./keys/key.pem'),
-  cert: fs.readFileSync('./keys/key-cert.pem')
+	key : fs.readFileSync('./keys/key.pem'),
+	cert : fs.readFileSync('./keys/key-cert.pem')
 };
-
-//for tests
-//var tests = require('./routes/tests');
-
-
 var app = express();
 
 // all environments
@@ -31,7 +25,6 @@ app.use(express.methodOverride());
 //app.use(require('stylus').middleware(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 // When in development mode, use the error handler
 if ('development' == app.get('env')) {
 	app.use(express.errorHandler());
@@ -41,8 +34,8 @@ if ('development' == app.get('env')) {
 app.use(app.router);
 
 //Logins
-app.get('/main', function(req, res){
-	 res.render('new');
+app.get('/main', function(req, res) {
+	res.render('new');
 });
 
 app.get('/', function(req, res) {
@@ -50,20 +43,22 @@ app.get('/', function(req, res) {
 });
 
 //get predictions
-app.post('/main', function(req, res){
+app.post('/main', function(req, res) {
 	var str = req.body.data.split(",")[1]
 	var buf = new Buffer(str, 'base64');
-	fs.writeFile("hello.wav", buf, function(err){
-        if(err) res.send(500, { error: 'something blew up' })
-        var child = exec("./recog", function (error, stdout, stderr) {
+	fs.writeFile("hello.wav", buf, function(err) {
+		if (err)
+			res.send(500, {
+				error : 'something blew up'
+			})
+		var child = exec("./recog", function(error, stdout, stderr) {
 			console.log('stdout: ' + stdout);
 			res.send(stdout);
 		});
-    });
+	});
 });
 
 //app specific gets here
-
 var executeTests = false;
 
 if (executeTests) {
@@ -85,12 +80,25 @@ app.get("*", function(req, res) {
 	res.status(404).send('Not found dude');
 });
 
-
-/*
-// Create an HTTP service.
-http.createServer(app).listen(app.get('port'), function() {
-	console.log('Express server listening on port ' + app.get('port'));
-});
-*/
 // Create an HTTPS service identical to the HTTP service.
-https.createServer(options, app).listen(app.get('port'));
+var server = https.createServer(options, app)
+//var server = http.createServer(app)
+server.listen(app.get('port'));
+var io = require('socket.io').listen(server);
+
+io.sockets.on('connection', function(socket) {
+	socket.emit('ready');
+	socket.on('set nickname', function(name) {
+		socket.set('nickname', name, function() {
+			socket.emit('news', {
+				hello : 'world'
+			});
+		});
+	});
+
+	socket.on('msg', function() {
+		socket.get('nickname', function(err, name) {
+			console.log('Chat message by ', name);
+		});
+	});
+});

@@ -15,8 +15,8 @@ else:
     data = sys.argv[1]
 
 data = feature.get_crp(data)
-data = feature.remove_neg(data)
-test = feature.filter_variance(data, 0.18)
+data = feature.replace_negative(data)
+test = feature.filter_variance(data, 0.18, True)
 tests = feature.split(test, 7)
 
 model1 = HMM(pickle.load(open("../learning/trained/identityChroma", "r")));

@@ -12,6 +12,17 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
   alert('The File APIs are not fully supported in this browser.');
 }
 
+var socket = io.connect('https://10.31.225.23/');
+
+socket.on('ready', function () {
+    socket.emit('set nickname', "Pranav");
+    socket.on('news', function(data){
+    	console.log(data);
+    });
+    socket.emit('msg', {message: "hi"});
+});
+
+
 
 function startRecording() {
 	if (navigator.getUserMedia) {
@@ -24,7 +35,6 @@ function startRecording() {
 			analyser.minDecibels = -880;
 			analyser.smoothingTimeConstant = 1;
 			analyser.fftSize = 2048;
-			console.log(analyser.minDecibels);
 			source.connect(analyser);
 			//analyser.connect(context.destination);
 			recorder = new Recorder(analyser);
@@ -44,8 +54,6 @@ function sendFile(str){
 	});
 }
 
-
-
 function readBlob(file, opt_startByte, opt_stopByte) {
     var start = parseInt(opt_startByte) || 0;
     var stop = parseInt(opt_stopByte) || file.size - 1;
@@ -55,20 +63,17 @@ function readBlob(file, opt_startByte, opt_stopByte) {
     // If we use onloadend, we need to check the readyState.
     reader.onloadend = function(evt) {
       if (evt.target.readyState == FileReader.DONE) { // DONE == 2
-      	console.log(evt.target.result);
-        document.getElementById('byte_content').textContent = reader.result;
-        document.getElementById('byte_range').textContent =
+        //document.getElementById('byte_content').textContent = reader.result;
+        /*document.getElementById('byte_range').textContent =
             ['Read bytes: ', start + 1, ' - ', stop + 1,
              ' of ', file.size, ' byte file'].join('');
+        */
         sendFile(evt.target.result);
       }
     };
 
     var blob = file.slice(start, stop + 1);
-    //reader.readAsBinaryString(blob);
     reader.readAsDataURL(blob);
-    //see how array buffer works instead
-    //reader.readAsArrayBuffer(blob);
 }
 
 function stopRecording() {
@@ -76,11 +81,7 @@ function stopRecording() {
 	recorder.exportWAV(function(s) {
 		var url = window.URL.createObjectURL(s);
 		$("#audio").get(0).src = url;
-		$("#save").attr("href", url);
-		$("#save").attr("download", "test1.wav");
-		wavblob = url;
-		console.log(wavblob);
-		readBlob(s)
+		readBlob(s);
 	});
 }
 
@@ -96,15 +97,14 @@ function toggleRecording(){
 }
 
 $(document).ready(function() {
-	$("#stop").hide();
-	$("#record").click(function() {
-		$(this).hide();
-		$("#stop").show();
-		startRecording();
-	});
-	$("#stop").click(function() {
-		$(this).hide();
-		$("#record").show();
-		stopRecording();
+	$("#toggle").text("Record");
+	$("#toggle").click(function() {
+		if ($("#toggle").html() == "Record"){
+			$("#toggle").text("Stop");
+			startRecording();
+		}else{
+			$("#toggle").text("Record");
+			stopRecording();
+		}
 	});
 });
