@@ -19,8 +19,15 @@ function startRecording() {
 			audio: true
 		}, function(s) {
 			var context = new AudioContext();
-			var mediaStreamSource = context.createMediaStreamSource(s);
-			recorder = new Recorder(mediaStreamSource);
+			var analyser = context.createAnalyser();
+			var source = context.createMediaStreamSource(s);
+			analyser.minDecibels = -880;
+			analyser.smoothingTimeConstant = 1;
+			analyser.fftSize = 2048;
+			console.log(analyser.minDecibels);
+			source.connect(analyser);
+			//analyser.connect(context.destination);
+			recorder = new Recorder(analyser);
 			recorder.clear();
 			recorder.record();
 		}, function(e) {
