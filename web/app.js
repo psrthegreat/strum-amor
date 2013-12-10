@@ -58,6 +58,19 @@ app.post('/main', function(req, res) {
 	});
 });
 
+function writeSegment(){
+	fs.writeFile("hello.wav", buf, function(err) {
+		if (err)
+			res.send(500, {
+				error : 'something blew up'
+			})
+		var child = exec("./recog", function(error, stdout, stderr) {
+			console.log('stdout: ' + stdout);
+			res.send(stdout);
+		});
+	});
+}
+
 //app specific gets here
 var executeTests = false;
 
@@ -75,9 +88,6 @@ if (executeTests) {
 	}
 }
 
-function getBieberTweet(callback){
-	return callback("yo")
-}
 
 //if the page does not exist
 app.get("*", function(req, res) {
@@ -91,30 +101,18 @@ server.listen(app.get('port'));
 var io = require('socket.io').listen(server);
 
 io.sockets.on('connection', function(socket) {
-	console.log("hey! " + socket.id)
+	socket.set('id', socket.id);
 	socket.emit('ready', socket.id);
-	socket.on('set nickname', function(name) {
-		socket.set('nickname', name, function() {
-			socket.emit('news', {
-				hello : 'world'
-			});
-		});
-	});
 
-	var tweets = setInterval(function () {
-	  	getBieberTweet(function (tweet) {
-	      socket.emit('tweet', tweet);
-	   });
-	  }, 100);
-	
-	socket.on('disconnect', function () {
-    	console.log("left! " + socket.id)
-    	clearInterval(tweets);
-  	});
-	
-	socket.on('msg', function() {
-		socket.get('nickname', function(err, name) {
-			console.log('Chat message by ', name);
+	socket.on('data', function(data) {
+		socket.get('id', function(err, id) {
+			fs.writeFile("hello.wav", buf, function(err) {
+				if (err) res.send(500, { error : 'something blew up'})
+				var child = exec("./recog", function(error, stdout, stderr) {
+				console.log('stdout: ' + stdout);
+				res.send(stdout);
+				});
+			});
 		});
 	});
 });
