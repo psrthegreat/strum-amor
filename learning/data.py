@@ -19,14 +19,14 @@ class Dataset(object):
         self.path = directory
         self.chords = chords
 
-    def readFile(self, name):
+    def readFile(self, name, feature):
         """
         Reads data from file into numpy array.
 
         """
         path = os.path.join(self.path, name)
         if '.mat' in name:
-            return self.readMAT(path, "f_chroma")
+            return self.readMAT(path, feature)
         elif '.csv' in name:
             return self.readCSV(name)
 
@@ -62,7 +62,7 @@ class Dataset(object):
         chordname = match.group(2).replace('sh', '#') + match.group(1)
         return chord.encode(chordname)
 
-    def loadList(self, filename):
+    def loadList(self, filename, feature="f_chroma"):
         """
         Reads a list of files and extracts the data and label for each file.
 
@@ -73,6 +73,6 @@ class Dataset(object):
         labels   = []
         with open(os.path.join(self.path, filename), "r") as f:
             for line in f.read().splitlines():
-                examples.append(self.readFile(line))
+                examples.append(self.readFile(line, feature))
                 labels.append(self.getLabel(line))
         return {"examples": examples, "labels" : labels}

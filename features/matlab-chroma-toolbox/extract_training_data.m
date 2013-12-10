@@ -10,6 +10,9 @@ for i=1:size(instruments,2)
         if strcmp(dirFileNames(n).name, 'files.txt')
             continue
         end
-        extract_chord_features(instrInputDir, dirFileNames(n).name, 1, instrOutputDir)
+        chromaDir = strcat(instrOutputDir, 'chroma/')
+        crpDir = strcat(instrOutputDir, 'crp/')
+        extract_chroma(instrInputDir, dirFileNames(n).name, 1, chroma)
+        extract_crp(instrInputDir, dirFileNames(n).name, 1, crp)
     end
 end
