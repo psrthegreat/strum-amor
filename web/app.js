@@ -75,6 +75,10 @@ if (executeTests) {
 	}
 }
 
+function getBieberTweet(callback){
+	return callback("yo")
+}
+
 //if the page does not exist
 app.get("*", function(req, res) {
 	res.status(404).send('Not found dude');
@@ -88,7 +92,7 @@ var io = require('socket.io').listen(server);
 
 io.sockets.on('connection', function(socket) {
 	console.log("hey! " + socket.id)
-	socket.emit('ready', "Yay");
+	socket.emit('ready', socket.id);
 	socket.on('set nickname', function(name) {
 		socket.set('nickname', name, function() {
 			socket.emit('news', {
@@ -96,10 +100,18 @@ io.sockets.on('connection', function(socket) {
 			});
 		});
 	});
+
+	var tweets = setInterval(function () {
+	  	getBieberTweet(function (tweet) {
+	      socket.emit('tweet', tweet);
+	   });
+	  }, 100);
+	
 	socket.on('disconnect', function () {
     	console.log("left! " + socket.id)
+    	clearInterval(tweets);
   	});
-
+	
 	socket.on('msg', function() {
 		socket.get('nickname', function(err, name) {
 			console.log('Chat message by ', name);

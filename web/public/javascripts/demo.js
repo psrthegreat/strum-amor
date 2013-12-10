@@ -14,13 +14,17 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
 
 var socket = io.connect('https://10.31.225.23/');
 
-socket.on('ready', function (data) {
-	console.log('data');
-    socket.emit('set nickname', "Pranav");
+socket.on('ready', function (id) {
+	console.log(id);
+    socket.emit('set nickname', id);
     socket.on('news', function(data){
     	console.log(data);
     });
     socket.emit('msg', {message: "hi"});
+});
+
+socket.on('tweet', function(data){
+    	console.log(data);
 });
 
 
@@ -34,11 +38,7 @@ function startRecording() {
 			var analyser = context.createAnalyser();
 			var source = context.createMediaStreamSource(s);
 			analyser.minDecibels = analyser.maxDecibels- 10;
-
-			//analyser.smoothingTimeConstant = 1;
-			//analyser.fftSize = 2048;
 			source.connect(analyser);
-			//analyser.connect(context.destination);
 			recorder = new Recorder(analyser);
 			recorder.clear();
 			recorder.record();
