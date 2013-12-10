@@ -13,14 +13,27 @@ from mixer import *
 # sys.argv = ["train.py", "../features/output/Piano_1/crp", "f_CRP"]
 # execfile("train.py")
 dataDir = "../features/output/"
-instruments = ['Piano_1', 'Nylon_Gt.2']
+instruments = [ 'Piano_1',
+                'Piano_2',
+                'Piano_3',
+                'Piano_Elec_1',
+                'Piano_Elec_2',
+                'Piano_Elec_60s',
+                'Guitar_Chorus',
+                'Guitar_Clean',
+                'Guitar_Funk',
+                'Guitar_Hawaiian',
+                'Guitar_Jazz',
+                'Guitar_Nylon_2',
+                'Guitar_Overdrive',
+                'Guitar_Steel' ]
 
-data_loader = data.Dataset([dataDir+instr+"/crp" for instr in instruments], "crp")
+data_loader = data.Dataset([dataDir+instr+"/crp/4410" for instr in instruments], "crp")
 trainData   = data_loader.loadList("train")
 ytrain = trainData['labels']
 xtrain = trainData['examples']
 
-data_loader = data.Dataset([dataDir+"Violin/crp"], "crp")
+data_loader = data.Dataset([dataDir+"Violin/crp/4410"], "crp")
 testData    = data_loader.loadList("test")
 ytest  = testData['labels']
 xtest  = testData['examples']
