@@ -16,6 +16,7 @@ import sys
 import data
 from model import *
 from mixer import *
+from feature import *
 
 if "__main__" in __name__ :
     featuresDir = "../features/chroma"
@@ -34,9 +35,7 @@ if "__main__" in __name__ :
     xtrain = trainData['examples']
     ytest  = testData['labels']
     xtest  = testData['examples']
-    
-    xtrain = np.asarray(xtrain)
-    xtrain[xtrain < 0] = 0
-    xtest = np.asarray(xtest)
-    xtest[xtest < 0] = 0
+
+    xtrain = remove_neg(xtrain)
+    xtest = remove_neg(xtest)
     print "Data loaded."

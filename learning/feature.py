@@ -98,6 +98,9 @@ def filter_groups(data, mingroup):
     return list(itertools.imap(operator.itemgetter(0),
                                itertools.groupby(gfilt)))
 
+def remove_neg(data):
+    return np.array(data)[data <0] =0
+
 if '__main__' in __name__:    
     load_matlab()
     ipc.run_server(fetch_data)
