@@ -10,7 +10,7 @@ split() {
 	# shuffle files and append to list
 	ftest="${1}test"
 	ftrain="${1}train"
-	# echo "$grep" | shuf | tee >(head -$ntest >> $ftest) | tail -$ntrain >> $ftrain
+	echo "$grep" | shuf | tee >(head -$ntest >> $ftest) | tail -$ntrain >> $ftrain
 }
 
 generate_lists() {
@@ -38,8 +38,11 @@ generate_lists() {
 
 if [[ -z $1 ]]; then
 	for instr in */; do
-		for dir in $instr*/; do
-			generate_lists $dir
+		echo $instr
+		for feat in $instr*/; do
+			for winlen in $feat*/; do
+				generate_lists $winlen
+			done
 		done
 	done
 fi
