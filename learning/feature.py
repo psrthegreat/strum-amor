@@ -51,21 +51,31 @@ def get_chroma(path):
 
     return data
 
-def filter_variance(data, level = 0.20):
+def filter_variance(data, level = 0.23):
     """
     Filter frames with low level of variance out.
 
     """
     dev = np.std(data, axis = 1);
     data = data[dev > level]
+    if((data.shape[0]) < 10) console.log('screwed up filter_variance');
     return data;
 
 def split(data, n):
+    """
+    Split data into groups of n (discard last if not multiple of n)
+
+    """
     return [data[i * n:(i + 1) * n] for i in xrange(len(data) / n)]
 
 def combine_maxcount(data):
+    """
+    Take mode of each frame and combine into one list.
+
+    """
     return np.hstack(scipy.stats.mode(data, axis = 1)[0].squeeze())
 
 if '__main__' in __name__:    
     load_matlab()
     ipc.run_server(fetch_data)
+
