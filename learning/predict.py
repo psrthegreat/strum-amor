@@ -87,7 +87,15 @@ class HMMPredictor(object):
         if self.feature_type == "chroma":
             self._features = feature.get_chroma(input_file)
         else:
-            self._features = feature.replace_negative(feature.get_crp(input_file))        
+            self._features = feature.get_crp(input_file)
+
+        if isinstance(self._features, basestring):
+            error          = self._features
+            self._features = None
+            raise ValueError(str(error))
+        
+        elif self.feature_type == "crp":
+            self._features = feature.replace_negative(self._features)
 
     def process_features(self):
         """
