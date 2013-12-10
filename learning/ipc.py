@@ -29,6 +29,20 @@ def get_client():
     """
     return Client(__address, authkey='strumamor')
 
+def get_response(command):
+    """
+    Gets data from server.
+
+    """
+    connection = get_client()
+
+    connection.send(command)
+
+    data = connection.recv()
+    connection.close()
+
+    return data
+
 __quit_command = "quit"
 def quit_server():
     """

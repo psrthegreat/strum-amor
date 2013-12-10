@@ -1,6 +1,16 @@
-function crp = extract_crp(inputDir, wavFile, saveFlag, outputDir)
+function crp = extract_crp(inputDir, wavFile, saveFlag, outputDir, window_length)
 
-[pitch, sideinfo] = extract_pitch(inputDir, wavFile);
+if (nargin < 3)
+    saveFlag = 0;
+end
+if (nargin < 4)
+    outputDir = '';
+end
+if (nargin < 5)
+    window_length = 4410;
+end
+
+[pitch, sideinfo] = extract_pitch(inputDir, wavFile, window_length);
 
 % pitch to CRP
 %%%%%%%%%%%%%%%
