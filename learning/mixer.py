@@ -8,6 +8,7 @@ to predict a single chord for the entire example.
 from itertools import chain, izip, repeat, imap
 from scipy import stats
 import numpy as np
+import pickle
 
 def flatten_labels(examples, labels):
     """
@@ -61,6 +62,9 @@ class Mixer(object):
 
         """
         return np.mean(np.equal(self.predict(examples), labels))
+
+    def save(self, name):
+        pickle.dump(self, open("./trained/" + name, "w+"));
 
 def middle_frame(examples):
     """
