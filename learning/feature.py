@@ -9,6 +9,10 @@ import os
 
 import ipc
 
+import numpy as np
+import scipy.stats
+
+
 def load_matlab():
     """
     Imports and starts matlab bridge if not started.
@@ -34,8 +38,6 @@ def fetch_data(command):
     except MatlabError as e:
         return "Error: %s" %(str(e))
 
-import numpy as np
-import scipy.stats
 
 def get_chroma(path):
     """
@@ -51,14 +53,15 @@ def get_chroma(path):
 
     return data
 
-def filter_variance(data, level = 0.23):
+def filter_variance(data, level = 0.20):
     """
     Filter frames with low level of variance out.
 
     """
     dev = np.std(data, axis = 1);
     data = data[dev > level]
-    if((data.shape[0]) < 10) console.log('screwed up filter_variance');
+    if((data.shape[0]) < 10):
+        print 'screwed up filter_variance';
     return data;
 
 def split(data, n):
@@ -66,7 +69,7 @@ def split(data, n):
     Split data into groups of n (discard last if not multiple of n)
 
     """
-    return [data[i * n:(i + 1) * n] for i in xrange(len(data) / n)]
+    return [data[i * n:(i + 1) * n] for i in xrange(1, len(data) / n)]
 
 def combine_maxcount(data):
     """
