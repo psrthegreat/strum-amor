@@ -8,23 +8,27 @@ import scipy.io
 import re
 import chord
 
+features = {'chroma': 'f_chroma', 'crp': 'f_CRP'}
+
 class Dataset(object):
 
-    def __init__(self, directory, chords = True):
+    def __init__(self, directories, feature="chroma"):
         """
-        Initialize reader with the directory containing data files
+        Initialize reader with a LIST of directories containing data files
         and whether to read chord features or major/minor features.
 
-        """
-        self.path = directory
-        self.chords = chords
+        Available features are "chroma" and "crp"
 
-    def readFile(self, name, feature):
+        """
+        self.paths = directories
+        self.feature = features[feature]
+
+    def readFile(self, path, name, feature):
         """
         Reads data from file into numpy array.
 
         """
-        path = os.path.join(self.path, name)
+        path = os.path.join(path, name)
         if '.mat' in name:
             return self.readMAT(path, feature)
         elif '.csv' in name:
@@ -62,7 +66,7 @@ class Dataset(object):
         chordname = match.group(2).replace('sh', '#') + match.group(1)
         return chord.encode(chordname)
 
-    def loadList(self, filename, feature="f_chroma"):
+    def loadList(self, filename):
         """
         Reads a list of files and extracts the data and label for each file.
 
@@ -71,8 +75,9 @@ class Dataset(object):
         """
         examples = []
         labels   = []
-        with open(os.path.join(self.path, filename), "r") as f:
-            for line in f.read().splitlines():
-                examples.append(self.readFile(line, feature))
-                labels.append(self.getLabel(line))
+        for path in self.paths:
+            with open(os.path.join(path, filename), "r") as f:
+                for line in f.read().splitlines():
+                    examples.append(self.readFile(path, line, self.feature))
+                    labels.append(self.getLabel(line))
         return {"examples": examples, "labels" : labels}

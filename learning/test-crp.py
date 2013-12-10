@@ -5,9 +5,28 @@ import pylab as pl
 import numpy as np
 import sys
 
-sys.argv = ["train.py", "../features/output/Piano_1/crp", "f_CRP"]
-execfile("train.py")
-# # sys.argv = ["train.py", "../features/output/Violin/chroma", "f_chroma"]
+import feature as ft
+import data
+from model import *
+from mixer import *
+
+# sys.argv = ["train.py", "../features/output/Piano_1/crp", "f_CRP"]
+# execfile("train.py")
+dataDir = "../features/output/"
+instruments = ['Piano_1', 'Nylon_Gt.2']
+
+data_loader = data.Dataset([dataDir+instr+"/crp" for instr in instruments], "crp")
+trainData   = data_loader.loadList("train")
+ytrain = trainData['labels']
+xtrain = trainData['examples']
+
+data_loader = data.Dataset([dataDir+"Violin/crp"], "crp")
+testData    = data_loader.loadList("test")
+ytest  = testData['labels']
+xtest  = testData['examples']
+
+xtrain = ft.remove_neg(xtrain)
+xtest  = ft.remove_neg(xtest)
 # matFeatures = {"chroma":"f_chroma", "crp":"f_CRP"}
 # for i, instr in enumerate(["Piano_1", "Violin", "Nylon_Gt.2"]):
 #     for j, feature in enumerate(["chroma", "crp"]):
@@ -18,10 +37,6 @@ execfile("train.py")
 #         pl.plot(xtrain[0].T)
 
 model = SegmentHMM(HMMGaussian())
-xtrain = np.asarray(xtrain)
-xtrain[xtrain < 0] = 0
-xtest = np.asarray(xtest)
-xtest[xtest < 0] = 0
 model.train([xtrain], [ytrain])
 
 frames, labels = flatten_labels(xtest, ytest)

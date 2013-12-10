@@ -1,36 +1,53 @@
 #!/bin/bash
 
-if [[ -z $1 ]]; then
-	echo "Need to specify folder!"
-	exit 1
-fi
-
 split() {
+	# filter files with grep
 	grep=$(ls $1 | grep -P $2)
+	# split files into test and train groups
 	n=$(echo "$grep" | wc -l)
 	ntest=$((n * 3/10))
 	ntrain=$((n - ntest))
+	# shuffle files and append to list
 	ftest="${1}test"
 	ftrain="${1}train"
-	echo "$grep" | shuf | tee >(head -$ntest >> $ftest) | tail -$ntrain >> $ftrain
+	# echo "$grep" | shuf | tee >(head -$ntest >> $ftest) | tail -$ntrain >> $ftrain
+}
+
+generate_lists() {
+	ftest="${1}test"
+	ftrain="${1}train"
+	if [ -f $ftest ]; then
+		rm "$ftest"
+	fi
+	if [ -f $ftrain ]; then
+		rm "$ftrain"
+	fi
+	touch $ftest
+	touch $ftrain
+
+	# split for each key
+	keys="C Csh D Dsh E F Fsh G Gsh A Ash B"
+	for key in $keys; do
+		split $1 "${key}[0-9]"
+	done
+
+	# shuffle lists at the end
 	cat $ftest | shuf > $ftest
 	cat $ftrain | shuf > $ftrain
 }
 
-ftest="${1}test"
-ftrain="${1}train"
-if [ -f $ftest ]; then
-    rm "$ftest"
+if [[ -z $1 ]]; then
+	for instr in */; do
+		for dir in $instr*/; do
+			generate_lists $dir
+		done
+	done
 fi
-if [ -f $ftrain ]; then
-    rm "$ftrain"
-fi
-touch $ftest
-touch $ftrain
-keys="C Csh D Dsh E F Fsh G Gsh A Ash B"
-for key in $keys; do
-    split $1 "${key}[0-9]"
+
+for arg; do
+	generate_lists $arg
 done
+
 
 # echo $files | head
 # mkdir "${1}wav"
