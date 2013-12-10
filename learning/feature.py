@@ -35,6 +35,7 @@ def fetch_data(command):
         return "Error: %s" %(str(e))
 
 import numpy as np
+import scipy.stats
 
 def get_chroma(path):
     """
@@ -50,7 +51,7 @@ def get_chroma(path):
 
     return data
 
-def filter_variance(data, level = 0.01):
+def filter_variance(data, level = 0.20):
     """
     Filter frames with low level of variance out.
 
@@ -58,6 +59,12 @@ def filter_variance(data, level = 0.01):
     dev = np.std(data, axis = 1);
     data = data[dev > level]
     return data;
+
+def split(data, n):
+    return [data[i * n:(i + 1) * n] for i in xrange(len(data) / n)]
+
+def combine_maxcount(data):
+    return np.hstack(scipy.stats.mode(data, axis = 1)[0].squeeze())
 
 if '__main__' in __name__:    
     load_matlab()

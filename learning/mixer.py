@@ -45,7 +45,7 @@ class Mixer(object):
         subclasses. By default fits a flattened vector of all examples and labels.
 
         """
-        self.fit(*flatten_labels(examples, labels))
+        self.model.fit(*flatten_labels(examples, labels))
 
     def predict(self, examples):
         """
