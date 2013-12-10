@@ -34,5 +34,9 @@ if "__main__" in __name__ :
     xtrain = trainData['examples']
     ytest  = testData['labels']
     xtest  = testData['examples']
-
+    
+    xtrain = np.asarray(xtrain)
+    xtrain[xtrain < 0] = 0
+    xtest = np.asarray(xtest)
+    xtest[xtest < 0] = 0
     print "Data loaded."
