@@ -87,7 +87,8 @@ server.listen(app.get('port'));
 var io = require('socket.io').listen(server);
 
 io.sockets.on('connection', function(socket) {
-	socket.emit('ready');
+	console.log("hey! " + socket.id)
+	socket.emit('ready', "Yay");
 	socket.on('set nickname', function(name) {
 		socket.set('nickname', name, function() {
 			socket.emit('news', {
@@ -95,6 +96,9 @@ io.sockets.on('connection', function(socket) {
 			});
 		});
 	});
+	socket.on('disconnect', function () {
+    	console.log("left! " + socket.id)
+  	});
 
 	socket.on('msg', function() {
 		socket.get('nickname', function(err, name) {

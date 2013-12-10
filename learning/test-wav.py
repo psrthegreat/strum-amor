@@ -16,8 +16,8 @@ else:
 
 data = feature.get_crp(data)
 data = feature.replace_negative(data)
-test = feature.filter_variance(data, 0.18, True)
-tests = feature.split(test, 7)
+test = feature.filter_variance(data, 0.18, False)
+tests = feature.split(test, 9)
 
 model1 = HMM(pickle.load(open("../learning/trained/identityChroma", "r")));
 model2 = HMM(pickle.load(open("../learning/trained/uniformChroma", "r")));
@@ -29,7 +29,6 @@ for model in [model3, model4]:
 	#print tests.shape
 	outputseries = np.array(model.predict(tests)).ravel();
 	print map(decode, map(int, outputseries));
-	outputcomp = feature.filter_groups(outputseries, 3)
+	outputcomp = feature.filter_groups(outputseries, 5)
 	#outputcomp = list(imap(itemgetter(0), groupby(outputseries)))
 	print map(decode, map(int, outputcomp))
-	print
