@@ -27,9 +27,9 @@ for i=1:size(instruments,2)
         if strcmp(dirFileNames(n).name, 'files.txt')
             continue
         end
-        % chromaDir = strcat(instrOutputDir, 'chroma/', window_length, '/');
+        % chromaDir = strcat(instrOutputDir, 'chroma/', int2str(window_length), '/');
         % extract_chroma(instrInputDir, dirFileNames(n).name, 1, chromaDir, window_length);
-        crpDir = strcat(instrOutputDir, 'crp/', window_length, '/');
+        crpDir = strcat(instrOutputDir, 'crp/', int2str(window_length), '/');
         extract_crp(instrInputDir, dirFileNames(n).name, 1, crpDir, window_length);
     end
 end

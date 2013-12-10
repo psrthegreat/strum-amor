@@ -40,9 +40,11 @@ if [[ -z $1 ]]; then
 	for instr in */; do
 		echo $instr
 		for feat in $instr*/; do
-			for winlen in $feat*/; do
-				generate_lists $winlen
-			done
+			ls ${feat}?
+			# mv "${feat}?/" "${feat}44100/"
+			# for winlen in $feat*/; do
+			#     generate_lists $winlen
+			# done
 		done
 	done
 fi
