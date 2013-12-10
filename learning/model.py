@@ -109,8 +109,8 @@ class HMMGaussian(SKModel):
         covar = self.model.get_covar()
         #covar = np.tied(covar, np.identity(covar.shape[0]))
         n_components = len(np.unique(labels))
-        #transmat = np.zeros([n_components, n_components]) + 1.0/n_components
-        transmat = np.identity(n_components);
+        transmat = np.zeros([n_components, n_components]) + 1.0/n_components
+        #transmat = np.identity(n_components);
         params = {'n_components' : n_components,
                   'startprob' : [1.0/n_components] * n_components,
                   'transmat' : transmat,

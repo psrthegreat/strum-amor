@@ -36,7 +36,7 @@ def fetch_data(command):
     """
     dir, file = os.path.split(command)
     try:
-        return mlab.extract_chord_features(dir + "/", file, 0, "").T
+        return mlab.extract_chroma(dir + "/", file, 0, "").T
     except MatlabError as e:
         return "Error: %s" %(str(e))
 
@@ -55,7 +55,7 @@ def get_chroma(path):
 
     return data
 
-def filter_variance(data, level = 0.20):
+def filter_variance(data, level = 0.23):
     """
     Filter frames with low level of variance out.
 

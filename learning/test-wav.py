@@ -14,11 +14,16 @@ if len(sys.argv) < 2:
 else:
     data = sys.argv[1]
 
-model = HMM(pickle.load(open("../learning/trained/1train", "r")));
 test = feature.filter_variance(feature.get_chroma(data))
-tests = feature.split(test, 10)
-#print tests.shape
-outputseries = model.predict(tests)
-outputseries = feature.combine_maxcount(outputseries)
-outputcomp = list(imap(itemgetter(0), groupby(outputseries)))
-print map(decode, map(int, outputseries))
+tests = feature.split(test, 7)
+model1 = HMM(pickle.load(open("../learning/trained/1train", "r")));
+model2 = HMM(pickle.load(open("../learning/trained/2train", "r")));
+for model in [model1, model2]:
+	
+	#print tests.shape
+	outputseries = np.array(model.predict(tests)).ravel();
+	print map(decode, map(int, outputseries));
+	outputcomp = feature.filter_groups(outputseries, 3)
+	#outputcomp = list(imap(itemgetter(0), groupby(outputseries)))
+	print map(decode, map(int, outputcomp))
+	print
