@@ -34,9 +34,14 @@ def fetch_data(command):
     Fetches data based on command received by client.
 
     """
-    dir, file = os.path.split(command)
+    typ, path = command
+    dir, file = os.path.split(path)
+    arguments = (dir + "/", file)
     try:
-        return mlab.extract_chord_features(dir + "/", file, 0, "").T
+        if typ == "chroma":
+            return mlab.extract_chroma(*arguments).T
+        if typ == "crp":
+            return mlab.extract_crp(*arguments).T
     except MatlabError as e:
         return "Error: %s" %(str(e))
 
@@ -46,14 +51,15 @@ def get_chroma(path):
     Extract chroma.
 
     """
-    connection = ipc.get_client()
+    return ipc.get_response(("chroma", os.path.abspath(path)))
 
-    connection.send(os.path.abspath(path))
+def get_crp(path):
+    """
+    Extract crp.
 
-    data = connection.recv()
-    connection.close()
+    """
+    return ipc.get_response(("crp", os.path.abspath(path)))
 
-    return data
 
 def filter_variance(data, level = 0.20):
     """
@@ -98,7 +104,7 @@ def filter_groups(data, mingroup):
     return list(itertools.imap(operator.itemgetter(0),
                                itertools.groupby(gfilt)))
 
-if '__main__' in __name__:    
+if '__main__' in __name__:
     load_matlab()
     ipc.run_server(fetch_data)
 
