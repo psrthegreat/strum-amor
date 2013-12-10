@@ -28,6 +28,14 @@ Checkpoint 4
 implement silence vs not to determine silence. Also hmm there
 -Figured out way to preprocess data to handle silence.
 
+Checkpoint 5
+- simple preprocessing browser side to discard small decibel noises.
+- preprocessing to filter out small variance frames
+- hidden markov model on 0.7s length windows.
+- Grouping by minimum of 3 adjacent predictions
+
+- built crp features
+
 Notes
 - Used mfcc as baseline. Have performed well in other music analysis tasks.
 - using different window sizes

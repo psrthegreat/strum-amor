@@ -16,8 +16,8 @@ else:
 
 test = feature.filter_variance(feature.get_chroma(data))
 tests = feature.split(test, 7)
-model1 = HMM(pickle.load(open("../learning/trained/1train", "r")));
-model2 = HMM(pickle.load(open("../learning/trained/2train", "r")));
+model1 = HMM(pickle.load(open("../learning/trained/identityChroma", "r")));
+model2 = HMM(pickle.load(open("../learning/trained/uniformChroma", "r")));
 for model in [model1, model2]:
 	
 	#print tests.shape

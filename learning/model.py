@@ -100,7 +100,7 @@ class HMMGaussian(SKModel):
             model = LDA()
         self.model = model
 
-    #dont remove the uncommented lines
+    #dont remove the commented lines
     def fit(self, frames, labels):
         # train LDA for means, covariance.
         self.model.fit(frames, labels, store_covariance = True)
