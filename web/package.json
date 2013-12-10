@@ -13,6 +13,7 @@
     "mongodb": "*",
     "mongoose" : "*",
     "connect-mongo" : "*",
-    "nodemailer" : "*"
+    "nodemailer" : "*",
+    "binaryjs": "*"
   }
 }
