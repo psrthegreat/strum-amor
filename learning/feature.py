@@ -5,6 +5,8 @@ Run as script to start server. Import and use extraction methods
 as clients.
 
 """
+import itertools
+import operator
 import os
 
 import ipc
@@ -58,7 +60,8 @@ def filter_variance(data, level = 0.23):
     """
     dev = np.std(data, axis = 1);
     data = data[dev > level]
-    if((data.shape[0]) < 10) console.log('screwed up filter_variance');
+    if data.shape[0] < 10:
+        print "bad filter variance", data.shape
     return data;
 
 def split(data, n):
@@ -68,12 +71,30 @@ def split(data, n):
     """
     return [data[i * n:(i + 1) * n] for i in xrange(len(data) / n)]
 
+def combine_concat(data):
+    """
+    Take predictions for each frame and make one flattened list.
+
+    """
+    return np.hstack(data)
+
 def combine_maxcount(data):
     """
     Take mode of each frame and combine into one list.
 
     """
     return np.hstack(scipy.stats.mode(data, axis = 1)[0].squeeze())
+
+def filter_groups(data, mingroup):
+    """
+    Collapse groups, discarding less than mingroup size.
+
+    """
+    gdata = [(elem, len(list(repeats))) for elem, repeats in
+             itertools.groupby(data)]
+    gfilt = [elem for elem, num in gdata if num >= mingroup]
+    return list(itertools.imap(operator.itemgetter(0),
+                               itertools.groupby(gfilt)))
 
 if '__main__' in __name__:    
     load_matlab()
