@@ -1,3 +1,4 @@
+var audioContext = new AudioContext();
 window.URL = window.URL || window.webkitURL;
 navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -30,6 +31,22 @@ function stopRecording() {
 		$("#save").attr("download", "test1.wav");
 	});
 }
+
+function toggleRecording(){
+    if(e.classList.contains("recording")){
+        audioRecorder.stop();
+        e.classList.remove("recording");
+        //save wav
+    else{
+        //start recording
+        if (!recorder) return;
+        e.classList.add("recording");
+        recorder.clear();
+        recorder.record();
+    }
+}
+
+function initAudio(){
 
 $(document).ready(function() {
 	$("#stop").hide();
