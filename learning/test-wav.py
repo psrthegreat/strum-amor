@@ -14,14 +14,17 @@ if len(sys.argv) < 2:
 else:
     data = sys.argv[1]
 
-test = feature.remove_neg(test)
-test = feature.filter_variance(feature.get_chroma(data))
+data = feature.get_crp(data)
+data = feature.remove_neg(data)
+test = feature.filter_variance(data, 0.18)
 tests = feature.split(test, 7)
+
 model1 = HMM(pickle.load(open("../learning/trained/identityChroma", "r")));
 model2 = HMM(pickle.load(open("../learning/trained/uniformChroma", "r")));
 model3 = HMM(pickle.load(open("../learning/trained/uniformcrp", "r")));
+model4 = HMM(pickle.load(open("../learning/trained/identitycrp", "r")));
 
-for model in [model2, model3]:
+for model in [model3, model4]:
 	
 	#print tests.shape
 	outputseries = np.array(model.predict(tests)).ravel();

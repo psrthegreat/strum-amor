@@ -13,7 +13,7 @@ import ipc
 
 import numpy as np
 import scipy.stats
-
+import matplotlib.pyplot as plt
 
 def load_matlab():
     """
@@ -67,6 +67,8 @@ def filter_variance(data, level = 0.23):
 
     """
     dev = np.std(data, axis = 1);
+    plt.plot(dev)
+    plt.show()
     data = data[dev > level]
     if data.shape[0] < 10:
         print "bad filter variance", data.shape
@@ -105,7 +107,9 @@ def filter_groups(data, mingroup):
                                itertools.groupby(gfilt)))
 
 def remove_neg(data):
-    return np.array(data)[data <0] =0
+    data = np.array(data)
+    data[data < 0 ] = 0
+    return data
 
 if '__main__' in __name__:
     load_matlab()

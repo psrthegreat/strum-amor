@@ -39,6 +39,8 @@ Checkpoint 5
 Checkpoint 6
 - got 98% test accuracy with CRP features, training on multiple instruments
   (piano, violin, guitar)
+- works really well for live recognition
+
 
 Notes
 - Used mfcc as baseline. Have performed well in other music analysis tasks.
