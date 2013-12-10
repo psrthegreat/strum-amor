@@ -41,6 +41,7 @@ class HMMPredictor(object):
                  feature_type     = "chroma",
                  model_path       = "../learning/trained/identityChroma",
                  variance_filter  = None,
+                 plot_variance    = False,
                  frame_split      = None,
                  group_filter     = None,
                  max_count_filter = False):
@@ -56,12 +57,14 @@ class HMMPredictor(object):
 
         """
         self.mixer            = None
+        self.model            = None
         self.feature_type     = feature_type
         self.model_path       = model_path
         self.variance_filter  = variance_filter
         self.frame_split      = frame_split
         self.group_filter     = group_filter
         self.max_count_filter = max_count_filter
+        self.plot_variance    = plot_variance
 
     @property
     def model_path(self):
@@ -92,7 +95,8 @@ class HMMPredictor(object):
 
         """
         if self.variance_filter is not None:
-            self._filtered_feat = feature.filter_variance(self._features, self.variance_filter)
+            self._filtered_feat = feature.filter_variance(self._features, self.variance_filter,
+                                                          self.plot_variance)
         else:
             self._filtered_feat = self._features
 
@@ -156,11 +160,29 @@ if "__main__" in __name__:
 
     # same as model = default_crp()
     model = HMMPredictor(feature_type    = "crp",
-                        model_path      = "../learning/trained/identitycrp",
-                        variance_filter = 0.18,
-                        frame_split     = 7,
-                        group_filter    = 3)
+                         model_path      = "../learning/trained/identitycrp",
+                         variance_filter = 0.18,
+                         plot_variance   = False,
+                         frame_split     = 7,
+                         group_filter    = 3)
     
     predictions = model.run(input_file)
+
+    # parameters can be changed here and parts of the model rerun.
+    #
+    # update number of frames to group:
+    #
+    # predictions.frame_split = 7
+    # predictions.process_features()
+    # predictions.predict()
+    # 
+    # update group filter:
+    #
+    # predictions.group_filter = 5
+    # predictions.predict()
+
+    # can look at these for debugging:
+    # _raw_predictions    = model._predictions
+    # _merged_predictions = model._combined_predict
 
     print map(chord.decode, map(int, predictions))
