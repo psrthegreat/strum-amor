@@ -3,13 +3,13 @@ inputDir = '../../wav-files/Scc1t2_';
 outputDir = '../output/';
 
 for i=1:size(instruments,2)
-	instrDir = strcat(inputDir, instruments{i});
-    dirFileNames = dir(instrDir);
+    instrInputDir = strcat(inputDir, instruments{i}, '/');
+    instrOutputDir = strcat(outputDir, instruments{i}, '/');
+    dirFileNames = dir(instrInputDir);
     for n=3:size(dirFileNames,1)
         if strcmp(dirFileNames(n).name, 'files.txt')
             continue
         end
-        outputDir = strcat(outputDir, instruments{i}, '/')
-        extract_chord_features(instrDir, dirFilenames(n).name, 1, outputDir)
+        extract_chord_features(instrInputDir, dirFileNames(n).name, 1, instrOutputDir)
     end
 end
