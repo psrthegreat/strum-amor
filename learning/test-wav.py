@@ -19,7 +19,7 @@ model = pickle.load(open("./trained/1train", "r"));
 print "Extracting features.."
 testex = feature.get_chroma(data);
 print "Predicting.."
-outputseries = model.predict(testex);
+outputseries = model.predict([testex]);
 print "Results:"
 outputcomp = list(imap(itemgetter(0), groupby(outputseries)));
 print outputcomp
