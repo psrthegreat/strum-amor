@@ -63,9 +63,6 @@ class Mixer(object):
         """
         return np.mean(np.equal(self.predict(examples), labels))
 
-    def save(self, name):
-        pickle.dump(self, open("./trained/" + name, "w+"));
-
 def middle_frame(examples):
     """
     Extracts the middle element of each array in a list of arrays.

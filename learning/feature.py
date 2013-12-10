@@ -34,6 +34,8 @@ def fetch_data(command):
     except MatlabError as e:
         return "Error: %s" %(str(e))
 
+import numpy as np
+
 def get_chroma(path):
     """
     Extract chroma.
@@ -47,6 +49,15 @@ def get_chroma(path):
     connection.close()
 
     return data
+
+def filter_variance(data, level = 0.01):
+    """
+    Filter frames with low level of variance out.
+
+    """
+    dev = np.std(data, axis = 1);
+    data = data[dev > level]
+    return data;
 
 if '__main__' in __name__:    
     load_matlab()
