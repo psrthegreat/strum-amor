@@ -3,6 +3,7 @@ import pickle
 import sys
 from itertools import imap, groupby
 from operator import itemgetter
+from chord import *
 
 import feature
 
@@ -12,14 +13,15 @@ else:
     data = sys.argv[1]
 
 #load a trained model
-print "Loading model.."
-model = pickle.load(open("./trained/1train", "r"));
+#print "Loading model.."
+model = pickle.load(open("../learning/trained/1train", "r"));
 
 #extract features
-print "Extracting features.."
+#print "Extracting features.."
 testex = feature.get_chroma(data);
-print "Predicting.."
-outputseries = model.predict([testex]);
-print "Results:"
+#print "Predicting.."
+
+outputseries = model.predict(testex.T);
+#print "Results:"
 outputcomp = list(imap(itemgetter(0), groupby(outputseries)));
-print outputcomp
+print map(decode, outputcomp)

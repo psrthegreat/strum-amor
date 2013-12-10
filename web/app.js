@@ -55,7 +55,7 @@ app.post('/main', function(req, res){
 	var buf = new Buffer(str, 'base64'); // Ta-da
 	fs.writeFile("hello.wav", buf, function(err){
         if(err) res.send(500, { error: 'something blew up' })
-        var child = exec("pwd", function (error, stdout, stderr) {
+        var child = exec("./recog", function (error, stdout, stderr) {
 			console.log('stdout: ' + stdout);
 			res.send(stdout);
 		});

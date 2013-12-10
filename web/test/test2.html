@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+        <title>Web Audio API createMediaSourceElement() Example</title>
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <aside>
+            <div id="myaudio"></div>
+        </aside>
+        <section>
+            <div>
+                <canvas id="fft" class="fft" width="300" height="200"></canvas>
+            </div>
+            <h2 id="current-time"></h2>
+        </section>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>
+            window.jQuery || document.write('<script src="jquery-1.9.1.min.js"><\/script>')
+        </script>
+        <script type="text/javascript" src="dat.gui.min.js"></script>
+        <script>
+
+
+            //drawing the canvas
+            var canvas = document.getElementById('fft');
+            var ctx = canvas.getContext('2d');
+            canvas.width = 1000;
+            const CANVAS_HEIGHT = canvas.height;
+            const CANVAS_WIDTH = canvas.width;
+
+            //creating the audio component
+            window.audio = new Audio();
+            audio.src = 'http://a88.phobos.apple.com/us/r1000/059/Music6/v4/4e/94/6d/4e946da9-6bff-357a-cd2b-2065287bde94/mzaf_2895795412084472233.plus.aac.p.m4a'
+            audio.controls = true;
+            //audio.autoplay = true;
+
+            //updating time window. Dependent on audio
+            var currenTimeNode = document.querySelector('#current-time');
+            audio.addEventListener('timeupdate', function(e) {
+                var currTime = audio.currentTime;
+                currenTimeNode.textContent = parseInt(currTime / 60) + ':' + parseInt(currTime % 60);
+            }, false);
+
+
+            document.querySelector('#myaudio').appendChild(audio);
+            (function() {
+                var lastTime = 0;
+                var vendors = ['ms', 'moz', 'webkit', 'o'];
+                for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+                    window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+                    window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+                }
+
+                if (!window.requestAnimationFrame)
+                    window.requestAnimationFrame = function(callback, element) {
+                        var currTime = new Date().getTime();
+                        var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                        var id = window.setTimeout(function() {
+                            callback(currTime + timeToCall);
+                        }, timeToCall);
+                        lastTime = currTime + timeToCall;
+                        return id;
+                    };
+
+                if (!window.cancelAnimationFrame)
+                    window.cancelAnimationFrame = function(id) {
+                        clearTimeout(id);
+                    };
+
+                var interval = 1000 / 60;
+                var context = new webkitAudioContext();
+                var analyser = context.createAnalyser();
+
+                // Fill with gradient
+                function rafCallback() {
+                    setTimeout(function() {
+                        window.requestAnimationFrame(rafCallback);
+                        var freqByteData = new Uint8Array(analyser.frequencyBinCount);
+                        analyser.getByteFrequencyData(freqByteData);
+                        var SPACER_WIDTH = 45;
+                        var BAR_WIDTH = 40;
+                        var OFFSET = 60;
+                        var CUTOFF = 1000;
+                        var numBars = Math.round(20);
+                        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                        ctx.fillStyle = '#ff2525';
+                        ctx.lineCap = 'round';
+                        var grd = ctx.createLinearGradient(0, 0, 1200, 0);
+                        grd.addColorStop(0, "#ff2525");
+                        grd.addColorStop(1, "white");
+                        ctx.fillStyle = grd;
+                        for (var i = 0; i < numBars; ++i) {
+                            var magnitude = freqByteData[i + OFFSET];
+                            ctx.fillRect(i * SPACER_WIDTH, CANVAS_HEIGHT, BAR_WIDTH, -magnitude);
+                        }
+                    }, 0);
+                }
+
+                //create the media element
+                function onLoad(e) {
+                    var source = context.createMediaElementSource(audio);
+                    source.connect(analyser);
+                    analyser.connect(context.destination);
+                    rafCallback();
+                }
+
+                function gotStream(stream) {
+                    var source = context.createMediaStreamSource(stream);
+                    console.log("min decibels:" + analyser.minDecibels);
+                    analyser.minDecibels = -70;
+                    analyser.smoothingTimeConstant = 0.89;
+                    source.connect(analyser);
+                    analyser.connect(context.destination);
+                    rafCallback();
+                }
+
+                //init of audio
+                function initAudio() {
+                    if (!navigator.webkitGetUserMedia)
+                        return (alert("Error: getUserMedia not supported!"));
+
+                    navigator.webkitGetUserMedia({
+                        audio : true
+                    }, gotStream, function(e) {
+                        alert('Error getting audio');
+                        console.log(e);
+                    });
+                }
+
+                // Need window.onload to fire first. See crbug.com/112368.
+                window.addEventListener('load', initAudio, false);
+            })();
+
+            var text = new function(){
+            this.xtranslate = -500;
+            this.xrotate = -5;
+            this.yrotate = 76;
+            };
+
+            function changeCSS() {
+                $('#fft').css("-webkit-transform", "translateY(-200px) translateX(" + text.xtranslate + "px) rotateX(" + text.xrotate + "deg) rotateY(" + text.yrotate + "deg)");
+                // render using requestAnimationFrame
+            }
+            var gui = new dat.GUI();
+
+            gui.add(text, 'xtranslate', -500, 500).onChange(function(newValue) {
+                text.xtranslate = newValue;
+                changeCSS();
+            });
+            ;
+            gui.add(text, 'xrotate', -100, 100).onChange(function(newValue) {
+                text.xrotate = newValue;
+                changeCSS();
+            });
+            ;
+            gui.add(text, 'yrotate', -100, 100).onChange(function(newValue) {
+                text.yrotate = newValue;
+                changeCSS();
+            });
+            changeCSS();
+
+        </script>
+    </body>
+</html>

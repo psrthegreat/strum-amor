@@ -11,6 +11,7 @@ import sklearn.svm
 import sklearn.linear_model
 import sklearn.lda
 import sklearn.hmm
+import pickle
 
 class SKModel(object):
     def __init__(self, skclass, **params):
@@ -40,6 +41,13 @@ class SKModel(object):
 
         """
         return self.skmodel.score(frames, labels)
+
+    def save(self, name):
+        """
+        Pickle dumps the model
+
+        """
+        pickle.dump(self, open("./trained/" + name, "w+"));
 
 class SVM(SKModel):
     """
