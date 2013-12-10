@@ -36,6 +36,7 @@ if "__main__" in __name__ :
     ytest  = testData['labels']
     xtest  = testData['examples']
 
-    xtrain = remove_neg(xtrain)
-    xtest = remove_neg(xtest)
+    xtrain = replace_negative(xtrain)
+    xtest = replace_negative(xtest)
+
     print "Data loaded."

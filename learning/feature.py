@@ -13,7 +13,6 @@ import ipc
 
 import numpy as np
 import scipy.stats
-import matplotlib.pyplot as plt
 
 def load_matlab():
     """
@@ -35,49 +34,50 @@ def fetch_data(command):
 
     """
     typ, path = command
+
     dir, file = os.path.split(path)
-    arguments = (dir + "/", file)
+    arguments = [dir + "/", file]
+
+    if len(command) >= 3:
+        arguments.extend([0, '', command[3]])
+
     try:
         if typ == "chroma":
             return mlab.extract_chroma(*arguments).T
+
         if typ == "crp":
             return mlab.extract_crp(*arguments).T
-    except MatlabError as e:
+
+    except (AttributeError, MatlabError) as e:
         return "Error: %s" %(str(e))
 
 
-def get_chroma(path):
+def get_chroma(path, window_length = None):
     """
     Extract chroma.
 
     """
-    return ipc.get_response(("chroma", os.path.abspath(path)))
+    commands = ["chroma", os.path.abspath(path)]
+    if window_length is not None:
+        commands.append(window_length)
+    return ipc.get_response(commands) 
 
-def get_crp(path):
+def get_crp(path, window_length = None):
     """
     Extract crp.
 
     """
-    return ipc.get_response(("crp", os.path.abspath(path)))
-
-
-def filter_variance(data, level = 0.23):
-    """
-    Filter frames with low level of variance out.
-
-    """
-    dev = np.std(data, axis = 1);
-    data = data[dev > level]
-    if data.shape[0] < 10:
-        print "bad filter variance", data.shape
-    return data;
+    commands = ["crp", os.path.abspath(path)]
+    if window_length is not None:
+        commands.append(window_length)
+    return ipc.get_response(commands) 
 
 def split(data, n):
     """
-    Split data into groups of n (discard last if not multiple of n)
+    Split data into groups of n by first dimension (discard last group if not a multiple of n)
 
     """
-    return [data[i * n:(i + 1) * n] for i in xrange(1, len(data) / n)]
+    return [data[i * n:(i + 1) * n] for i in xrange(len(data) / n)]
 
 def combine_concat(data):
     """
@@ -93,20 +93,47 @@ def combine_maxcount(data):
     """
     return np.hstack(scipy.stats.mode(data, axis = 1)[0].squeeze())
 
+def filter_variance(data, level = 0.23, plot = False):
+    """
+    Filter frames with low level of variance out.
+
+    0.23 Chroma
+    0.18 CRP
+
+    """
+    data = np.asarray(data)
+    dev  = np.std(data, axis = 1);
+
+    if plot:
+        import matplotlib.pyplot as plt
+        plt.plot(dev)
+        plt.show()
+
+    filtered = data[dev > level]
+
+    if filtered.shape[0] < 10:
+        level = np.mean(dev)
+        print "bad filter variance, fallback to", level
+        filtered = data[dev > level]
+
+    return filtered
+
 def filter_groups(data, mingroup):
     """
     Collapse groups, discarding less than mingroup size.
 
     """
-    gdata = [(elem, len(list(repeats))) for elem, repeats in
-             itertools.groupby(data)]
-    gfilt = [elem for elem, num in gdata if num >= mingroup]
-    return list(itertools.imap(operator.itemgetter(0),
-                               itertools.groupby(gfilt)))
+    filtered = [elem for elem, repeats in itertools.groupby(data)
+                if len(list(repeats)) >= mingroup]
+    return [elem for elem, group in itertools.groupby(filtered)]
 
-def remove_neg(data):
-    data = np.array(data)
-    data[data < 0 ] = 0
+def replace_negative(data, value = 0):
+    """
+    Replaces values less than 0 with value (default 0).
+
+    """
+    data = np.asarray(data)
+    data[data < 0 ] = value
     return data
 
 if '__main__' in __name__:

@@ -100,7 +100,6 @@ class HMMGaussian(SKModel):
             model = LDA()
         self.model = model
 
-    #dont remove the commented lines
     def fit(self, frames, labels):
         # train LDA for means, covariance.
         self.model.fit(frames, labels, store_covariance = True)
@@ -121,8 +120,6 @@ class HMMGaussian(SKModel):
                   'params' : ''
         }
         self.skmodel = sklearn.hmm.GaussianHMM(**params)
-        #print frames[1,:].shape
-        #self.skmodel.fit([frames]);
         # set means, covariances
         self.skmodel.means_ = means
         #print means
@@ -134,4 +131,3 @@ class HMMGaussian(SKModel):
         #self.skmodel.covars_ = np.array([np.diag(covar)]* n_components)
         #spherical - 91.5
         #self.skmodel.covars_ = (np.ones(n_components) * np.mean(np.diag(covar))).reshape(-1, 1)
-        #print self.skmodel.covars_
