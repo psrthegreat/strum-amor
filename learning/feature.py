@@ -67,8 +67,6 @@ def filter_variance(data, level = 0.23):
 
     """
     dev = np.std(data, axis = 1);
-    plt.plot(dev)
-    plt.show()
     data = data[dev > level]
     if data.shape[0] < 10:
         print "bad filter variance", data.shape

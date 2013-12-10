@@ -42,7 +42,7 @@ app.use(app.router);
 
 //Logins
 app.get('/main', function(req, res){
-	 res.render('main');
+	 res.render('new');
 });
 
 app.get('/', function(req, res) {
@@ -52,7 +52,7 @@ app.get('/', function(req, res) {
 //get predictions
 app.post('/main', function(req, res){
 	var str = req.body.data.split(",")[1]
-	var buf = new Buffer(str, 'base64'); // Ta-da
+	var buf = new Buffer(str, 'base64');
 	fs.writeFile("hello.wav", buf, function(err){
         if(err) res.send(500, { error: 'something blew up' })
         var child = exec("./recog", function (error, stdout, stderr) {
