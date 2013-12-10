@@ -23,6 +23,11 @@ instrument. Seeing tied covariances performs better than spherical and diagonal.
 -Timbre invariant features taking mfcc inverse.
 -confusion matrices
 
+Checkpoint 4
+-Figured out needed to do well on silence. Getting silence wrong. Decided to
+implement silence vs not to determine silence. Also hmm there
+-Figured out way to preprocess data to handle silence.
+
 Notes
 - Used mfcc as baseline. Have performed well in other music analysis tasks.
 - using different window sizes

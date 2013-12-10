@@ -50,15 +50,18 @@ def get_chroma(path):
 
     return data
 
-def filter_variance(data, level = 0.01):
+def filter_variance(data, level = 0.23):
     """
     Filter frames with low level of variance out.
 
     """
     dev = np.std(data, axis = 1);
     data = data[dev > level]
+    if((data.shape[0]) < 10) console.log('screwed up filter_variance');
     return data;
+
 
 if '__main__' in __name__:    
     load_matlab()
     ipc.run_server(fetch_data)
+
