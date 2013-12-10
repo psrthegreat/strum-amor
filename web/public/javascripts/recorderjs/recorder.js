@@ -65,7 +65,6 @@
 
     worker.onmessage = function(e){
       var blob = e.data;
-      console.log(blob);
       currCallback(blob);
     }
 
