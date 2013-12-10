@@ -1,6 +1,10 @@
 import os
 
 from mlabwrap import mlab
+from mlabraw import error as MatlabError
+
+mlab.addpath(os.path.dirname(__file__))
+
 from multiprocessing.connection import Listener, AuthenticationError
 
 address = ('localhost', 7000)
@@ -14,20 +18,34 @@ while True:
         continue
     print "Connection accepted from", listener.last_accepted
 
-    path = connection.recv()
+    try:
+        path = connection.recv()
+    except IOError as e:
+        print "Connection receive error: %s" %(str(e))
+        continue
 
-    print "Received path", path
+    if path == "quit" or path == "exit":
+        print "Received exit command."
+        try:
+            connection.send("Exited server.")
+        finally:
+            connection.close()
+            break
 
-    if path == "quit":
-        connection.close()
-        break
-    
+    print "Received path", path    
     dir, file = os.path.split(path)
-    data = mlab.extract_chord_features(dir + "/", file)
 
-    connection.send(data)
+    try:
+        data = mlab.extract_chord_features(dir + "/", file, 0, "")
+    except MatlabError as e:
+        data = "Error: %s" %(str(e))
+
+    try:
+        connection.send(data)
+    except IOError as e:
+        "Connection send error: %s" %(str(e))
+
     connection.close()
-
     print "Connection closed."
 
 listener.close()
