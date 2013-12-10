@@ -1,20 +1,20 @@
 #!/bin/bash
 
 if [[ -z $1 ]]; then
-    echo "Need to specify folder!"
-    exit 1
+	echo "Need to specify folder!"
+	exit 1
 fi
 
 split() {
-    grep=$(ls $1 | grep -P $2)
-    n=$(echo "$grep" | wc -l)
-    ntest=$((n * 3/10))
-    ntrain=$((n - ntest))
-    ftest="${1}test"
-    ftrain="${1}train"
-    echo "$grep" | shuf | tee >(head -$ntest >> $ftest) | tail -$ntrain >> $ftrain
-    cat $ftest | shuf > $ftest
-    cat $ftrain | shuf > $ftrain
+	grep=$(ls $1 | grep -P $2)
+	n=$(echo "$grep" | wc -l)
+	ntest=$((n * 3/10))
+	ntrain=$((n - ntest))
+	ftest="${1}test"
+	ftrain="${1}train"
+	echo "$grep" | shuf | tee >(head -$ntest >> $ftest) | tail -$ntrain >> $ftrain
+	cat $ftest | shuf > $ftest
+	cat $ftrain | shuf > $ftrain
 }
 
 ftest="${1}test"
@@ -25,6 +25,8 @@ fi
 if [ -f $ftrain ]; then
     rm "$ftrain"
 fi
+touch $ftest
+touch $ftrain
 keys="C Csh D Dsh E F Fsh G Gsh A Ash B"
 for key in $keys; do
     split $1 "${key}[0-9]"
