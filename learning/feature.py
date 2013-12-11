@@ -106,7 +106,6 @@ def filter_variance(data, level = None, plot = False):
     if(level is None):
         level = np.mean(dev)
 
-
     if plot:
         import matplotlib.pyplot as plt
         plt.plot(dev)
@@ -114,8 +113,9 @@ def filter_variance(data, level = None, plot = False):
 
     filtered = data[dev > level]
 
-    if filtered.shape[0] < 10:
-        filtered = data
+    if filtered.shape[0] < 2:
+        level = np.mean(dev)
+        filtered = data[dev > level]
 
     return filtered
 
