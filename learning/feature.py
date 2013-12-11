@@ -9,6 +9,7 @@ import itertools
 import operator
 import os
 
+import audio
 import ipc
 
 import numpy as np
@@ -25,49 +26,49 @@ def load_matlab():
     from mlabwrap import mlab
     from mlabraw import error as MatlabError
 
-    mlab.addpath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "features/matlab-chroma-toolbox"))
-
+    abspath = os.path.abspath(__file__)
+    features = os.path.join(os.path.dirname(os.path.dirname(abspath)),
+                            "features")
+    toolbox = os.path.join(features, "matlab-chroma-toolbox")
+    mlab.addpath(toolbox)
 
 def fetch_data(command):
     """
     Fetches data based on command received by client.
 
     """
-    typ, path = command
-
-    dir, file = os.path.split(path)
-    arguments = [dir + "/", file]
-
-    if len(command) >= 3:
-        arguments.extend([0, '', command[3]])
+    typ = command[0]
+    arguments = command[1:]
 
     try:
         if typ == "chroma":
-            return mlab.extract_chroma(*arguments).T
+            return mlab.extract_chroma_direct(*arguments).T
 
         if typ == "crp":
-            return mlab.extract_crp(*arguments).T
+            return mlab.extract_crp_direct(*arguments).T
 
-    except (AttributeError, MatlabError) as e:
+    except (AttributeError, ValueError, SystemError, MatlabError) as e:
         return "Error: %s" %(str(e))
 
 
-def get_chroma(path, window_length = None):
+def get_chroma(filestr, window_length = None):
     """
     Extract chroma.
 
     """
-    commands = ["chroma", os.path.abspath(path)]
+    data, info = audio.load_wav(filestr)
+    commands = ["chroma", data, info['fs']]
     if window_length is not None:
         commands.append(window_length)
     return ipc.get_response(commands) 
 
-def get_crp(path, window_length = None):
+def get_crp(filestr, window_length = None):
     """
     Extract crp.
 
     """
-    commands = ["crp", os.path.abspath(path)]
+    data, info = audio.load_wav(filestr)
+    commands = ["crp", data, info['fs']]
     if window_length is not None:
         commands.append(window_length)
     return ipc.get_response(commands) 
