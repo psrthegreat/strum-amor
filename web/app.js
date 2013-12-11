@@ -111,29 +111,28 @@ io.sockets.on('connection', function(socket) {
 				if(data == undefined) return;
 				var str = data.split(",")[1]
 				var buf = new Buffer(str, 'base64');
-
+				
 				/* without file--doesn't work yet.
 				var child = spawn('python', ['-u', '../learning/predict.py']);
 				child.stdin.write(str, 'base64', function(){
 					child.stdin.end();
 				});
 				child.stdout.on('data', function(data){
-				    console.log(data.toString('utf8'))
-				    socket.volatile.emit('res', data)	
+					console.log(data.toString('utf8'))
+					socket.volatile.emit('res', data)	
 				});
 				child.stderr.on('data', function(data){
 				    console.log(data.toString('utf8'));
-				});*/
-
+				});
+				*/
 				prefix = "./clientwavs/"
 				name = id + count + ".wav"
 				file = prefix + name
 				fs.writeFile(file, buf, function(err) {
 					if (err) socket.emit('res', 'something blew up')
 					var child = exec("python ../learning/predict.py " + file, function(error, stdout, stderr) {
-						if(stdout != "[]\n"){
-							socket.emit('res', stdout)
-						}
+						console.log(stderr.toString('utf8'));
+						socket.emit('res', stdout)
 					});
 				});
 			});
