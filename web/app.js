@@ -116,8 +116,8 @@ io.sockets.on('connection', function(socket) {
 				fs.writeFile(file, buf, function(err) {
 					if (err) socket.emit('res', 'something blew up')
 					var child = exec("python ../learning/test-wav.py " + file, function(error, stdout, stderr) {
-						if(stdout != "[]"){
-							socket.emit('res', stdout)
+						if(stdout != "[]\n"){
+							socket.volatile.emit('res', stdout)
 						}
 					});
 				});
