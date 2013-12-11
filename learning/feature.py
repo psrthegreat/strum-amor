@@ -113,11 +113,6 @@ def filter_variance(data, level = None, plot = False):
         plt.show()
 
     filtered = data[dev > level]
-
-    if filtered.shape[0] < 2:
-        level = np.mean(dev)
-        filtered = data[dev > level]
-
     return filtered
 
 def filter_groups(data, mingroup):

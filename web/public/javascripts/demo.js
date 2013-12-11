@@ -46,12 +46,13 @@ function rafCallback() {
 		window.requestAnimationFrame(rafCallback);
 		var freqByteData = new Uint8Array(analyser2.frequencyBinCount);
 		analyser2.getByteFrequencyData(freqByteData);
-		var SPACER_WIDTH = 50;
-		var BAR_WIDTH = 40;
-		var OFFSET = 60;
+		var SPACER_WIDTH = 15;
+		var BAR_WIDTH = 2;
+		var OFFSET = 12;
 		var CUTOFF = 1000;
-		var numBars = Math.round(CANVAS_WIDTH/(BAR_WIDTH));
-		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+		var MOVE_UP = -100;
+		var numBars = Math.round(CANVAS_WIDTH/SPACER_WIDTH);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.fillStyle = '#ff2525';
 		ctx.lineCap = 'round';
 		var grd = ctx.createLinearGradient(0, 0, 1200, 0);
@@ -60,8 +61,8 @@ function rafCallback() {
 		ctx.fillStyle = grd;
 
 		for (var i = 0; i < numBars; ++i) {
-			var magnitude = freqByteData[i + OFFSET];
-			ctx.fillRect(i * SPACER_WIDTH, CANVAS_HEIGHT, BAR_WIDTH, -magnitude + 10);
+			var magnitude = freqByteData[i+ OFFSET];
+			ctx.fillRect(i * SPACER_WIDTH, CANVAS_HEIGHT- MOVE_UP + 200*1/(i+1) + magnitude*0.35, BAR_WIDTH, -30 + (-200*1/(i+1) - magnitude*0.35)*2);
 		}
 	}, 0);
 }
@@ -77,8 +78,9 @@ function startRecording(callback) {
 			analyser2 = context.createAnalyser();
 			var source = context.createMediaStreamSource(s);
 			analyser1.minDecibels = analyser1.maxDecibels - 20
-			analyser2.minDecibels = -100;
+			analyser2.minDecibels = -80;
 			analyser2.smoothingTimeConstant = 0.9;
+			analyser2.fftSize = 2048;
 			source.connect(analyser1);
 			source.connect(analyser2);
 			recorder = new Recorder(analyser1);
@@ -167,11 +169,12 @@ socket.on('res', function(d2){
 $(document).ready(function() {
 	canvas = document.getElementById('fft');
 	ctx = canvas.getContext('2d');
-	canvas.width =600;
+	canvas.width =window.innerWidth;
 	CANVAS_HEIGHT = canvas.height;
 	CANVAS_WIDTH = canvas.width;
-
+	canvas.height = 600;
 	startRecording(function(){
+		/*
 		var cont = setInterval(function () {
 			freezeRecording(function (str) {
 				socket.emit('data', str);
@@ -181,6 +184,7 @@ $(document).ready(function() {
 		socket.on('disconnect', function(){
     		clearInterval(cont); 
     	});
+		*/
 	});
 
 

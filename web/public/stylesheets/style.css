@@ -51,10 +51,13 @@ body {
 }
 
 #response{
-  font-size: 120px;
+  font-size: 80px;
   color: #D84A38;
   display: table;
   margin: 0 auto;
+  position: absolute;
+  right: 60px;
+  top: 265px;
 }
 
 #fft{

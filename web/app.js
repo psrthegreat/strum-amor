@@ -103,7 +103,7 @@ var io = require('socket.io').listen(server);
 io.sockets.on('connection', function(socket) {
 	socket.set('id', socket.id);
 	socket.set('count', 0);
-	socket.emit('ready', socket.id);
+	//socket.emit('ready', socket.id);
 	socket.on('data', function(data) {
 		socket.get('id', function(err, id) {
 			socket.get('count', function(err, count) {
@@ -146,9 +146,9 @@ io.sockets.on('connection', function(socket) {
 	   		fs.readdir('./clientwavs/', function(e,files){
 	   			for (var i = 0; i < files.length; i++) {
 					if (!files[i].match(new RegExp('^'+id))) continue;
-	   				//fs.unlink('./clientwavs/'+files[i], function(err){
-	   				//	if (err) throw err;
-	   				//});
+	   				fs.unlink('./clientwavs/'+files[i], function(err){
+	   					if (err) throw err;
+	   				});
 	   			}
 	   		})
 	   	});
