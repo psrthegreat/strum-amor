@@ -51,7 +51,7 @@ def fetch_data(command):
         return "Error: %s" %(str(e))
 
 
-def get_chroma(filestr, window_length = None):
+def get_chroma(filestr, window_length = None, threshold = None):
     """
     Extract chroma.
 
@@ -60,9 +60,11 @@ def get_chroma(filestr, window_length = None):
     commands = ["chroma", data, info['fs']]
     if window_length is not None:
         commands.append(window_length)
+        if threshold is not None:
+            commands.append(threshold)
     return ipc.get_response(commands) 
 
-def get_crp(filestr, window_length = None):
+def get_crp(filestr, window_length = None, threshold = None):
     """
     Extract crp.
 
@@ -71,6 +73,8 @@ def get_crp(filestr, window_length = None):
     commands = ["crp", data, info['fs']]
     if window_length is not None:
         commands.append(window_length)
+        if threshold is not None:
+            commands.append(threshold)
     return ipc.get_response(commands) 
 
 def split(data, n):
