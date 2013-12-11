@@ -43,6 +43,7 @@ class HMMPredictor(object):
                  feature_type     = "chroma",
                  model_path       = "../learning/trained/identityChroma",
                  variance_filter  = None,
+                 min_frames       = None,
                  plot_variance    = False,
                  frame_split      = None,
                  group_filter     = None,
@@ -63,6 +64,7 @@ class HMMPredictor(object):
         self.feature_type     = feature_type
         self.model_path       = model_path
         self.variance_filter  = variance_filter
+        self.min_frames       = min_frames
         self.frame_split      = frame_split
         self.group_filter     = group_filter
         self.max_count_filter = max_count_filter
@@ -110,6 +112,11 @@ class HMMPredictor(object):
         else:
             self._filtered_feat = self._features
 
+        if self.min_frames is not None:
+            if len(self._filtered_feat) < self.min_frames:
+                self.features = []
+                return
+
         if self.frame_split is not None:
             split = feature.split(self._filtered_feat, self.frame_split)
         else:
@@ -117,11 +124,15 @@ class HMMPredictor(object):
 
         self.features = split
 
+
     def predict(self):
         """
         Predict with loaded model. load_features and process_features must have been called.
 
         """
+        if not self.features:
+            return None
+
         if self.mixer is None:
             self.mixer = mixer.HMM(self.model)
 
@@ -166,19 +177,20 @@ if "__main__" in __name__:
     if len(sys.argv) < 2:
         import base64, cStringIO
         input_data = sys.stdin.read(-1)
-        print 'receive', len(input_data)
         input_data = base64.b64decode(input_data)
         input_file = cStringIO.StringIO(input_data)
     else:
         input_file = sys.argv[1]
 
     # same as model = default_crp()
-    model = HMMPredictor(feature_type    = "crp",
-                         model_path      = "../learning/trained/identitycrp",
-                         variance_filter = 0.19,
-                         plot_variance   = False,
-                         frame_split     = 2,
-                         group_filter    = 5)
+    model = HMMPredictor(feature_type     = "crp",
+                         model_path       = "../learning/trained/identitycrp",
+                         variance_filter  = 0.19,
+                         min_frames       = 6,
+                         plot_variance    = False,
+                         frame_split      = None,
+                         group_filter     = None,
+                         max_count_filter = True)
     
     predictions = model.run(input_file)
 
@@ -198,6 +210,7 @@ if "__main__" in __name__:
     # can look at these for debugging:
     # _raw_predictions    = model._predictions
     # _merged_predictions = model._combined_predict
-
-    answer = scipy.stats.mode(predictions)[0]
-    print chord.decode(int(answer));
+    if predictions:
+        print chord.decode(int(predictions[0]));
+    else:
+        print ""
