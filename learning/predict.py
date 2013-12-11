@@ -162,9 +162,12 @@ def default_chroma():
 
 if "__main__" in __name__:
     if len(sys.argv) < 2:
-        print "must specify WAV input file argument"
-        sys.exit(0)
-    input_file = sys.argv[1]
+        import base64, cStringIO
+        input_data = sys.stdin.read(-1)
+        input_data = base64.b64decode(input_data)
+        input_file = cStringIO.StringIO(input_data)
+    else:
+        input_file = sys.argv[1]
 
     # same as model = default_crp()
     model = HMMPredictor(feature_type    = "crp",

@@ -1,4 +1,4 @@
-function [chroma, sideinfo] = extract_chroma(inputDir, wavFile, saveFlag, outputDir, window_length)
+function [chroma, sideinfo] = extract_chroma_direct(audio, fs, saveFlag, outputDir, window_length)
 
 if (nargin < 3)
     saveFlag = 0;
@@ -10,7 +10,7 @@ if (nargin < 5)
     window_length = 4410;
 end
 
-[pitch, sideinfo] = extract_pitch(inputDir, wavFile, window_length);
+[pitch, sideinfo] = extract_pitch_direct(audio, fs, window_length);
 
 % pitch to chroma
 %%%%%%%%%%%%%%%%%
@@ -19,7 +19,7 @@ parameter.save = saveFlag;
 
 if saveFlag == 1
     parameter.save_dir = outputDir;
-    parameter.save_filename = wavFile(1:end-4);
+    parameter.save_filename = 'test.wav';
     mkdir(parameter.save_dir);
 end
 
