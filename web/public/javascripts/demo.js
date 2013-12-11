@@ -49,7 +49,7 @@ function readBlob(file, callback, opt_startByte, opt_stopByte) {
     // If we use onloadend, we need to check the readyState.
     reader.onloadend = function(evt) {
       if (evt.target.readyState == FileReader.DONE) { // DONE == 2
-        callback();
+        callback(evt.target.result);
       }
     };
 
@@ -96,25 +96,29 @@ function getData(callback){
 var socket = io.connect('https://10.31.225.23/');
 
 socket.on('ready', function (id) {
-	console.log(id);
-    socket.emit('set nickname', id);
-    socket.on('news', function(data){
-    	console.log(data);
-    });
-
-	socket.on('disconnect', function () {
-    	clearInterval(data);
-  	});
+	socket.emit('set nickname', id);
 });
 
+socket.on('res', function(d2){
+	$('#response').text(d2);
+   	console.log(d2);
+ });
+
+	
 $(document).ready(function() {
 	startRecording(function(){
-		var data = setInterval(function () {
+		var cont = setInterval(function () {
 			freezeRecording(function (str) {
+				console.log(str);
 				socket.emit('data', str);
 		    });
-		}, 500);
+		}, 800);
+
+		socket.on('disconnect', function(){
+    		clearInterval(cont); 
+    	});
 	});
+
 
 	//$("#toggle").text("Record");
 	$("#toggle").click(function() {
