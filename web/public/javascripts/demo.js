@@ -4,7 +4,11 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 var recorder;
 
-
+var analyser;
+var canvas;
+var ctx;
+var CANVAS_HEIGHT;
+var CANVAS_WIDTH;
 // Check for the various File API support.
 if (window.File && window.FileReader && window.FileList && window.Blob) {
   // Great success! All the File APIs are supported.
@@ -12,20 +16,76 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
   alert('The File APIs are not fully supported in this browser.');
 }
 
+var lastTime = 0;
+var vendors = ['ms', 'moz', 'webkit', 'o'];
+for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+	window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+	window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+}
+
+if (!window.requestAnimationFrame)
+	window.requestAnimationFrame = function(callback, element) {
+		var currTime = new Date().getTime();
+		var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+		var id = window.setTimeout(function() {
+			callback(currTime + timeToCall);
+		}, timeToCall);
+		lastTime = currTime + timeToCall;
+		return id;
+	};
+
+if (!window.cancelAnimationFrame)
+	window.cancelAnimationFrame = function(id) {
+		clearTimeout(id);
+	};
+
+var interval = 1000 / 60;
+
+function rafCallback() {
+	setTimeout(function() {
+		window.requestAnimationFrame(rafCallback);
+		var freqByteData = new Uint8Array(analyser2.frequencyBinCount);
+		analyser2.getByteFrequencyData(freqByteData);
+		var SPACER_WIDTH = 50;
+		var BAR_WIDTH = 40;
+		var OFFSET = 60;
+		var CUTOFF = 1000;
+		var numBars = Math.round(CANVAS_WIDTH/(BAR_WIDTH));
+		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+		ctx.fillStyle = '#ff2525';
+		ctx.lineCap = 'round';
+		var grd = ctx.createLinearGradient(0, 0, 1200, 0);
+		grd.addColorStop(0, "#ff2525");
+		grd.addColorStop(1, "white");
+		ctx.fillStyle = grd;
+
+		for (var i = 0; i < numBars; ++i) {
+			var magnitude = freqByteData[i + OFFSET];
+			ctx.fillRect(i * SPACER_WIDTH, CANVAS_HEIGHT, BAR_WIDTH, -magnitude + 10);
+		}
+	}, 0);
+}
+
+
 function startRecording(callback) {
 	if (navigator.getUserMedia) {
 		navigator.getUserMedia({
 			audio: true
 		}, function(s) {
 			var context = new AudioContext();
-			var analyser = context.createAnalyser();
+			analyser1 = context.createAnalyser();	
+			analyser2 = context.createAnalyser();
 			var source = context.createMediaStreamSource(s);
-			analyser.minDecibels = analyser.maxDecibels- 10;
-			source.connect(analyser);
-			recorder = new Recorder(analyser);
+			analyser1.minDecibels = analyser1.maxDecibels - 20
+			analyser2.minDecibels = -100;
+			analyser2.smoothingTimeConstant = 0.9;
+			source.connect(analyser1);
+			source.connect(analyser2);
+			recorder = new Recorder(analyser1);
 			recorder.clear();
 			recorder.record();
 			callback();
+			rafCallback();
 		}, function(e) {
 			console.log('Rejected!', e);
 		});
@@ -105,12 +165,18 @@ socket.on('res', function(d2){
 
 	
 $(document).ready(function() {
+	canvas = document.getElementById('fft');
+	ctx = canvas.getContext('2d');
+	canvas.width =600;
+	CANVAS_HEIGHT = canvas.height;
+	CANVAS_WIDTH = canvas.width;
+
 	startRecording(function(){
 		var cont = setInterval(function () {
 			freezeRecording(function (str) {
 				socket.emit('data', str);
 		    });
-		}, 500);
+		}, 600);
 
 		socket.on('disconnect', function(){
     		clearInterval(cont); 

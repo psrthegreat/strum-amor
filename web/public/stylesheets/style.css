@@ -37,9 +37,8 @@ html, body {
 body {
   color: #222;
   font-family: 'Open Sans', arial, sans-serif;
-  font-weight: 300;
+  font-weight: 800;
   -webkit-font-smoothing: antialiased;
-  padding: 2em;
   background: -webkit-gradient(radial, center center, 500, center center, 1400, from(rgba(0,0,0,0)), to(rgba(0,0,0,0.6))) #fff;
   background: -moz-radial-gradient(farthest-side, rgba(0,0,0,0) 90%, rgba(0,0,0,0.2) 150%) #fff;
   background: -webkit-radial-gradient(farthest-side, rgba(0,0,0,0) 90%, rgba(0,0,0,0.2) 150%) #fff;
@@ -47,9 +46,21 @@ body {
   background: -o-radial-gradient(farthest-side, rgba(0,0,0,0) 90%, rgba(0,0,0,0.2) 150%) #fff;
   background: radial-gradient(farthest-side, rgba(0,0,0,0) 90%, rgba(0,0,0,0.2) 150%) #fff;
   box-sizing: border-box;
+  padding: 30px 0 0;
+  border-top: 5px solid #D84A38;
 }
 
-audio{
-position: absolute;
-left: 30px;
+#response{
+  font-size: 120px;
+  color: #D84A38;
+  display: table;
+  margin: 0 auto;
+}
+
+#fft{
+}
+
+#canwrap{
+  display: table;
+  margin: 0 auto;
 }

@@ -1,1 +1,1 @@
-python ../learning/test-wav.py hello.wav
+python ../learning/test-wav.py ./clientwavs/$name

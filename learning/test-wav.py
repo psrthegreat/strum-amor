@@ -17,7 +17,7 @@ else:
 data = feature.get_crp(data)
 data = feature.replace_negative(data)
 test = feature.filter_variance(data, 0.19, False)
-if(test.shape[0] < 6):
+if(test.shape[0] < 2):
 	print [];
 else:
 	tests = feature.split(test, 2)
@@ -34,4 +34,3 @@ else:
 		#print map(decode, map(int, outputseries));
 		#outputcomp = feature.filter_groups(outputseries, 5)
 		#outputcomp = list(imap(itemgetter(0), groupby(outputseries)))
-		
