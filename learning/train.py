@@ -27,9 +27,9 @@ if "__main__" in __name__ :
             feature = sys.argv[2]
 
     print "Loading data from " + featuresDir + "..."
-    data_loader = data.Dataset(featuresDir)
-    trainData   = data_loader.loadList("train", feature)
-    testData    = data_loader.loadList("test", feature)
+    data_loader = data.Dataset([featuresDir], feature)
+    trainData   = data_loader.loadList("train")
+    testData    = data_loader.loadList("test")
 
     ytrain = trainData['labels']
     xtrain = trainData['examples']

@@ -130,9 +130,9 @@ io.sockets.on('connection', function(socket) {
 				file = prefix + name
 				fs.writeFile(file, buf, function(err) {
 					if (err) socket.emit('res', 'something blew up')
-					var child = exec("python ../learning/predict.py " + file, function(error, stdout, stderr) {
+					var child = exec("python ../learning/500test-wav.py " + file, function(error, stdout, stderr) {
 						if(stdout != "[]\n"){
-							socket.emit('res', stdout)
+							socket.volatile.emit('res', stdout)
 						}
 					});
 				});
@@ -146,9 +146,9 @@ io.sockets.on('connection', function(socket) {
 	   		fs.readdir('./clientwavs/', function(e,files){
 	   			for (var i = 0; i < files.length; i++) {
 					if (!files[i].match(new RegExp('^'+id))) continue;
-	   				fs.unlink('./clientwavs/'+files[i], function(err){
-	   					if (err) throw err;
-	   				});
+	   				//fs.unlink('./clientwavs/'+files[i], function(err){
+	   				//	if (err) throw err;
+	   				//});
 	   			}
 	   		})
 	   	});
