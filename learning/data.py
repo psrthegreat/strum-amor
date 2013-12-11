@@ -6,6 +6,7 @@ import os
 import numpy
 import scipy.io
 import re
+import random
 import chord
 
 features = {'chroma': 'f_chroma', 'crp': 'f_CRP'}
@@ -76,9 +77,12 @@ class Dataset(object):
         examples = []
         labels   = []
         for path in self.paths:
+            print os.path.join(path, filename)
             with open(os.path.join(path, filename), "r") as f:
-
                 for line in f.read().splitlines():
                     examples.append(self.readFile(path, line, self.feature))
                     labels.append(self.getLabel(line))
+        # tmp = zip(examples, labels)
+        # random.shuffle(tmp)
+        # examples, labels = zip(*tmp)
         return {"examples": examples, "labels" : labels}
