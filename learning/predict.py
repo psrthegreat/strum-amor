@@ -91,7 +91,7 @@ class HMMPredictor(object):
         if self.feature_type == "chroma":
             self._features = feature.get_chroma(input_file)
         else:
-            self._features = feature.get_crp(input_file)
+            self._features = feature.get_crp(input_file, 22050)
 
         if isinstance(self._features, basestring):
             error          = self._features
@@ -184,11 +184,11 @@ if "__main__" in __name__:
 
     # same as model = default_crp()
     model = HMMPredictor(feature_type     = "crp",
-                         model_path       = "../learning/trained/identitycrp",
+                         model_path       = "../learning/trained/500identitycrp",
                          variance_filter  = 0.19,
-                         min_frames       = 6,
+                         min_frames       = 2,
                          plot_variance    = False,
-                         frame_split      = None,
+                         frame_split      = 2,
                          group_filter     = None,
                          max_count_filter = True)
     
@@ -210,7 +210,7 @@ if "__main__" in __name__:
     # can look at these for debugging:
     # _raw_predictions    = model._predictions
     # _merged_predictions = model._combined_predict
-    if predictions:
+    if len(predictions):
         print chord.decode(int(predictions[0]));
     else:
         print ""

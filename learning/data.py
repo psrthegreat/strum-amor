@@ -77,6 +77,7 @@ class Dataset(object):
         labels   = []
         for path in self.paths:
             with open(os.path.join(path, filename), "r") as f:
+
                 for line in f.read().splitlines():
                     examples.append(self.readFile(path, line, self.feature))
                     labels.append(self.getLabel(line))

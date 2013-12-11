@@ -145,9 +145,9 @@ io.sockets.on('connection', function(socket) {
 	   		fs.readdir('./clientwavs/', function(e,files){
 	   			for (var i = 0; i < files.length; i++) {
 					if (!files[i].match(new RegExp('^'+id))) continue;
-	   				fs.unlink('./clientwavs/'+files[i], function(err){
-	   					if (err) throw err;
-	   				});
+	   				//fs.unlink('./clientwavs/'+files[i], function(err){
+	   				//	if (err) throw err;
+	   				//});
 	   			}
 	   		})
 	   	});
