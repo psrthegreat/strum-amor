@@ -41,6 +41,10 @@ Checkpoint 6
   (piano, violin, guitar)
 - works really well for live recognition
 
+Checkpoint 7
+-larger training set hit 99.8% accuracy on test set. Trained on multiple
+instruments. Live setting to modify without use of HMM, and take CRP variance as
+determining whether chord or not.
 
 Notes
 - Used mfcc as baseline. Have performed well in other music analysis tasks.
