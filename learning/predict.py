@@ -2,9 +2,11 @@
 Chord Predictor.
 
 """
+import itertools
 import pickle
 import sys
 
+import numpy as np
 import scipy.stats
 
 import chord
@@ -48,7 +50,8 @@ class HMMPredictor(object):
                  frame_split      = None,
                  group_filter     = None,
                  window_size      = 4410,
-                 max_count_filter = False):
+                 max_count_filter = False,
+                 lda              = None):
         """
         Initialize parameters:
 
@@ -71,6 +74,7 @@ class HMMPredictor(object):
         self.max_count_filter = max_count_filter
         self.plot_variance    = plot_variance
         self.window_size      = window_size
+        self.lda              = lda
 
     @property
     def model_path(self):
@@ -93,16 +97,16 @@ class HMMPredictor(object):
         if self.feature_type == "chroma":
             self._features = feature.get_chroma(input_file)
         else:
-            self._features = feature.get_crp(input_file, self.window_size)
+            self._features = feature.get_crp(input_file, self.window_size, 0.001)
 
         if isinstance(self._features, basestring):
             error          = self._features
             self._features = None
             raise ValueError(str(error))
-        
-        elif self.feature_type == "crp":
-            self._features = feature.replace_negative(self._features)
 
+        if self.feature_type == "crp":
+            self._features = feature.replace_negative(self._features)
+        
     def process_features(self):
         """
         Process loaded features. load_features must have been called.
@@ -113,6 +117,12 @@ class HMMPredictor(object):
                                                           self.plot_variance)
         else:
             self._filtered_feat = self._features
+
+
+        if self.lda is not None:
+            noise = self.lda.predict(self._filtered_feat)
+            self._filtered_feat = [elem for elem, n in itertools.izip(self._filtered_feat,
+                                                                      noise) if n == 0]
 
         if self.min_frames is not None:
             if len(self._filtered_feat) < self.min_frames:
@@ -147,7 +157,7 @@ class HMMPredictor(object):
 
         if self.group_filter is not None:
             self.prediction = feature.filter_groups(self._combined_predict, self.group_filter)
-            if self.max_count_filter is not None:
+            if self.max_count_filter is not None and len(self.prediction):
                 self.prediction = feature.combine_maxcount([self.prediction])
         else:
             self.prediction = self._combined_predict
@@ -186,11 +196,30 @@ if "__main__" in __name__:
     else:
         input_file = sys.argv[1]
 
+
+    # does not work!
+
+    #lda = pickle.load(open("../learning/trained/randomlda", "r"))
+    #gaussian = pickle.load(open("../learning/trained/chordgaussian", "r"))
+    #mean, covar = gaussian['mean'], gaussian['covar']
+    #def pdf(x):
+    #    return (2*np.pi)**(-6)*np.linalg.det(covar)**(-1.0/2)*np.exp(-0.5*(x-mean).T.dot(np.linalg.inv(covar)).dot(x-mean))
+
+    #threshold = 1e-60
+    #def predict(frames):
+    #    print np.mean(map(pdf, frames))
+    #    return [0 if pdf(x) > threshold else 1 for x in frames]
+
+    #class Test(object):
+    #    def predict(self, x):
+    #        return predict(x)
+
     # same as model = default_crp()
     model = HMMPredictor(feature_type     = "crp",
-                         model_path       = "../learning/trained/identitycrp",
+                         model_path       = "../learning/trained/uniformcrp",
+                         lda              = None,
                          window_size      = 4410,
-                         variance_filter  = 0.18,
+                         variance_filter  = 0.16,
                          min_frames       = 4,
                          plot_variance    = False,
                          frame_split      = None,
