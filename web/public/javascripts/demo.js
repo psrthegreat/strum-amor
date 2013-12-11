@@ -101,7 +101,6 @@ socket.on('ready', function (id) {
 
 socket.on('res', function(d2){
 	$('#response').text(d2);
-   	console.log(d2);
  });
 
 	
@@ -109,10 +108,9 @@ $(document).ready(function() {
 	startRecording(function(){
 		var cont = setInterval(function () {
 			freezeRecording(function (str) {
-				console.log(str);
 				socket.emit('data', str);
 		    });
-		}, 800);
+		}, 500);
 
 		socket.on('disconnect', function(){
     		clearInterval(cont); 
