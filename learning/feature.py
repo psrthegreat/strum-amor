@@ -92,7 +92,7 @@ def combine_maxcount(data):
     Take mode of each frame and combine into one list.
 
     """
-    return np.hstack(scipy.stats.mode(data, axis = 1)[0].squeeze())
+    return np.hstack(scipy.stats.mode(data, axis = 1)[0].ravel())
 
 def filter_variance(data, level = None, plot = False):
     """
