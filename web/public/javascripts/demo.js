@@ -12,19 +12,7 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
   alert('The File APIs are not fully supported in this browser.');
 }
 
-var socket = io.connect('https://10.31.225.23/');
-
-socket.on('ready', function () {
-    socket.emit('set nickname', "Pranav");
-    socket.on('news', function(data){
-    	console.log(data);
-    });
-    socket.emit('msg', {message: "hi"});
-});
-
-
-
-function startRecording() {
+function startRecording(callback) {
 	if (navigator.getUserMedia) {
 		navigator.getUserMedia({
 			audio: true
@@ -32,14 +20,12 @@ function startRecording() {
 			var context = new AudioContext();
 			var analyser = context.createAnalyser();
 			var source = context.createMediaStreamSource(s);
-			analyser.minDecibels = -880;
-			analyser.smoothingTimeConstant = 1;
-			analyser.fftSize = 2048;
+			analyser.minDecibels = analyser.maxDecibels- 10;
 			source.connect(analyser);
-			//analyser.connect(context.destination);
 			recorder = new Recorder(analyser);
 			recorder.clear();
 			recorder.record();
+			callback();
 		}, function(e) {
 			console.log('Rejected!', e);
 		});
@@ -54,7 +40,7 @@ function sendFile(str){
 	});
 }
 
-function readBlob(file, opt_startByte, opt_stopByte) {
+function readBlob(file, callback, opt_startByte, opt_stopByte) {
     var start = parseInt(opt_startByte) || 0;
     var stop = parseInt(opt_stopByte) || file.size - 1;
 
@@ -63,12 +49,7 @@ function readBlob(file, opt_startByte, opt_stopByte) {
     // If we use onloadend, we need to check the readyState.
     reader.onloadend = function(evt) {
       if (evt.target.readyState == FileReader.DONE) { // DONE == 2
-        //document.getElementById('byte_content').textContent = reader.result;
-        /*document.getElementById('byte_range').textContent =
-            ['Read bytes: ', start + 1, ' - ', stop + 1,
-             ' of ', file.size, ' byte file'].join('');
-        */
-        sendFile(evt.target.result);
+        callback(evt.target.result);
       }
     };
 
@@ -79,9 +60,20 @@ function readBlob(file, opt_startByte, opt_stopByte) {
 function stopRecording() {
 	recorder.stop();
 	recorder.exportWAV(function(s) {
-		var url = window.URL.createObjectURL(s);
-		$("#audio").get(0).src = url;
+		//var url = window.URL.createObjectURL(s);
+		///$("#audio").get(0).src = url;
 		readBlob(s);
+	});
+}
+
+function freezeRecording(callback) {
+	recorder.stop();
+	recorder.exportWAV(function(s) {
+		recorder.clear();
+		recorder.record();
+		//var url = window.URL.createObjectURL(s);
+		///$("#audio").get(0).src = url;
+		readBlob(s, callback);
 	});
 }
 
@@ -96,15 +88,48 @@ function toggleRecording(){
     }
 }
 
+
+function getData(callback){
+	return callback("yo")
+}
+
+var socket = io.connect('https://10.31.225.23/');
+
+socket.on('ready', function (id) {
+	socket.emit('set nickname', id);
+});
+
+socket.on('res', function(d2){
+	$('#response').text(d2);
+   	console.log(d2);
+ });
+
+	
 $(document).ready(function() {
-	$("#toggle").text("Record");
+	startRecording(function(){
+		var cont = setInterval(function () {
+			freezeRecording(function (str) {
+				console.log(str);
+				socket.emit('data', str);
+		    });
+		}, 800);
+
+		socket.on('disconnect', function(){
+    		clearInterval(cont); 
+    	});
+	});
+
+
+	//$("#toggle").text("Record");
 	$("#toggle").click(function() {
-		if ($("#toggle").html() == "Record"){
+	/*	if ($("#toggle").html() == "Record"){
 			$("#toggle").text("Stop");
 			startRecording();
 		}else{
-			$("#toggle").text("Record");
-			stopRecording();
-		}
+	*/
+			//$("#toggle").text("Record");
+		stopRecording();
+	//	}
 	});
 });
+

@@ -52,11 +52,23 @@ app.post('/main', function(req, res) {
 				error : 'something blew up'
 			})
 		var child = exec("./recog", function(error, stdout, stderr) {
-			console.log('stdout: ' + stdout);
 			res.send(stdout);
 		});
 	});
 });
+
+function writeSegment(){
+	fs.writeFile("hello.wav", buf, function(err) {
+		if (err)
+			res.send(500, {
+				error : 'something blew up'
+			})
+		var child = exec("./recog", function(error, stdout, stderr) {
+			console.log('stdout: ' + stdout);
+			res.send(stdout);
+		});
+	});
+}
 
 //app specific gets here
 var executeTests = false;
@@ -75,6 +87,7 @@ if (executeTests) {
 	}
 }
 
+
 //if the page does not exist
 app.get("*", function(req, res) {
 	res.status(404).send('Not found dude');
@@ -87,18 +100,42 @@ server.listen(app.get('port'));
 var io = require('socket.io').listen(server);
 
 io.sockets.on('connection', function(socket) {
-	socket.emit('ready');
-	socket.on('set nickname', function(name) {
-		socket.set('nickname', name, function() {
-			socket.emit('news', {
-				hello : 'world'
+	socket.set('id', socket.id);
+	socket.set('count', 0);
+	socket.emit('ready', socket.id);
+	socket.on('data', function(data) {
+		socket.get('id', function(err, id) {
+			socket.get('count', function(err, count) {
+				socket.set('count', count + 1);
+				if(data == undefined) return;
+				var str = data.split(",")[1]
+				var buf = new Buffer(str, 'base64');
+				prefix = "./clientwavs/"
+				name = id + count + ".wav"
+				file = prefix + name
+				fs.writeFile(file, buf, function(err) {
+					if (err) socket.emit('res', 'something blew up')
+					var child = exec("python ../learning/test-wav.py " + file, function(error, stdout, stderr) {
+						if(stdout != "[]"){
+							socket.emit('res', stdout)
+						}
+					});
+				});
 			});
 		});
 	});
 
-	socket.on('msg', function() {
-		socket.get('nickname', function(err, name) {
-			console.log('Chat message by ', name);
-		});
-	});
+	socket.on('disconnect',function(){
+		console.log('User Disconnect. Removing files!')
+	   	socket.get('id', function(err, id){
+	   		fs.readdir('./clientwavs/', function(e,files){
+	   			for (var i = 0; i < files.length; i++) {
+					if (!files[i].match(new RegExp('^'+id))) continue;
+	   				fs.unlink('./clientwavs/'+files[i], function(err){
+	   					if (err) throw err;
+	   				});
+	   			}
+	   		})
+	   	});
+	 });
 });

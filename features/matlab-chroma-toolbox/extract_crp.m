@@ -1,24 +1,26 @@
-function [crp, sideinfo] = extract_crp(inputDir, wavFile, saveFlag, outputDir, window_length)
+function [crp, sideinfo] = extract_crp(input_dir, wav_file, save_flag, output_dir, window_length)
 
 if (nargin < 3)
-    saveFlag = 0;
+    save_flag = 0;
 end
+
 if (nargin < 4)
-    outputDir = '';
+    output_dir = '';
 end
+
 if (nargin < 5)
     window_length = 4410;
 end
 
-[pitch, sideinfo] = extract_pitch(inputDir, wavFile, window_length);
+[pitch, sideinfo] = extract_pitch(input_dir, wav_file, window_length);
 
 % pitch to CRP
 %%%%%%%%%%%%%%%
-parameter.save = saveFlag;
+parameter.save = save_flag;
 
-if saveFlag == 1
-    parameter.saveDir = outputDir;
-    parameter.saveFilename = wavFile(1:end-4);
+if save_flag == 1
+    parameter.saveDir = output_dir;
+    parameter.saveFilename = wav_file(1:end-4);
     mkdir(parameter.saveDir);
 end
 
