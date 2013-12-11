@@ -71,7 +71,7 @@ def _process(connection, process):
             connection.close()
             return __quit_command
 
-    print "Processing command", command
+    #print "Processing command", command
     data = process(command)
 
     try:
@@ -94,14 +94,11 @@ def run_server(process = lambda x : x):
             connection = listener.accept()
         except AuthenticationError:
             continue
-        print "Connection accepted from", listener.last_accepted
+        #print "Connection accepted from", listener.last_accepted
 
         result = _process(connection, process)
 
         if result == __quit_command:
             break
-
-        if result is not None:
-            print result
 
     listener.close()

@@ -47,6 +47,7 @@ class HMMPredictor(object):
                  plot_variance    = False,
                  frame_split      = None,
                  group_filter     = None,
+                 window_size      = 4410,
                  max_count_filter = False):
         """
         Initialize parameters:
@@ -69,6 +70,7 @@ class HMMPredictor(object):
         self.group_filter     = group_filter
         self.max_count_filter = max_count_filter
         self.plot_variance    = plot_variance
+        self.window_size      = window_size
 
     @property
     def model_path(self):
@@ -91,7 +93,7 @@ class HMMPredictor(object):
         if self.feature_type == "chroma":
             self._features = feature.get_chroma(input_file)
         else:
-            self._features = feature.get_crp(input_file, 22050)
+            self._features = feature.get_crp(input_file, self.window_size)
 
         if isinstance(self._features, basestring):
             error          = self._features
@@ -138,13 +140,15 @@ class HMMPredictor(object):
 
         self._prediction = self.mixer.predict(self.features)
 
-        if self.max_count_filter:
+        if self.max_count_filter and self.group_filter is None:
             self._combined_predict = feature.combine_maxcount(self._prediction)
         else:
             self._combined_predict = feature.combine_concat(self._prediction)
 
         if self.group_filter is not None:
             self.prediction = feature.filter_groups(self._combined_predict, self.group_filter)
+            if self.max_count_filter is not None:
+                self.prediction = feature.combine_maxcount([self.prediction])
         else:
             self.prediction = self._combined_predict
 
@@ -184,12 +188,13 @@ if "__main__" in __name__:
 
     # same as model = default_crp()
     model = HMMPredictor(feature_type     = "crp",
-                         model_path       = "../learning/trained/500identitycrp",
-                         variance_filter  = 0.19,
-                         min_frames       = 2,
+                         model_path       = "../learning/trained/identitycrp",
+                         window_size      = 4410,
+                         variance_filter  = 0.18,
+                         min_frames       = 4,
                          plot_variance    = False,
-                         frame_split      = 2,
-                         group_filter     = None,
+                         frame_split      = None,
+                         group_filter     = 4,
                          max_count_filter = True)
     
     predictions = model.run(input_file)
@@ -210,7 +215,7 @@ if "__main__" in __name__:
     # can look at these for debugging:
     # _raw_predictions    = model._predictions
     # _merged_predictions = model._combined_predict
-    if len(predictions):
+    if predictions is not None and len(predictions):
         print chord.decode(int(predictions[0]));
     else:
         print ""

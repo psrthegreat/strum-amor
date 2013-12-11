@@ -176,7 +176,7 @@ $(document).ready(function() {
 			freezeRecording(function (str) {
 				socket.emit('data', str);
 		    });
-		}, 600);
+		}, 800);
 
 		socket.on('disconnect', function(){
     		clearInterval(cont); 
