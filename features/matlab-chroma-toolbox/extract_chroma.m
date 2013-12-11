@@ -1,4 +1,4 @@
-function chroma = extract_chroma(input_dir, wav_file, save_flag, output_dir, window_length)
+function [chroma, sideinfo] = extract_chroma(input_dir, wav_file, save_flag, output_dir, window_length)
 
 if (nargin < 3)
     save_flag = 0;
