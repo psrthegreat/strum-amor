@@ -43,12 +43,13 @@ instruments = [ 'Piano_1',
 for i, instr in enumerate(instruments):
     sys.argv = ["train.py", dataDir+instr+"/chroma/4410", "chroma"]
     execfile("train.py")
-    print [np.linalg.norm(xtrain[0][i]) for i in range(6)]
-    print [stats.tvar(xtrain[0][i]) for i in range(6)]
+    # print [np.linalg.norm(xtrain[0][i]) for i in range(6)]
+    # print [stats.tvar(xtrain[0][i]) for i in range(6)]
 
-    # pl.subplot(2,len(instruments)/2, i+1)
-    # pl.plot(xtrain[0].T)
-    # pl.title(instr)
+    pl.title("Window Size 4410")
+    pl.subplot(2,len(instruments)/2, i+1)
+    pl.plot(xtrain[0].T)
+    pl.title(instr)
 
 pl.show()
 
