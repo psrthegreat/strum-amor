@@ -20,7 +20,7 @@ from feature import *
 
 if "__main__" in __name__ :
     featuresDir = "../features/chroma"
-    feature = "f_chroma"
+    feature = "chroma"
     if len(sys.argv) > 1:
         featuresDir = sys.argv[1]
         if len(sys.argv) > 2:
@@ -36,7 +36,7 @@ if "__main__" in __name__ :
     ytest  = testData['labels']
     xtest  = testData['examples']
 
-    xtrain = replace_negative(xtrain)
-    xtest = replace_negative(xtest)
+    # xtrain = replace_negative(xtrain)
+    # xtest = replace_negative(xtest)
 
     print "Data loaded."

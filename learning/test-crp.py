@@ -28,59 +28,36 @@ instruments = [ 'Piano_1',
                 'Guitar_Overdrive',
                 'Guitar_Steel' ]
 
-data_loader = data.Dataset([dataDir+instr+"/crp/4410" for instr in instruments], "crp")
-trainData   = data_loader.loadList("train")
-ytrain = trainData['labels']
-xtrain = trainData['examples']
+# data_loader = data.Dataset([dataDir+instr+"/crp/44100" for instr in instruments], "crp")
+# trainData   = data_loader.loadList("train")
+# ytrain = trainData['labels']
+# xtrain = trainData['examples']
 
-data_loader = data.Dataset([dataDir+"Violin/crp/4410"], "crp")
-testData    = data_loader.loadList("test")
-ytest  = testData['labels']
-xtest  = testData['examples']
+# data_loader = data.Dataset([dataDir+"Guitar_Clean/crp/44100"], "crp")
+# testData    = data_loader.loadList("test")
+# ytest  = testData['labels']
+# xtest  = testData['examples']
 
-xtrain = ft.remove_neg(xtrain)
-xtest  = ft.remove_neg(xtest)
-# matFeatures = {"chroma":"f_chroma", "crp":"f_CRP"}
-# for i, instr in enumerate(["Piano_1", "Violin", "Nylon_Gt.2"]):
-#     for j, feature in enumerate(["chroma", "crp"]):
-#         sys.argv = ["train.py", "../features/output/"+instr+"/"+feature, matFeatures[feature]]
-#         execfile("train.py")
+# xtrain = ft.replace_negative(xtrain)
+# xtest  = ft.replace_negative(xtest)
+for i, instr in enumerate(instruments):
+    sys.argv = ["train.py", dataDir+instr+"/chroma/4410", "chroma"]
+    execfile("train.py")
+    print [np.linalg.norm(xtrain[0][i]) for i in range(6)]
+    print [stats.tvar(xtrain[0][i]) for i in range(6)]
 
-#         pl.subplot(2,3,3*j+(i+1))
-#         pl.plot(xtrain[0].T)
+    # pl.subplot(2,len(instruments)/2, i+1)
+    # pl.plot(xtrain[0].T)
+    # pl.title(instr)
 
-model = SegmentHMM(HMMGaussian())
-model.train([xtrain], [ytrain])
-
-frames, labels = flatten_labels(xtest, ytest)
-p = model.model.predict(frames[0:80])
-print p
-
-print "frame level"
-start = 1
-end = len(ytest)
-b =  flatten_labels(xtest[start:end], ytest[start:end])[1]
-a = model.predict([xtest[start:end]])[0]
-cm = confusion_matrix(a, b)
-print model.score([xtest], [ytest])
-print model.score([xtrain], [ytrain]);
-
-pl.matshow(cm)
-pl.title('Confusion matrix')
-pl.colorbar()
-pl.ylabel('True label')
-pl.xlabel('Predicted label')
-
-# sys.argv = ["train.py", "../features/output/Piano_1/chroma"]
-# execfile("train.py")
+pl.show()
 
 # model = SegmentHMM(HMMGaussian())
-
 # model.train([xtrain], [ytrain])
 
-# frames, labels = flatten_labels(xtest, ytest)
-# p = model.model.predict(frames[0:80])
-# print p
+# # frames, labels = flatten_labels(xtest, ytest)
+# # p = model.model.predict(frames[0:80])
+# # print p
 
 # print "frame level"
 # start = 1
@@ -96,5 +73,31 @@ pl.xlabel('Predicted label')
 # pl.colorbar()
 # pl.ylabel('True label')
 # pl.xlabel('Predicted label')
-pl.show()
+
+# # sys.argv = ["train.py", "../features/output/Piano_1/chroma"]
+# # execfile("train.py")
+
+# # model = SegmentHMM(HMMGaussian())
+
+# # model.train([xtrain], [ytrain])
+
+# # frames, labels = flatten_labels(xtest, ytest)
+# # p = model.model.predict(frames[0:80])
+# # print p
+
+# # print "frame level"
+# # start = 1
+# # end = len(ytest)
+# # b =  flatten_labels(xtest[start:end], ytest[start:end])[1]
+# # a = model.predict([xtest[start:end]])[0]
+# # cm = confusion_matrix(a, b)
+# # print model.score([xtest], [ytest])
+# # print model.score([xtrain], [ytrain]);
+
+# # pl.matshow(cm)
+# # pl.title('Confusion matrix')
+# # pl.colorbar()
+# # pl.ylabel('True label')
+# # pl.xlabel('Predicted label')
+# pl.show()
 
