@@ -1,1 +1,3 @@
-python ../learning/test-wav.py ./clientwavs/$name
+for file in ./clientwavs/*; do
+	python ../learning/test-wav.py $file
+done

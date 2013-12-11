@@ -25,26 +25,27 @@ generate_lists() {
 	touch $ftest
 	touch $ftrain
 
-	# split for each key
+	# split for each key and type
 	keys="C Csh D Dsh E F Fsh G Gsh A Ash B"
+	types="maj min"
 	for key in $keys; do
-		split $1 "${key}[0-9]"
+		for type in $types; do
+			split $1 "${type}[0-9]${key}[0-9]"
+		done
 	done
 
 	# shuffle lists at the end
-	cat $ftest | shuf > $ftest
-	cat $ftrain | shuf > $ftrain
+	# cat $ftest | shuf > $ftest
+	# cat $ftrain | shuf > $ftrain
 }
 
 if [[ -z $1 ]]; then
 	for instr in */; do
 		echo $instr
 		for feat in $instr*/; do
-			ls ${feat}?
-			# mv "${feat}?/" "${feat}44100/"
-			# for winlen in $feat*/; do
-			#     generate_lists $winlen
-			# done
+			for winlen in $feat*/; do
+				generate_lists $winlen
+			done
 		done
 	done
 fi
