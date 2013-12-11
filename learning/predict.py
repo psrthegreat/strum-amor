@@ -5,6 +5,8 @@ Chord Predictor.
 import pickle
 import sys
 
+import scipy.stats
+
 import chord
 import feature
 import mixer
@@ -164,6 +166,7 @@ if "__main__" in __name__:
     if len(sys.argv) < 2:
         import base64, cStringIO
         input_data = sys.stdin.read(-1)
+        print 'receive', len(input_data)
         input_data = base64.b64decode(input_data)
         input_file = cStringIO.StringIO(input_data)
     else:
@@ -172,10 +175,10 @@ if "__main__" in __name__:
     # same as model = default_crp()
     model = HMMPredictor(feature_type    = "crp",
                          model_path      = "../learning/trained/identitycrp",
-                         variance_filter = 0.18,
+                         variance_filter = 0.19,
                          plot_variance   = False,
-                         frame_split     = 7,
-                         group_filter    = 3)
+                         frame_split     = 2,
+                         group_filter    = 5)
     
     predictions = model.run(input_file)
 
@@ -196,4 +199,5 @@ if "__main__" in __name__:
     # _raw_predictions    = model._predictions
     # _merged_predictions = model._combined_predict
 
-    print map(chord.decode, map(int, predictions))
+    answer = scipy.stats.mode(predictions)[0]
+    print chord.decode(int(answer));
