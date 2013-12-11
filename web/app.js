@@ -52,7 +52,6 @@ app.post('/main', function(req, res) {
 				error : 'something blew up'
 			})
 		var child = exec("./recog", function(error, stdout, stderr) {
-			console.log('stdout: ' + stdout);
 			res.send(stdout);
 		});
 	});
@@ -102,17 +101,41 @@ var io = require('socket.io').listen(server);
 
 io.sockets.on('connection', function(socket) {
 	socket.set('id', socket.id);
+	socket.set('count', 0);
 	socket.emit('ready', socket.id);
-
 	socket.on('data', function(data) {
 		socket.get('id', function(err, id) {
-			fs.writeFile("hello.wav", buf, function(err) {
-				if (err) res.send(500, { error : 'something blew up'})
-				var child = exec("./recog", function(error, stdout, stderr) {
-				console.log('stdout: ' + stdout);
-				res.send(stdout);
+			socket.get('count', function(err, count) {
+				socket.set('count', count + 1);
+				if(data == undefined) return;
+				var str = data.split(",")[1]
+				var buf = new Buffer(str, 'base64');
+				prefix = "./clientwavs/"
+				name = id + count + ".wav"
+				file = prefix + name
+				fs.writeFile(file, buf, function(err) {
+					if (err) socket.emit('res', 'something blew up')
+					var child = exec("python ../learning/test-wav.py " + file, function(error, stdout, stderr) {
+						if(stdout != "[]"){
+							socket.emit('res', stdout)
+						}
+					});
 				});
 			});
 		});
 	});
+
+	socket.on('disconnect',function(){
+		console.log('User Disconnect. Removing files!')
+	   	socket.get('id', function(err, id){
+	   		fs.readdir('./clientwavs/', function(e,files){
+	   			for (var i = 0; i < files.length; i++) {
+					if (!files[i].match(new RegExp('^'+id))) continue;
+	   				fs.unlink('./clientwavs/'+files[i], function(err){
+	   					if (err) throw err;
+	   				});
+	   			}
+	   		})
+	   	});
+	 });
 });

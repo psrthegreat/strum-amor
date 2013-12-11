@@ -93,7 +93,7 @@ def combine_maxcount(data):
     """
     return np.hstack(scipy.stats.mode(data, axis = 1)[0].squeeze())
 
-def filter_variance(data, level = 0.23, plot = False):
+def filter_variance(data, level = None, plot = False):
     """
     Filter frames with low level of variance out.
 
@@ -103,6 +103,9 @@ def filter_variance(data, level = 0.23, plot = False):
     """
     data = np.asarray(data)
     dev  = np.std(data, axis = 1);
+    if(level is None):
+        level = np.mean(dev)
+
 
     if plot:
         import matplotlib.pyplot as plt
@@ -112,9 +115,7 @@ def filter_variance(data, level = 0.23, plot = False):
     filtered = data[dev > level]
 
     if filtered.shape[0] < 10:
-        level = np.mean(dev)
-        print "bad filter variance, fallback to", level
-        filtered = data[dev > level]
+        filtered = data
 
     return filtered
 
