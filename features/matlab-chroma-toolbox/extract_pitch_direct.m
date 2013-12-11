@@ -1,4 +1,4 @@
-function [pitch, sideinfo] = extract_pitch_test(audio, fs, window_length)
+function [pitch, sideinfo] = extract_pitch_direct(audio, fs, window_length)
 
 % default window length
 if (nargin < 3)

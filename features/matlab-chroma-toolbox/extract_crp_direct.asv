@@ -17,9 +17,8 @@ end
 parameter.save = save_flag;
 
 if save_flag == 1
-    [path, name,] = fileparts(output_path);
-    parameter.saveDir = path;
-    parameter.saveFilename = name;
+    parameter.saveDir = output_path;
+    parameter.saveFilename = 'tes;
     mkdir(parameter.saveDir);
 end
 
