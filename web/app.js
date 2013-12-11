@@ -132,7 +132,7 @@ io.sockets.on('connection', function(socket) {
 					if (err) socket.emit('res', 'something blew up')
 					var child = exec("python ../learning/predict.py " + file, function(error, stdout, stderr) {
 						if(stdout != "[]\n"){
-							socket.volatile.emit('res', stdout)
+							socket.emit('res', stdout)
 						}
 					});
 				});
