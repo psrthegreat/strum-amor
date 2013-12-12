@@ -174,7 +174,6 @@ $(document).ready(function() {
 	CANVAS_WIDTH = canvas.width;
 	canvas.height = 600;
 	startRecording(function(){
-		/*
 		var cont = setInterval(function () {
 			freezeRecording(function (str) {
 				socket.emit('data', str);
@@ -184,7 +183,6 @@ $(document).ready(function() {
 		socket.on('disconnect', function(){
     		clearInterval(cont); 
     	});
-		*/
 	});
 
 
