@@ -1,10 +1,4 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%% ICML 2013 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Use the following line _only_ if you're still using LaTeX 2.09.
 %\documentstyle[icml2013,epsf,natbib]{article}
-% If you rely on Latex2e packages, like most moden people use this:
 \documentclass{article}
 
 % For figures
@@ -14,536 +8,121 @@
 
 % For citations
 \usepackage{natbib}
-
+\usepackage{amsmath}
 % For algorithms
 \usepackage{algorithm}
 \usepackage{algorithmic}
 
-% As of 2011, we use the hyperref package to produce hyperlinks in the
-% resulting PDF.  If this breaks your system, please commend out the
-% following usepackage line and replace \usepackage{icml2013} with
-% \usepackage[nohyperref]{icml2013} above.
 \usepackage{hyperref}
 
-% Packages hyperref and algorithmic misbehave sometimes.  We can fix
-% this with the following command.
 \newcommand{\theHalgorithm}{\arabic{algorithm}}
 
-% Employ the following version of the ``usepackage'' statement for
-% submitting the draft version of the paper for review.  This will set
-% the note in the first column to ``Under review.  Do not distribute.''
 %\usepackage{icml2013} 
-% Employ this version of the ``usepackage'' statement after the paper has
-% been accepted, when creating the final version.  This will set the
-% note in the first column to ``Proceedings of the...''
 \usepackage[accepted]{icml2013}
 
 
 % The \icmltitle you define below is probably too long as a header.
 % Therefore, a short form for the running title is supplied here:
-\icmltitlerunning{Submission and Formatting Instructions for ICML 2013}
+\icmltitlerunning{A Supervised Approach To Musical Chord Recognition}
 
 \begin{document} 
 
 \twocolumn[
-\icmltitle{A Supervised Approach To Chord Recognition}
+\icmltitle{A Supervised Approach To Musical Chord Recognition}
 
-% It is OKAY to include author information, even for blind
-% submissions: the style file will automatically remove it for you
-% unless you've provided the [accepted] option to the icml2013
-% package.
+\icmlauthor{Pranav Rajpurkar}{pranavsr@stanford.edu}
 \icmlauthor{Brad Girardeau}{bgirarde@stanford.edu}
 \icmlauthor{Takatoki Migimatsu}{takatoki@stanford.edu}
-\icmlauthor{Pranav Rajpurkar}{pranavsr@stanford.edu}
 \icmladdress{Stanford University,
            Stanford, CA 94305 USA}
-
 
 % You may provide any keywords that you 
 % find helpful for describing your paper; these are used to populate 
 % the "keywords" metadata in the PDF but will not be shown in the document
-\icmlkeywords{boring formatting information, machine learning, ICML}
+\icmlkeywords{musical chord recognition, machine learning}
 
 \vskip 0.3in
 ]
 
 \begin{abstract} 
-In classical and popular music, knowing the progressions of chords underlying the melodies is an essential
-part of understanding, playing, and building on the music. However, analyzing chords by hand can be a time consuming process. An automated
-tool for this process will save time when learning and analyzing new songs, allowing the development of new interactive musical applications.
+In this paper, we present a prototype of an online tool for real-time chord recognition. It makes use of a Hidden Markov Model in conjunction with Gaussian Discriminant Analysis. Unlike approaches to collect data through web-scraping or training on hand-labeled song data, we generate a copious amount of chord data programmatically. We improve the performance of system by substituting the usually tried Chroma features with a novel set of Chroma DCT-Reduced log Pitch features to push test accuracy on clean data to 99.96\%. We finally propose a set of modifications to have the online system achieve a good balance between speed and accuracy.
 \end{abstract} 
 
-\section{Electronic Submission}
-\label{submission}
+\section{Introduction}
+\label{intro}
+There is significant value in an automated tool to determine chords from audio. Knowing the progressions of chords underlying the melodies is an essential part of understanding, playing, and building on the music. To a curious learner of music, such a tool creates the opportunity to be able to play a new pop song without requiring good-quality hand-labelled chord tags. Equally useful to a learner is being able to receive feedback concerning the accuracy with which a chord was played, making such a system a good automated feedback tool, capable of being plugged in to an online MOOC class. To a song writer, the system is useful in being able to explore chords supporting the melodic content of the song.
 
-As in the past few years, ICML will rely exclusively on
-electronic formats for submission and review. 
+Furthermore, the use of such a system extends into other machine learning tasks. The tasks of identifying a song from its waveform data, and of classifying the genre of song can be linked to finding the chord progressions underlying the harmonic content of the song. Hand-labelling chord names and marking chord changes in a song takes a lot of manual time and effort. An automated tool for this process would save such time, and would allow the development of new  musical tools and research.
+
+Most exisiting research in the field of chord recognition has been designed for offline processing. There are a few realtime implementations available \url{https://files.nyu.edu/jb2843/public/Publications_files/Cho_Bello_ICMC2009.pdf} and  Idea of generatic audio from symbolic data \url{http://dl.acm.org/citation.cfm?id=1178726}
+But we are first to do it online.
+
+\section{Data Generation}
+The chord prediction task is a multiclass classification task. In music, a chord is a harmonic set of notes sounding simultaneously. We choose the minor and major chords, the two most common sets of chords in popular music to classify on. Using the traditional twelve pitch scale (C, C\#, D, D\#, E, F, F\#, G, G\#, A, A\#, B), we have 24 such distinct chords.
+
+There are different ways of playing the same chord. The Cmaj chord, for instance, is the set of three notes C, E, and G played simultaneously. On a piano, these notes can be played on different octaves. Played on the fourth octave, the Cmaj would have the notes C4, E4, G4. It is also possible to play Cmaj in with E as the lowest note - E4, G4, C5 (first inversion form) and with G as the lowest note G4, C5, E5 (second inversion form).
+
+To train the system, we generate training data programmatically in Python using INSERT. We generate midi files for each of the 24 chords, taking into account 8 octaves, and 3 inversion forms, to generate a total of 576 midi files. We then use these 576 midi files in conjunction with 6 soundfonts for piano, guitar and violin to generate a total of 3456 sound files.
+
+In musical chord recognition, feature extraction operates over frames. The generated wav files, which are an average of 4 seconds in length, are first split into frames of window size 10ms each, and a n-dimensional feature vector is extracted for each frame. We label each frame with the label of the chord on its corresponding sound file, to generate ~1 million training examples.
+
+\section{Paralelling Speech Recognition}
+
+The pipeline of a chord recognition system is very similar to that of a speech recognition one and relies on techniques that were originally applied to speech recognition tasks. The use of the Hidden Markov Models, and the division of a sound file into frames on which the prediction task is performed, are two such techniques which have been reproduced in identifying chords. However, the task of finding chords is also different from speech tasks in a few ways, and these differences can be exploited to specialize a system in the task of chord recognition.
+
+\subsection{Feature Extraction}
+
+One important difference between the two surfaces in the choice of features for the tasks. Mel-frequency cepstrum coefficients (MFCC) are commonly used as features in speech recognition systems. These represents the short-term power spectrum of a sound. It has been found that MFCCs are closely related to timbre - quality that is associated to being able to distinguish between a voice, string instrument, wind instrument, and percussion instrument. These have traditionally be seen as bad features for chord recognition, since they discard the pitch content of the sound, and are simply used to set benchmarks for other features.
+
+Chroma features are commonly used for chord recognition tasks. It is a representation in which the the entire spectrum of sound frequencies is distributed into 12 bins representing the traditional twelve pitch scale. An advantage of Chroma features is that they invariant to octaves and inversions. These features also possess a reasonable level of robustness to changes in instruments. We use the Matlab Chroma Toolbox to extract Chroma features for the frames.
+
+Figure 1 shows the extract Chroma for C major. Note that the spikes at INSERT correspond to spikes at C, E, and G, the notes constituting the C major. This supports the idea that Chroma encodes the harmonic content of sound.
+
+INSERT CHROMA IMAGE FOR C. MAYBE EVEN INVERSIONS
+
+To test the performance of Chroma features against MFCC features, we start with a binary classification problem of distinguishing major chords from minor chords. An SVM with RBF kernel $$ K(x, z) = \exp(-\gamma\lVert{x - y}\rVert^2)$$ is trained, with regularization and kernel parameters ($\gamma = \frac{1}{\text{\# features}}$ and $C = 100$). Table 1 shows the results, and confirms that chroma features are much better suited to the task of chord recognition than MFCCs are.
+
+, the SVM gives a test accuracy of 51.0\%. Next an SVM with RBF kernel is trained using basic chroma features, and gives an accuracy of 97.7\% on a test set. 
+
+\section{Frame Model}
+Since we have a multiclass classification problem, we first use multinomial logistic regression or softmax regression to get a performance baseline. To test the accuracy of frame model, we predict the chord on each frame. Our frame accuracy on the training set gives an accuracy of 1233% on the training set. On a holdout set, we get an accuracy of 1223%.
+
+\section{Mixer Model}
+Our frame model outputs a prediction for each frame. Our final classification task, however, is on a wav file, which is a collection of frames. We now come up with a mixer model, which is a model for putting the results on the frame together. There are many ways of doing this, including looking at the middle frame, or counting the most frequent prediction across all of the frames.
+
+Let us assume that a test wav file consists of a single chord being played. We will drop this assumption later, but for now, let us consider this simpler case. Now that we have constraint no chord changes within a wave file, we use the following model for predictions.
+
+We assume that the prediction on each frame is independent of the prediction on other frames.
+Hence our prediction is $argmax y P(y | X) = Prod P(y | x_i)$. We get a test accuracy of 1223% predicting on wav files. 
+
+\section{Improving the frame model}
+Softmax regression is a learning algorithm that models p(y |x ), the conditional distribution of the chord given the extracted frame features. We now look at a model that tries to model p(x| y) and p(y): Gaussian Discriminant Analysis (GDA). The model is:
+x|y = i ∼ N (µi, Σ)
+Since our aim is to make the system independent of any specific genre, we model the distribution of y’s as unifrom $p(y) = 1/num_chords$. We also model p(x|y) using a multivariate normal distribution. Although we model each gaussian with different means, we assume they all share the same covariance matrix. With this new generative model, we can now expand our mixer model.
+
+\section{Improving the mixer model}
+Earlier, we had imposed the constraint that chords could not change in a wav file. However, in songs, chords do change frequently. Our next model allows us to loosen that constraint. We now use a hidden markov model to predict the chord sequence in wav files. The emission probabilities p(x|y) can be modelled by our GDA frame model, and we assume uniform chord transitions to remain flexible to any genre of music. We determine the most likely state sequence by the Viterbi algorithm.
+
+With the new model, for a random sequence of frames,  we achieve 1223% test accuracy training and testing on instruments 1223. Note that this is very high for two reasons. Features are robust in being invariant to octave, and inversions, so it is possible to overfit the training data, and have the test data be very close to an already seen data point in the training set.
 
 
-\subsection{Templates for Papers}
+\section{Improving features}
 
-Electronic templates for producing papers for submission are available
-for \LaTeX\/ and Microsoft Word. Templates are accessible on the World
-Wide Web at:\\
-\textbf{\texttt{http://icml.cc/2013/}}
+The reason we are able to get very high accuracy was that our features were invariant to octave and inversions, and somewhat invariant to instrumentation. It would be possible to get even higher accuracy if features were invariant of instruments. CRP (Chroma DCT-Reduced log Pitch) is a chroma-based audio feature that boosts the degree of timbre invariance. The general idea is to discard timbre-related information similar to that expressed by MFCCs, in effect leaving the information related to pitch.
 
-\noindent
-Send questions about these electronic templates to
-\texttt{program@icml.cc}.
 
-The formatting instructions below will be enforced for initial submissions and camera-ready copies. 
-\begin{itemize}
-\item The maximum paper length is 8 pages excluding references, and 
-9 pages including references.
-\item Do not alter the style template; in particular, do not compress the paper format 
-by reducing the vertical spaces.
-\item Do not include author information or acknowledgments in your
-  initial submission. 
-\item Place figure captions {\em under} the figure (and omit titles from
-  inside the graphic file itself).  Place table captions {\em over}
-  the table.
-\item References must include page numbers whenever possible and be as
-  complete as possible.  Place multiple citations in chronological order.  
-\end{itemize}
-Please see below for details on each of these items.
+Graph showing chroma vs crp features.
 
-\subsection{Submitting Papers}
+With these feautres, on clean chords, training on instruments 1223, and testing on 1223 we get an accuracy of 1223. We found that training only on piano improved the performance even more.
 
-Submission to ICML 2013 will be entirely electronic, via a web site
-(not email).  The URL and information about the submission process
-are available on the conference web site at
+\section{Live system consideration}
 
-\textbf{\texttt{http://icml.cc/2013/}}
-
-{\bf Paper Deadline:} The deadline for paper submission to ICML 2013
-is at 23:59 Universal Time (3:59 Pacific Daylight Time) on the due date
-(October 1, December 15, or February 15, depending on the review cycle).  
-If your full submission does not reach us by this time, it will 
-not be considered for publication. There is no separate abstract submission.
-
-{\bf Anonymous Submission:} To facilitate blind review, no identifying
-author information should appear on the title page or in the paper
-itself.  Section~\ref{author info} will explain the details of how to
-format this.
-
-{\bf Simultaneous Submission:} ICML will not accept any paper which,
-at the time of submission, is under review for another conference or
-has already been published. This policy also applies to papers that
-overlap substantially in technical content with conference papers
-under review or previously published. ICML submissions must not be
-submitted to other conferences during ICML's review period. Authors
-may submit to ICML substantially different versions of journal papers
-that are currently under review by the journal, but not yet accepted
-at the time of submission. Informal publications, such as technical
-reports or papers in workshop proceedings which do not appear in
-print, do not fall under these restrictions.
-
-\medskip
-
-To ensure our ability to print submissions, authors must provide their
-manuscripts in \textbf{PDF} format.  Furthermore, please make sure
-that files contain only Type-1 fonts (e.g.,~using the program {\tt
-  pdffonts} in linux or using File/DocumentProperties/Fonts in
-Acrobat).  Other fonts (like Type-3) might come from graphics files
-imported into the document.
-
-Authors using \textbf{Word} must convert their document to PDF.  Most
-of the latest versions of Word have the facility to do this
-automatically.  Submissions will not be accepted in Word format or any
-format other than PDF. Really. We're not joking. Don't send Word.
-
-Those who use \textbf{\LaTeX} to format their accepted papers need to
-pay close attention to the typefaces used.  Specifically, when
-producing the PDF by first converting the dvi output of \LaTeX\ to Postscript
-the default behavior is to use non-scalable Type-3 PostScript bitmap
-fonts to represent the standard \LaTeX\ fonts. The resulting document
-is difficult to read in electronic form; the type appears fuzzy. To
-avoid this problem, dvips must be instructed to use an alternative
-font map.  This can be achieved with
-something like the following commands:\\[0.5em]
-{\bf dvips -Ppdf -tletter -G0 -o paper.ps paper.dvi}\\
-{\bf ps2pdf paper.ps}\\[0.5em]
-Note that it is a zero following the ``-G''.  This tells dvips to use
-the config.pdf file (and this file refers to a better font mapping).
-
-Another alternative is to use the \textbf{pdflatex} program instead of
-straight \LaTeX. This program avoids the Type-3 font problem, however
-you must ensure that all of the fonts are embedded (use {\tt
-pdffonts}). If they are not, you need to configure pdflatex to use a
-font map file that specifies that the fonts be embedded. Also you
-should ensure that images are not downsampled or otherwise compressed
-in a lossy way.
-
-Note that the 2013 style files use the {\tt hyperref} package to
-make clickable links in documents.  If this causes problems for you,
-add {\tt nohyperref} as one of the options to the {\tt icml2013}
-usepackage statement.
-
-\subsection{Reacting to Reviews}
-We will continue the ICML tradition in which the authors are given the
-option of providing a short reaction to the initial reviews. These
-reactions will be taken into account in the discussion among the
-reviewers and area chairs.
-
-\subsection{Submitting Final Camera-Ready Copy}
-
-The final versions of papers accepted for publication should follow the
-same format and naming convention as initial submissions, except of
-course that the normal author information (names and affiliations)
-should be given.  See Section~\ref{final author} for details of how to
-format this.
-
-The footnote, ``Preliminary work.  Under review by the International
-Conference on Machine Learning (ICML).  Do not distribute.'' must be
-modified to ``\textit{Proceedings of the
-$\mathit{30}^{th}$ International Conference on Machine Learning},
-Atlanta, Georgia, USA, 2013.  JMLR: W\&CP volume 28. 
-Copyright 2013 by the author(s).''
-
-For those using the \textbf{\LaTeX} style file, simply change
-$\mathtt{\backslash usepackage\{icml2013\}}$ to 
-
-\verb|\usepackage[accepted]{icml2013}|
-
-\noindent
-Authors using \textbf{Word} must edit the
-footnote on the first page of the document themselves.
-
-Camera-ready copies should have the title of the paper as running head
-on each page except the first one.  The running title consists of a
-single line centered above a horizontal rule which is $1$ point thick.
-The running head should be centered, bold and in $9$ point type.  The
-rule should be $10$ points above the main text.  For those using the
-\textbf{\LaTeX} style file, the original title is automatically set as running
-head using the {\tt fancyhdr} package which is included in the ICML
-2013 style file package.  In case that the original title exceeds the
-size restrictions, a shorter form can be supplied by using
-
-\verb|\icmltitlerunning{...}|
-
-just before $\mathtt{\backslash begin\{document\}}$.
-Authors using \textbf{Word} must edit the header of the document themselves.
-
-\section{Format of the Paper} 
+One of such differences is that the unit of speech that makes up a word, a phone, changes much more quickly than a chord does. A chord is usually sustained for a few centiseconds, if not a few seconds, before it changes. We make use of this knowledge in our live system to distinguish chords from noise.
  
-All submissions must follow the same format to ensure the printer can
-reproduce them without problems and to let readers more easily find
-the information that they desire.
-
-\subsection{Length and Dimensions}
-
-Papers must not exceed eight (8) pages, including all figures, tables,
-and appendices, but excluding references. When references are included,
-the paper must not exceed nine (9) pages. Any submission that exceeds 
-this page limit or that diverges significantly from the format specified 
-herein will be rejected without review.
-
-The text of the paper should be formatted in two columns, with an
-overall width of 6.75 inches, height of 9.0 inches, and 0.25 inches
-between the columns. The left margin should be 0.75 inches and the top
-margin 1.0 inch (2.54~cm). The right and bottom margins will depend on
-whether you print on US letter or A4 paper, but all final versions
-must be produced for US letter size.
-
-The paper body should be set in 10~point type with a vertical spacing
-of 11~points. Please use Times Roman typeface throughout the text.
-
-\subsection{Title}
-
-The paper title should be set in 14~point bold type and centered
-between two horizontal rules that are 1~point thick, with 1.0~inch
-between the top rule and the top edge of the page. Capitalize the
-first letter of content words and put the rest of the title in lower
-case.
-
-\subsection{Author Information for Submission}
-\label{author info}
-
-To facilitate blind review, author information must not appear.  If
-you are using \LaTeX\/ and the \texttt{icml2013.sty} file, you may use
-\verb+\icmlauthor{...}+ to specify authors.  The author information
-will simply not be printed until {\tt accepted} is an argument to the
-style file. Submissions that include the author information will not
-be reviewed.
-
-\subsubsection{Self-Citations}
-
-If your are citing published papers for which you are an author, refer
-to yourself in the third person. In particular, do not use phrases
-that reveal your identity (e.g., ``in previous work \cite{langley00}, we 
-have shown \ldots'').
-
-Do not anonymize citations in the reference section by removing or
-blacking out author names. The only exception are manuscripts that are
-not yet published (e.g. under submission). If you choose to refer to
-such unpublished manuscripts \cite{anonymous}, anonymized copies have 
-to be submitted
-as Supplementary Material via CMT. However, keep in mind that an ICML
-paper should be self contained and should contain sufficient detail
-for the reviewers to evaluate the work. In particular, reviewers are
-not required to look a the Supplementary Material when writing their
-review.
-
-\subsubsection{Camera-Ready Author Information}
-\label{final author}
-
-If a paper is accepted, a final camera-ready copy must be prepared.
-%
-For camera-ready papers, author information should start 0.3~inches
-below the bottom rule surrounding the title. The authors' names should
-appear in 10~point bold type, electronic mail addresses in 10~point
-small capitals, and physical addresses in ordinary 10~point type.
-Each author's name should be flush left, whereas the email address
-should be flush right on the same line. The author's physical address
-should appear flush left on the ensuing line, on a single line if
-possible. If successive authors have the same affiliation, then give
-their physical address only once.
-
-A sample file (in PDF) with author names is included in the ICML2013 
-style file package.
-
-\subsection{Abstract}
-
-The paper abstract should begin in the left column, 0.4~inches below
-the final address. The heading `Abstract' should be centered, bold,
-and in 11~point type. The abstract body should use 10~point type, with
-a vertical spacing of 11~points, and should be indented 0.25~inches
-more than normal on left-hand and right-hand margins. Insert
-0.4~inches of blank space after the body. Keep your abstract brief and 
-self-contained,
-limiting it to one paragraph and no more than six or seven sentences.
-
-\subsection{Partitioning the Text} 
-
-You should organize your paper into sections and paragraphs to help
-readers place a structure on the material and understand its
-contributions.
-
-\subsubsection{Sections and Subsections}
-
-Section headings should be numbered, flush left, and set in 11~pt bold
-type with the content words capitalized. Leave 0.25~inches of space
-before the heading and 0.15~inches after the heading.
-
-Similarly, subsection headings should be numbered, flush left, and set
-in 10~pt bold type with the content words capitalized. Leave
-0.2~inches of space before the heading and 0.13~inches afterward.
-
-Finally, subsubsection headings should be numbered, flush left, and
-set in 10~pt small caps with the content words capitalized. Leave
-0.18~inches of space before the heading and 0.1~inches after the
-heading. 
-
-Please use no more than three levels of headings.
-
-\subsubsection{Paragraphs and Footnotes}
-
-Within each section or subsection, you should further partition the
-paper into paragraphs. Do not indent the first line of a given
-paragraph, but insert a blank line between succeeding ones.
- 
-You can use footnotes\footnote{For the sake of readability, footnotes
-should be complete sentences.} to provide readers with additional
-information about a topic without interrupting the flow of the paper. 
-Indicate footnotes with a number in the text where the point is most
-relevant. Place the footnote in 9~point type at the bottom of the
-column in which it appears. Precede the first footnote in a column
-with a horizontal rule of 0.8~inches.\footnote{Multiple footnotes can
-appear in each column, in the same order as they appear in the text,
-but spread them across columns and pages if possible.}
-
-\begin{figure}[ht]
-\vskip 0.2in
-\begin{center}
-\centerline{\includegraphics[width=\columnwidth]{icml_numpapers}}
-\caption{Historical locations and number of accepted papers for International
-  Machine Learning Conferences (ICML 1993 -- ICML 2008) and
-  International Workshops on Machine Learning (ML 1988 -- ML
-  1992). At the time this figure was produced, the number of
-  accepted papers for ICML 2008 was unknown and instead estimated.}
-\label{icml-historical}
-\end{center}
-\vskip -0.2in
-\end{figure} 
-
-\subsection{Figures}
- 
-You may want to include figures in the paper to help readers visualize
-your approach and your results. Such artwork should be centered,
-legible, and separated from the text. Lines should be dark and at
-least 0.5~points thick for purposes of reproduction, and text should
-not appear on a gray background.
-
-Label all distinct components of each figure. If the figure takes the
-form of a graph, then give a name for each axis and include a legend
-that briefly describes each curve. Do not include a title inside the
-figure; instead, the caption should serve this function.
-
-Number figures sequentially, placing the figure number and caption
-{\it after\/} the graphics, with at least 0.1~inches of space before
-the caption and 0.1~inches after it, as in
-Figure~\ref{icml-historical}.  The figure caption should be set in
-9~point type and centered unless it runs two or more lines, in which
-case it should be flush left.  You may float figures to the top or
-bottom of a column, and you may set wide figures across both columns
-(use the environment {\tt figure*} in \LaTeX), but always place
-two-column figures at the top or bottom of the page.
-
-\subsection{Algorithms}
-
-If you are using \LaTeX, please use the ``algorithm'' and ``algorithmic'' 
-environments to format pseudocode. These require 
-the corresponding stylefiles, algorithm.sty and 
-algorithmic.sty, which are supplied with this package. 
-Algorithm~\ref{alg:example} shows an example. 
-
-\begin{algorithm}[tb]
-   \caption{Bubble Sort}
-   \label{alg:example}
-\begin{algorithmic}
-   \STATE {\bfseries Input:} data $x_i$, size $m$
-   \REPEAT
-   \STATE Initialize $noChange = true$.
-   \FOR{$i=1$ {\bfseries to} $m-1$}
-   \IF{$x_i > x_{i+1}$} 
-   \STATE Swap $x_i$ and $x_{i+1}$
-   \STATE $noChange = false$
-   \ENDIF
-   \ENDFOR
-   \UNTIL{$noChange$ is $true$}
-\end{algorithmic}
-\end{algorithm}
- 
-\subsection{Tables} 
- 
-You may also want to include tables that summarize material. Like 
-figures, these should be centered, legible, and numbered consecutively. 
-However, place the title {\it above\/} the table with at least 
-0.1~inches of space before the title and the same after it, as in 
-Table~\ref{sample-table}. The table title should be set in 9~point 
-type and centered unless it runs two or more lines, in which case it
-should be flush left.
-
-% Note use of \abovespace and \belowspace to get reasonable spacing 
-% above and below tabular lines. 
-
-\begin{table}[t]
-\caption{Classification accuracies for naive Bayes and flexible 
-Bayes on various data sets.}
-\label{sample-table}
-\vskip 0.15in
-\begin{center}
-\begin{small}
-\begin{sc}
-\begin{tabular}{lcccr}
-\hline
-\abovespace\belowspace
-Data set & Naive & Flexible & Better? \\
-\hline
-\abovespace
-Breast    & 95.9$\pm$ 0.2& 96.7$\pm$ 0.2& $\surd$ \\
-Cleveland & 83.3$\pm$ 0.6& 80.0$\pm$ 0.6& $\times$\\
-Glass2    & 61.9$\pm$ 1.4& 83.8$\pm$ 0.7& $\surd$ \\
-Credit    & 74.8$\pm$ 0.5& 78.3$\pm$ 0.6&         \\
-Horse     & 73.3$\pm$ 0.9& 69.7$\pm$ 1.0& $\times$\\
-Meta      & 67.1$\pm$ 0.6& 76.5$\pm$ 0.5& $\surd$ \\
-Pima      & 75.1$\pm$ 0.6& 73.9$\pm$ 0.5&         \\
-\belowspace
-Vehicle   & 44.9$\pm$ 0.6& 61.5$\pm$ 0.4& $\surd$ \\
-\hline
-\end{tabular}
-\end{sc}
-\end{small}
-\end{center}
-\vskip -0.1in
-\end{table}
-
-Tables contain textual material that can be typeset, as contrasted 
-with figures, which contain graphical material that must be drawn. 
-Specify the contents of each row and column in the table's topmost
-row. Again, you may float tables to a column's top or bottom, and set
-wide tables across both columns, but place two-column tables at the
-top or bottom of the page.
- 
-\subsection{Citations and References} 
-
-Please use APA reference format regardless of your formatter
-or word processor. If you rely on the \LaTeX\/ bibliographic 
-facility, use {\tt natbib.sty} and {\tt icml2013.bst} 
-included in the style-file package to obtain this format.
-
-Citations within the text should include the authors' last names and
-year. If the authors' names are included in the sentence, place only
-the year in parentheses, for example when referencing Arthur Samuel's
-pioneering work \yrcite{Samuel59}. Otherwise place the entire
-reference in parentheses with the authors and year separated by a
-comma \cite{Samuel59}. List multiple references separated by
-semicolons \cite{kearns89,Samuel59,mitchell80}. Use the `et~al.'
-construct only for citations with three or more authors or after
-listing all authors to a publication in an earlier reference \cite{MachineLearningI}.
-
-Authors should cite their own work in the third person
-in the initial version of their paper submitted for blind review.
-Please refer to Section~\ref{author info} for detailed instructions on how to
-cite your own papers.
-
-Use an unnumbered first-level section heading for the references, and 
-use a hanging indent style, with the first line of the reference flush
-against the left margin and subsequent lines indented by 10 points. 
-The references at the end of this document give examples for journal
-articles \cite{Samuel59}, conference publications \cite{langley00}, book chapters \cite{Newell81}, books \cite{DudaHart2nd}, edited volumes \cite{MachineLearningI}, 
-technical reports \cite{mitchell80}, and dissertations \cite{kearns89}. 
-
-Alphabetize references by the surnames of the first authors, with
-single author entries preceding multiple author entries. Order
-references for the same authors by year of publication, with the
-earliest first. Make sure that each reference includes all relevant
-information (e.g., page numbers).
-
-\subsection{Software and Data}
-
-We strongly encourage the publication of software and data with the
-camera-ready version of the paper whenever appropriate.  This can be
-done by including a URL in the camera-ready copy.  However, do not
-include URLs that reveal your institution or identity in your
-submission for review.  Instead, provide an anonymous URL or upload
-the material as ``Supplementary Material'' into the CMT reviewing
-system.  Note that reviewers are not required to look a this material
-when writing their review.
-
-
-% Acknowledgements should only appear in the accepted version. 
-\section*{Acknowledgments} 
- 
-\textbf{Do not} include acknowledgements in the initial version of
-the paper submitted for blind review.
-
-If a paper is accepted, the final camera-ready version can (and
-probably should) include acknowledgements. In this case, please
-place such acknowledgements in an unnumbered section at the
-end of the paper. Typically, this will include thanks to reviewers
-who gave useful comments, to colleagues who contributed to the ideas, 
-and to funding agencies and corporate sponsors that provided financial 
-support.  
-
-
-% In the unusual situation where you want a paper to appear in the
-% references without citing it in the main text, use \nocite
-\nocite{langley00}
+In a live system, one of the most important considerations to take into account is noise. Even while running the system on songs, there are segments that consist of percussion, or silence. It is important for a system to not predict any chord in this timespan. 
+Challenging is that we don't know what's about to come next.
 
 \bibliography{example_paper}
 \bibliographystyle{icml2013}
 
 \end{document} 
-
-
-% This document was modified from the file originally made available by
-% Pat Langley and Andrea Danyluk for ICML-2K. This version was
-% created by Lise Getoor and Tobias Scheffer, it was slightly modified  
-% from the 2010 version by Thorsten Joachims & Johannes Fuernkranz, 
-% slightly modified from the 2009 version by Kiri Wagstaff and 
-% Sam Roweis's 2008 version, which is slightly modified from 
-% Prasad Tadepalli's 2007 version which is a lightly 
-% changed version of the previous year's version by Andrew Moore, 
-% which was in turn edited from those of Kristian Kersting and 
-% Codrina Lauth. Alex Smola contributed to the algorithmic style files.  
