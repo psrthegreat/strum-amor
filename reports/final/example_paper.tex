@@ -63,7 +63,7 @@ There are different ways of playing the same chord. The Cmaj chord, for instance
 
 To train the system, we generate training data programmatically in Python using INSERT TOOLKIT INSERT REFERENCE. We generate midi files for each of the 24 chords, taking into account 8 octaves, and 3 inversion forms, to generate a total of 576 midi files. We then use these 576 midi files in conjunction with 6 soundfonts for piano, guitar and violin to generate a total of 3456 sound files.
 
-In musical chord recognition, feature extraction operates over frames. The generated wav files, which are an average of 4 seconds in length, are first split into frames of window size 10ms each, and a n-dimensional feature vector is extracted for each frame. We label each frame with the label of the chord on its corresponding sound file, to generate ~1 million training examples.
+In musical chord recognition, feature extraction operates over frames. The generated wav files, which are an average of 4 seconds in length, are first split into frames of window size 100ms each, and a n-dimensional feature vector is extracted for each frame. We label each frame with the label of the chord on its corresponding sound file, to generate 100,000 training examples.
 
 \section{Paralelling Speech Recognition}
 
@@ -170,6 +170,8 @@ Independence Mixer & Insert\%\\
 \subsection{Improved frame model}
 Softmax regression is a learning algorithm that models $p(y|x)$, the conditional distribution of the chord given the extracted frame features. We now look at a model that tries to model $p(x|y)$ and $p(y)$: Gaussian Discriminant Analysis (GDA). INSERT CITATION WHERE USED BEFORE. We model $p(x|y)$ using a multivariate normal distribution. Although we model each gaussian with different means, we assume they all share the same covariance matrix: $x|y=i \sim \mathcal{N}$$(\mu_i, \Sigma)$. Since our aim is to make the system independent of any specific genre, we model $p(y) = 1/24$, a model in which all chords are equally likely. With this new generative model, we can now expand our mixer model.
 
+INSERT CONFUSION MATRIX AND NOTE ABOUT MISSING A PITCH MAJOR VS MINOR
+
 \subsection{Improved mixer model}
 Earlier, we had imposed the constraint that chords could not change in a wav file. Our next model allows us to loosen that constraint. We now use a Hidden Markov Model to predict the chord sequence in sound files, allowing us to determine chord changes in a file. INSERT CITATION WHERE USED BEFORE. Firstly, the emission probabilities $p(x|y)$ are modelled by our GDA frame model. While state transitions are usually learned in chord recognition tasks, INSERT CITATION WHERE USED BEFORE, since each genre of music has a different distribution of transitions, assuming uniform state transitions allows us to remain flexible to any genre of music. We determine the most likely state sequence by the Viterbi decoding. Table 4 summarizes the accuracies acheived by the improved mixer model trained on different sets of instruments.
 
@@ -238,9 +240,18 @@ Guitar & Guitar  & Insert\%\\
 
 \section{Live system consideration}
 
-A live system presents new challenges for chord recognition, but also expands the possibilities of 
-In a live system, one of the most important considerations to take into account is noise. Even while running the system on songs, there are segments that consist of percussion, or silence. It is important for a system to not predict any chord in this timespan. 
-Challenging is that we don't know what's about to come next.
+A live system presents new challenges for chord recognition, while pushing the extents of possible uses of the system.
+One of the most important considerations for a live system to take into account is noise. It is important for a system to not predict any chord in this timespan. 
+
+Our realtime system makes use of the Web Audio API to capture live audio. Every 800ms, we encode the audio in wav format, and transfer it to a server using WebSockets. We then extract features for every 100ms frame in the wav file, and predict the most likely chord sequence in the 800ms using the HMM. 
+
+\subsection{Handling Noise}
+At this stage, we are able to determine whether the 800ms segment is a noise or a chord. Using the knowledge that it usually takes a few seconds before chords change, we can then post-process the output by looking at the number of times chord changes were predicted by the HMM in the 800ms segment. If any chord lasts for more than 400ms in the prediction, then we output the chord as our prediction for the 800ms segment. Otherwise, we understand that segment of sound as consisting of noise.
+
+MAYBE INCLUDE PART ABOUT VARIANCE
+
+\section{Conclusion}
+In this paper, we present
 
 \bibliography{example_paper}
 \bibliographystyle{icml2013}
