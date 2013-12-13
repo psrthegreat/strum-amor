@@ -45,7 +45,7 @@
 ]
 
 \begin{abstract} 
-In this paper, we present a prototype of an online tool for real-time chord recognition. It makes use of a Hidden Markov Model in conjunction with Gaussian Discriminant Analysis. Unlike approaches to collect data through web-scraping or training on hand-labeled song data, we generate a copious amount of chord data programmatically. We improve the performance of system by substituting the usually tried Chroma features with a novel set of Chroma DCT-Reduced log Pitch features to push test accuracy on clean data to 99.96\%. We finally propose a set of modifications to have the online system achieve a good balance between speed and accuracy.
+In this paper, we present a prototype of an online tool for real-time chord recognition. It makes use of a Hidden Markov Model in conjunction with Gaussian Discriminant Analysis. Unlike approaches to collect data through web-scraping or training on hand-labeled song data, we generate chord data programmatically. We improve the performance of system by substituting the usually tried Chroma features with a novel set of Chroma DCT-Reduced log Pitch features to push test accuracy on clean data to 99.96\%. We finally propose a set of modifications to have the online system achieve a good balance between speed and accuracy.
 \end{abstract} 
 
 \section{Introduction}
@@ -78,33 +78,118 @@ Chroma features are commonly used for chord recognition tasks. It is a represent
 
 Figure 1 shows the extract Chroma for C major. Note that the spikes at INSERT correspond to spikes at C, E, and G, the notes constituting the C major. This supports the idea that Chroma encodes the harmonic content of sound.
 
-INSERT CHROMA IMAGE FOR C. MAYBE EVEN INVERSIONS
+INSERT CHROMA IMAGE FOR Cmaj on different OCTAVES and INVERSIONS
 
-To test the performance of Chroma features against MFCC features, we start with a binary classification problem of distinguishing major chords from minor chords. An SVM with RBF kernel $$ K(x, z) = \exp(-\gamma\lVert{x - y}\rVert^2)$$ is trained, with regularization and kernel parameters ($\gamma = \frac{1}{\text{\# features}}$ and $C = 100$). Table 1 shows the results, and confirms that chroma features are much better suited to the task of chord recognition than MFCCs are.
+To test the performance of Chroma features against MFCC features, we start with a binary classification problem of distinguishing major chords from minor chords. An SVM with RBF kernel $$ K(x, z) = \exp(-\gamma\lVert{x - y}\rVert^2)$$ is trained, with regularization and kernel parameters ($\gamma = 1$ and $C = 100$). Table 1 shows the results, and confirms that chroma features are much better suited to the task of chord recognition than MFCCs are.
+\begin{table}[t]
+\caption{Classification accuracies for MFCC vs Chroma on binary classification task of distinguishing major and minor chords}
+\label{mfccvschroma}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{sc}
+\begin{tabular}{lcccr}
+\hline
+\abovespace\belowspace
+Features & Test Accuracy \\
+\hline
+\abovespace
+MFCC    & 51.0\%\\
+Chroma & 97.7\%\\
+\hline
+\end{tabular}
+\end{sc}
+\end{small}
+\end{center}
+\vskip -0.1in
+\end{table}
 
-, the SVM gives a test accuracy of 51.0\%. Next an SVM with RBF kernel is trained using basic chroma features, and gives an accuracy of 97.7\% on a test set. 
+\section{Initial Models}
+\subsection{Frame Model}
+With Chroma established as good features for the chord recognition model, we can now extend to the multiclass classification problem of determining the exact chord. We first use multinomial logistic regression, also called softmax regression, as our initial frame model. The frame model is responsible for making predictions on individual frames. Table 2 shows the accuracies achieved by the softmax classifier on the training and test set.
+\begin{table}[t]
+\caption{Softmax Regression accuracies on an 80/20 holdout set}
+\label{mfccvschroma}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{sc}
+\begin{tabular}{lcccr}
+\hline
+\abovespace\belowspace
+Set & Accuracy \\
+\hline
+\abovespace
+Traning    & Insert\%\\
+Testing & Insert\%\\
+\hline
+\end{tabular}
+\end{sc}
+\end{small}
+\end{center}
+\vskip -0.1in
+\end{table}
 
-\section{Frame Model}
-Since we have a multiclass classification problem, we first use multinomial logistic regression or softmax regression to get a performance baseline. To test the accuracy of frame model, we predict the chord on each frame. Our frame accuracy on the training set gives an accuracy of 1233% on the training set. On a holdout set, we get an accuracy of 1223%.
+\subsection{Mixer Model}
+Our frame model outputs a prediction for each frame. Our final classification task, however, is on a sound file, which is a collection of frames. We now define a mixer model, which is a model for collecting and using the results on individuals frames outputted by the frame model. The simplest mixer model can look at the middle frame in the file, or count the most frequent prediction across all of the frames.
 
-\section{Mixer Model}
-Our frame model outputs a prediction for each frame. Our final classification task, however, is on a wav file, which is a collection of frames. We now come up with a mixer model, which is a model for putting the results on the frame together. There are many ways of doing this, including looking at the middle frame, or counting the most frequent prediction across all of the frames.
+We consider the following mixer model. Let us first assume that a test sound file consists of a single chord being played. We will drop this assumption later, but for now, the simple case allows us to build up to the more complex one. Now that we have imposed the constraint that there are no chord changes within a wave file, we use the following model for predictions.
 
-Let us assume that a test wav file consists of a single chord being played. We will drop this assumption later, but for now, let us consider this simpler case. Now that we have constraint no chord changes within a wave file, we use the following model for predictions.
+We assume that the prediction on each frame is independent of the prediction on other frames. Let f be the number of frames in a file.
+Hence our predicted output $y_p = \underset{y}{\operatorname{argmax}} p(y | X) = \prod_{i=1}^fp(y | x_i)$. 
+\begin{figure}[ht]
+\vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth]{f1}}
+\caption{Bayesian network of mixer model}
+\label{icml-historical}
+\end{center}
+\vskip -0.2in
+\end{figure}
 
-We assume that the prediction on each frame is independent of the prediction on other frames.
-Hence our prediction is $argmax y P(y | X) = Prod P(y | x_i)$. We get a test accuracy of 1223% predicting on wav files. 
+\section{Improved models}
+\subsection{Improved frame model}
+Softmax regression is a learning algorithm that models $p(y|x)$, the conditional distribution of the chord given the extracted frame features. We now look at a model that tries to model $p(x|y)$ and $p(y)$: Gaussian Discriminant Analysis (GDA). We model $p(x|y)$ using a multivariate normal distribution. Although we model each gaussian with different means, we assume they all share the same covariance matrix:
 
-\section{Improving the frame model}
-Softmax regression is a learning algorithm that models p(y |x ), the conditional distribution of the chord given the extracted frame features. We now look at a model that tries to model p(x| y) and p(y): Gaussian Discriminant Analysis (GDA). The model is:
-x|y = i ∼ N (µi, Σ)
-Since our aim is to make the system independent of any specific genre, we model the distribution of y’s as unifrom $p(y) = 1/num_chords$. We also model p(x|y) using a multivariate normal distribution. Although we model each gaussian with different means, we assume they all share the same covariance matrix. With this new generative model, we can now expand our mixer model.
+$x|y=i \sim \mathcal{N}$$(\mu_i, \Sigma)$
 
-\section{Improving the mixer model}
-Earlier, we had imposed the constraint that chords could not change in a wav file. However, in songs, chords do change frequently. Our next model allows us to loosen that constraint. We now use a hidden markov model to predict the chord sequence in wav files. The emission probabilities p(x|y) can be modelled by our GDA frame model, and we assume uniform chord transitions to remain flexible to any genre of music. We determine the most likely state sequence by the Viterbi algorithm.
+Since our aim is to make the system independent of any specific genre, we model $p(y) = 1/24$, a model in which all chords are equally likely. With this new generative model, we can now expand our mixer model.
 
-With the new model, for a random sequence of frames,  we achieve 1223% test accuracy training and testing on instruments 1223. Note that this is very high for two reasons. Features are robust in being invariant to octave, and inversions, so it is possible to overfit the training data, and have the test data be very close to an already seen data point in the training set.
+\subsection{Improved mixer model}
+Earlier, we had imposed the constraint that chords could not change in a wav file. Our next model allows us to loosen that constraint. We now use a hidden markov model to predict the chord sequence in sound files. The emission probabilities $p(x|y)$ can be modelled by our GDA frame model, and we assume uniform chord state transitions to remain flexible to any genre of music. We determine the most likely state sequence by the Viterbi algorithm.
+\begin{figure}[ht]
+\vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth]{hmm}}
+\caption{Hidden Markov Model to determine most likely chord state sequences}
+\label{icml-historical}
+\end{center}
+\vskip -0.2in
+\end{figure}
 
+With the new model, for a random sequence of frames,  we achieve INSERT test accuracy training and testing on instruments INSERT.
+\begin{table}[t]
+\caption{Softmax Regression accuracies on an 80/20 holdout set}
+\label{mfccvschroma}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{sc}
+\begin{tabular}{lcccr}
+\hline
+\abovespace\belowspace
+Set & Accuracy \\
+\hline
+\abovespace
+Traning    & Insert\%\\
+Testing & Insert\%\\
+\hline
+\end{tabular}
+\end{sc}
+\end{small}
+\end{center}
+\vskip -0.1in
+\end{table}
 
 \section{Improving features}
 
