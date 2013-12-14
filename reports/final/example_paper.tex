@@ -312,29 +312,7 @@ Testing & 53.9\%\\
 Earlier, we had imposed the constraint that chords could not change in a WAV
 file. Our next model allows us to drop that constraint. We now use a Hidden
 Markov Model to predict the chord sequence in sound files, allowing us to
-determine chord changes in a file \cite{sheh}. Firstly, the emission
-probabilities $p(x|y)$ are modelled by our GDA frame model. While state
-transitions are usually learned in chord recognition tasks, \cite{lee}, since
-each genre of music has a different distribution of transitions, assuming
-uniform state transitions allows us to remain flexible to any genre of music. We
-determine the most likely state sequence by the Viterbi decoding. Table 4
-summarizes the accuracies acheived by the improved mixer model trained on
-different sets of instruments.
-
-Figure 3 shows the confusion matrix. The most common misclassifications are ones
-between a major chords and its corresponding minor version. This is explained by
-the fact that a major and a minor chord for any note have two out of three notes
-in common.
-
-\begin{figure}[ht]
-\vskip 0.2in
-\begin{center}
-\centerline{\includegraphics[width=\columnwidth]{conf}}
-\caption{Confusion matrix for HMM training and testing on Piano}
-\label{icml-historical}
-\end{center}
-\vskip -0.2in
-\end{figure}
+determine chord changes in a file \cite{sheh}. 
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -345,6 +323,20 @@ in common.
 \end{center}
 \vskip -0.2in
 \end{figure}
+
+Firstly, the emission
+probabilities $p(x|y)$ are modelled by our GDA frame model. While state
+transitions are usually learned in chord recognition tasks \cite{lee}, since
+each genre of music has a different distribution of transitions, assuming
+uniform state transitions allows us to remain flexible to any genre of music. We
+determine the most likely state sequence by Viterbi decoding. Table 5
+summarizes the accuracies acheived by the improved mixer model trained on
+different sets of instruments.
+
+Figure 4 shows the confusion matrix for the Mixer Model trained and tested on generated Piano audio. The most common misclassifications are ones
+between major chords and the corresponding minor chords. This is explained by
+the fact that a major and a minor chord of the same key have two out of three notes
+in common.
 
 \begin{table}[t]
 \caption{HMM accuracies training and testing on different data sets}
@@ -371,11 +363,22 @@ All & All & 90.68\%\\
 \vskip -0.1in
 \end{table}
 
+\begin{figure}[ht]
+\vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth]{conf}}
+\caption{Confusion matrix for HMM training and testing on Piano}
+\label{icml-historical}
+\end{center}
+\vskip -0.2in
+\end{figure}
+
+
 \section{Improving Features}
 
 Chroma features, in their invariance to octave and inversions, make great
 features for the chord recognition task. To boost the accuracy further would
-require features were invariant of instruments \cite{jiang}. CRP (Chroma
+require features invariant of instruments \cite{jiang}. CRP (Chroma
 DCT-Reduced log Pitch) is a chroma-based audio feature that boosts the degree of
 timbre invariance. The general idea is to extract Chroma features, and then
 discard timbre-related information similar to that expressed by MFCCs, in effect
