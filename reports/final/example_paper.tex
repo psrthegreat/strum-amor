@@ -85,8 +85,8 @@ Chroma features are commonly used for chord recognition tasks \cite{fujishima}. 
 \vskip -0.2in
 \end{figure}
 
+To test the performance of Chroma features against MFCC features, we start with a binary classification problem of distinguishing major chords from minor chords. An SVM with RBF kernel $$ K(x, z) = \exp(-\gamma\lVert{x - y}\rVert^2)$$ is trained, with regularization and kernel parameters ($\gamma = 1$ and $C = 100$). Table 1 summarizes the results, and confirms that chroma features are much better suited to the task of chord recognition than MFCCs.
 
-To test the performance of Chroma features against MFCC features, we start with a binary classification problem of distinguishing major chords from minor chords. An SVM with RBF kernel $$ K(x, z) = \exp(-\gamma\lVert{x - y}\rVert^2)$$ is trained, with regularization and kernel parameters ($\gamma = 1$ and $C = 100$). Table 1 shows the results, and confirms that chroma features are much better suited to the task of chord recognition than MFCCs are.
 \begin{table}[t]
 \caption{Classification accuracies for MFCC vs Chroma on binary classification task of distinguishing major and minor chords}
 \label{mfccvschroma}
