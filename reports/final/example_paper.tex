@@ -50,7 +50,7 @@ In this paper, we present a prototype of an online tool for real-time chord reco
 
 \section{Introduction}
 \label{intro}
-There is significant value in an automated tool to determine chords from audio. Knowing the progressions of chords underlying the melodies is an essential part of understanding, playing, and building on the music. To a curious learner of music, such a tool creates the opportunity to play a new pop song without meticulously hand-labelled chord tags. Equally useful to a learner is being able to receive feedback concerning the accuracy with which a chord was played, making such a system a good automated feedback tool, capable of being plugged into an online MOOC class. To a song writer, the system is useful for exploring chords supporting the melodic content of the song.
+There is significant value in an automated tool to determine chords from audio. Knowing the progressions of chords underlying the melodies is an essential part of understanding, playing, and building on the music. To a curious learner of music, such a tool creates the opportunity to play a new pop song without meticulously hand-labelled chord tags. Equally useful to a learner is being able to receive feedback concerning the accuracy with which a chord was played, making such a system a good automated feedback tool, capable of being plugged into an MOOC music class. To a song writer, the system is useful for exploring chords supporting the melodic content of the song.
 
 Furthermore, the use of such a system extends into other machine learning tasks. The tasks of identifying a song from its waveform data, and of classifying the genre of song can be linked to finding the chord progressions underlying the harmonic content of the song. Hand-labelling chord names and marking chord changes in a song takes a lot of manual time and effort. An automated tool for this process saves time, and allows the development of new musical tools and research.
 
@@ -61,9 +61,9 @@ The chord prediction task is a multiclass classification task. In music, a chord
 
 There are different ways of playing the same chord. The Cmaj chord, for instance, is the set of three notes C, E, and G played simultaneously. On a piano, these notes can be played on different octaves. Played on the fourth octave, the Cmaj would have the notes C4, E4, G4. It is also possible to play Cmaj in with E as the lowest note - E4, G4, C5 (first inversion form) and with G as the lowest note G4, C5, E5 (second inversion form).
 
-\cite{lee}. To train the system, we generate training data programmatically. We generate midi files for each of the 24 chords, taking into account 8 octaves, and 3 inversion forms, to generate a total of 576 midi files. We then use an audio synthesizer Timidity++ to convert the 576 generated midi files, in conjunction with 6 soundfonts for piano, guitar, and violin, to generate a total of 3456 audio files in WAVE format.
+To train the system, we generate training data programmatically. This has found to have advantages over hand-labelling song data in its ability to generate lots of training data \cite{lee}. We generate midi files for each of the 24 chords, taking into account 8 octaves, and 3 inversion forms, to generate a total of 576 midi files. We then use an audio synthesizer Timidity++ to convert the 576 generated midi files, in conjunction with 3 soundfonts for piano, guitar, and violin, to generate a total of 1728 audio files in WAVE format.
 
-In musical chord recognition, feature extraction operates over frames. The generated wav files, which are an average of 4 seconds in length, are first split into frames of window size 100ms each, and a n-dimensional feature vector is extracted for each frame. We label each frame with the label of the chord on its corresponding sound file, to generate CHECK 100,000 training examples.
+In musical chord recognition, feature extraction operates over frames. The generated wav files, which are an average of 4 seconds in length, are first split into frames of window size 100ms each, and a n-dimensional feature vector is extracted for each frame. We label each frame with the label of the chord on its corresponding sound file, to generate 69,120 examples. We use 80% of the data as our training set, and 20% as our testing set. 
 
 \section{Paralleling Speech Recognition}
 
@@ -71,11 +71,9 @@ The pipeline of a chord recognition system is very similar to that of a speech r
 
 \subsection{Feature Extraction}
 
-One important difference between the two surfaces in the choice of features for the tasks. Mel-frequency cepstrum coefficients (MFCC) have been the dominant features used in speech recognition systems \cite{young}. These represents the short-term power spectrum of a sound. It has been found that MFCCs are closely related to timbre - quality that is associated to being able to distinguish between a voice, string instrument, wind instrument, and percussion instrument. WE FOUND INSTEAD OF These have traditionally been seen as bad features for chord recognition, since they discard the pitch content of the sound, CHECK and are simply used to set benchmarks for other features CHECK.
+One important difference between the two surfaces in the choice of features for the tasks. Mel-frequency cepstrum coefficients (MFCC) have been the dominant features used in speech recognition systems. These represent the short-term power spectrum of a sound. It has been found that MFCCs are closely related to timbre - a quality that is considered able to distinguish between a voice, string instrument, wind instrument, and percussion instrument. These have traditionally been seen as bad features for chord recognition, since they discard the pitch content of the sound, but are useful in setting a baseline benchmark for such a system.
 
-Chroma features are commonly used for chord recognition tasks. \cite{fujishima}. It is a representation in which the the entire spectrum of sound frequencies is distributed into 12 bins representing the traditional twelve pitch scale. An advantage of Chroma features is that they invariant to octaves and inversions. These features also possess a reasonable level of robustness to changes in instruments. We use the Matlab Chroma Toolbox to extract Chroma features for the frames.
-
-Figure 1 shows the extract Chroma for C major. Note that the spikes at INSERT correspond to spikes at C, E, and G, the notes constituting the C major. This supports the idea that Chroma encodes the harmonic content of sound.
+Chroma features are commonly used for chord recognition tasks \cite{fujishima}. It is a representation in which the the entire spectrum of sound frequencies is distributed into 12 bins representing the traditional twelve pitch scale. An advantage of Chroma features is that they invariant to octaves and inversions. These features also possess a reasonable level of robustness to changes in instruments. We use the Matlab Chroma Toolbox to extract Chroma features for the frames INSERT CITATION.  Figure 1 shows the extracted Chroma features for C major major. The energy spikes at C, E, and G, the notes constituting the C major, supporting the idea that Chroma encodes the harmonic content of sound.
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -178,12 +176,8 @@ Independence Mixer & 48.3\%\\
 \section{Improved models}
 \subsection{Improved frame model}
 
-<<<<<<< HEAD
-Softmax regression is a learning algorithm that models $p(y|x)$, the conditional distribution of the chord given the extracted frame features. We now look at a model that tries to model $p(x|y)$ and $p(y)$: Gaussian Discriminant Analysis (GDA). \url{http://www.mpi-inf.mpg.de/~pgrosche/publications/2011_JiangGroscheKonzMueller_ChordRecognitionEvaluation_AES42-Ilmenau.pdf}. We model $p(x|y)$ using a multivariate normal distribution. Although we model each gaussian with different means, we assume they all share the same covariance matrix: $x|y=i \sim \mathcal{N}$$(\mu_i, \Sigma)$. Since our aim is to make the system independent of any specific genre, we model $p(y) = 1/24$, a model in which all chords are equally likely. 
-
-=======
 Softmax regression is a learning algorithm that models $p(y|x)$, the conditional distribution of the chord given the extracted frame features. We now look at a model that tries to model $p(x|y)$ and $p(y)$: Gaussian Discriminant Analysis (GDA). \cite{jiang}. We model $p(x|y)$ using a multivariate normal distribution. Although we model each gaussian with different means, we assume they all share the same covariance matrix: $x|y=i \sim \mathcal{N}$$(\mu_i, \Sigma)$. Since our aim is to make the system independent of any specific genre, we model $p(y) = 1/24$, a model in which all chords are equally likely. 
->>>>>>> 6d6906ef62bc26c6712f1f2b795da54daa8350b6
+
 \begin{table}[t]
 \caption{GDA frame model accuracies on an 80/20 train/test split}
 \label{mfccvschroma}
@@ -288,7 +282,6 @@ Guitar & Guitar  & Insert\%\\
 \vskip -0.1in
 \end{table}
 
-
 \section{Live system consideration}
 
 A live system presents new challenges for chord recognition, while pushing the extents of possible uses of the system.
@@ -301,15 +294,9 @@ At this stage, we are able to determine whether the 800ms segment is a noise or 
 
 \subsection{Window Size}
 800ms was seen to be the optimal time for recording. Increasing the window time for collecting the recording from 800ms was found to create a highly noticeable delay in the live system. On the other hand, reducing the window time decreased accuracy. It was also harder to distinguish between noise and chords with a smaller window.
-
-MAYBE INCLUDE PART ABOUT VARIANCE
-
+ 
 \section{Conclusion}
-In this paper, we present an implementation of a real-time chord recognition system. Using novel web technologies, we are able to apply:
-- HMM
-- GAUSSIAN
-- NOISE HANDLING
-- DATA GENERATION
+In this paper, we present an implementation of a real-time chord recognition system. Using novel web technologies, we are able to apply/ We use a Hidden Markov Model in conjunction with Gaussian Discriminant Analysis for the classification task. Unlike approaches to collect data through web-scraping or training on hand-labeled song data, we generate symbolic chord data programmatically. We improve the performance of system by substituting the usually tried Chroma features with a novel set of Chroma DCT-Reduced log Pitch features to push test accuracy on clean data to 99.96\%. We finally propose a set of modifications to have the system predict with speed and accuracy in realtime. 
 
 \bibliography{example_paper}
 \bibliographystyle{icml2013}
