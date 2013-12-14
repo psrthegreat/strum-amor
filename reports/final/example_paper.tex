@@ -284,7 +284,7 @@ model that tries to model $p(x|y)$ and $p(y)$: Gaussian Discriminant Analysis
 Although we model each gaussian with different means, we assume they all share
 the same covariance matrix: $x|y=i \sim \mathcal{N}$$(\mu_i, \Sigma)$. Since our
 aim is to make the system independent of any specific genre, we model $p(y) =
-1/24$, a model in which all chords are equally likely.
+1/24$, a model in which all chords are equally likely. Table 4 summarizes the classification accuracies.
 
 \begin{table}[t]
 \caption{GDA frame model accuracies}
@@ -309,34 +309,6 @@ Testing & 53.9\%\\
 \vskip -0.1in
 \end{table}
 
-With this improved frame model, we achieve a test accuracy of 97.01\%. Figure
-3 shows the confusion matrix. The most common misclassifications are ones
-between a major chords and its corresponding minor version. This is explained by
-the fact that a major and a minor chord for any note have two out of three notes
-in common.
-
-Softmax regression is a learning algorithm that models $p(y|x)$, the conditional
-distribution of the chord given the extracted frame features. We now look at a
-model that tries to model $p(x|y)$ and $p(y)$: Gaussian Discriminant Analysis
-(GDA). \cite{jiang}. We model $p(x|y)$ using a multivariate normal distribution.
-Although we model each gaussian with different means, we assume they all share
-the same covariance matrix: $x|y=i \sim \mathcal{N}$$(\mu_i, \Sigma)$. Since our
-aim is to make the system independent of any specific genre, we model $p(y) =
-1/24$, a model in which all chords are equally likely. With this improved frame
-model, we achieve a test accuracy of INSERT\%. Figure INSERT shows the confusion
-matrix. The most common misclassifications are ones between a major chords and
-its corresponding minor version. This is explained by the fact that a major and
-a minor chord for any note have two out of three notes in common.
-
-\begin{figure}[ht]
-\vskip 0.2in
-\begin{center}
-\centerline{\includegraphics[width=\columnwidth]{conf}}
-\caption{Confusion matrix of improved frame model}
-\label{icml-historical}
-\end{center}
-\vskip -0.2in
-\end{figure}
 
 \subsection{Improved mixer model}
 Earlier, we had imposed the constraint that chords could not change in a wav
@@ -362,6 +334,21 @@ uniform state transitions allows us to remain flexible to any genre of music. We
 determine the most likely state sequence by the Viterbi decoding. Table 4
 summarizes the accuracies acheived by the improved mixer model trained on
 different sets of instruments.
+
+Figure 3 shows the confusion matrix. The most common misclassifications are ones
+between a major chords and its corresponding minor version. This is explained by
+the fact that a major and a minor chord for any note have two out of three notes
+in common.
+
+\begin{figure}[ht]
+\vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth]{conf}}
+\caption{Confusion matrix for HMM training and testing on Piano}
+\label{icml-historical}
+\end{center}
+\vskip -0.2in
+\end{figure}
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -433,7 +420,7 @@ Training Data & Testing Data & Accuracy \\
 \hline
 \abovespace
 Piano & Piano & 98.72\%\\
-Guitar & Guitar & 99.96\%\\
+Piano & Guitar & 99.96\%\\
 Piano & Violin & 98.54\%\\
 All & All & 99.19\%\\
 \hline
@@ -466,12 +453,9 @@ for more than 400ms in the prediction, then we output the chord as our
 prediction for the 800ms segment. Otherwise, we understand that segment of sound
 as consisting of noise.
 
-\subsection{Window Size}
-800ms was seen to be the optimal time for recording. Increasing the window time
-for collecting the recording from 800ms was found to create a highly noticeable
-delay in the live system. On the other hand, reducing the window time decreased
-accuracy. It was also harder to distinguish between noise and chords with a
-smaller window.
+\subsection{Recording Interval}
+We found 800ms to be the optimal time interval over which to process the audio. Increasing the interval 
+for collecting the recording from 800ms was found to create a noticeable delay in the live system. On the other hand, reducing the window time not only decreased accuracy, but also made it harder to distinguish between noise and chords.
 
 \section{Conclusion}
 In this paper, we present an implementation of a real-time chord recognition
