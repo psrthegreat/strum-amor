@@ -67,12 +67,12 @@ meticulously hand-labelled chord tags. Equally useful to a learner is being able
 to receive feedback concerning the accuracy with which a chord was played,
 making such a system a good automated feedback tool, capable of being plugged
 into an online music course. To a song writer, the system is useful for exploring
-chords supporting the melodic content of the song.
+chords supporting the melodic content of a song.
 
 Furthermore, the use of such a system extends into other machine learning tasks.
-The tasks of identifying a song from its waveform data, and of classifying the
-genre of song can be linked to finding the chord progressions underlying the
-harmonic content of the song. Hand-labelling chord names and marking chord
+The tasks of identifying a song from its waveform data, and of classifying its
+genre can be linked to finding the chord progressions underlying its
+harmonic content. Hand-labelling chord names and marking chord
 changes in a song takes a lot of manual time and effort. An automated tool for
 this process saves time, and allows the development of new musical tools and
 research.
@@ -131,15 +131,15 @@ It is a representation in which the the entire spectrum of sound frequencies is
 distributed into 12 bins representing the traditional twelve pitch scale. An
 advantage of Chroma features is that they are invariant to octaves and inversions.
 We use the Matlab Chroma Toolbox to extract Chroma features for the frames
-\cite{muller}. Figure 1 shows the extracted Chroma features for the C major
-chord. The energy spikes at C, E, and G, the notes constituting the Cmaj chord,
+\cite{muller}. Figure 1 shows the extracted Chroma features for the C Major
+chord. The energy spikes at C, E, and G, the notes constituting the C Major chord,
 supporting the idea that Chroma features encode the harmonic content of a chord.
 
 \begin{figure}[ht]
 \vskip 0.2in
 \begin{center}
 \centerline{\includegraphics[width=\columnwidth]{chromac}}
-\caption{Chroma features for Cmaj in various octaves and inversions}
+\caption{Chroma features for C Major in various octaves and inversions}
 \label{chroma}
 \end{center}
 \vskip -0.2in
@@ -364,13 +364,13 @@ All & All & 90.68\%\\
 
 \section{Improving Features}
 
-Chroma features, in their invariance to octave and inversions, make great
+Chroma features, in their invariance to octave and inversions, make good
 features for the chord recognition task. To boost the accuracy further would
-require features invariant of instruments \cite{jiang}. CRP (Chroma
-DCT-Reduced log Pitch) is a chroma-based audio feature that boosts the degree of
-timbre invariance. The general idea is to extract Chroma features, and then
+require features invariant of instruments. CRP (Chroma
+DCT-Reduced log Pitch) has been recently introduced as a chroma-based audio feature that boosts the degree of
+timbre invariance \cite{jiang}. The general idea is to extract Chroma features, and then
 discard timbre-related information similar to that expressed by MFCCs, in effect
-leaving the information related to pitch. Table 5 summarizes the accuracies
+leaving the information related to pitch. Table 6 summarizes the accuracies
 achieved by the new CRP features in relation to the Chroma features.
 
 \begin{figure}[ht]
@@ -384,7 +384,7 @@ achieved by the new CRP features in relation to the Chroma features.
 \end{figure}
 
 \begin{table}[t]
-\caption{Chroma vs CRP}
+\caption{New scores after replacing Chroma with CRP}
 \label{chromavscrp}
 \vskip 0.15in
 \begin{center}
@@ -409,20 +409,18 @@ All & All & 99.19\%\\
 \end{table}
 
 \section{Live System Considerations}
-
-A live system presents new challenges for chord recognition, while pushing the
-extents of possible uses of the system.
-One of the most important considerations for a live system to take into account
-is noise. It is important for a system to not predict any chord in this
-timespan.
-
 Our real-time system makes use of the Web Audio API to capture live audio. Every
 800ms, we encode the audio in WAV format, and transfer it to a server using
 WebSockets. We then extract features for every 100ms frame in the WAV file, and
 predict the most likely chord sequence in the 800ms using the HMM.
 
+
 \subsection{Handling Noise}
-At this stage, we are able to determine whether the 800ms segment is a noise or
+A live online system, while pushing the extents of possible uses of the system, presents new challenges for chord recognition.
+One of the most important considerations for a live system to take into account
+is noise. It is ideal for a system to not predict any chord in when there are no chords being played.
+
+Once the HMM returns that most likely chord sequence,  we are able to determine whether the 800ms segment is a noise or
 a chord. Using the knowledge that it usually takes a few seconds before chords
 change, we can then post-process the output by looking at the number of times
 chord changes were predicted by the HMM in the 800ms segment. If any chord lasts
@@ -430,13 +428,11 @@ for more than 400ms in the prediction, then we output the chord as our
 prediction for the 800ms segment. Otherwise, we understand that segment of sound
 as consisting of noise.
 
-\subsection{Recording Interval}
-We found 800ms to be the optimal time interval over which to process the audio. Increasing the interval 
+800ms was found to be the optimal time interval over which to process the audio. Increasing the interval 
 for collecting the recording from 800ms was found to create a noticeable delay in the live system. On the other hand, reducing the window time not only decreased accuracy, but also made it harder to distinguish between noise and chords.
 
 \section{Conclusion}
-In this paper, we present an implementation of a real-time chord recognition system. We show the effectiveness of Hidden Markov Models with Gaussian emissions in classifying chords. Furthermore, we show how timbre-invariant CRP features can improve robustness, compared to Chroma. Integrating noise detection strategies then create an effective live recognition system. With this system, we improve the feasibility of automatic chord recognition, and pave the way for making this technology more accessible to the public.
-
+In this paper, we present an implementation of an online, real-time chord recognition system using modern web technologies. We show the effectiveness of Hidden Markov Models with Gaussian emissions in classifying chords. Furthermore, we show how timbre-invariant CRP features can improve robustness compared to Chroma. Finally we detail a strategy for noise detection to create an effective live recognition system. With this system, we improve the feasibility of live automatic chord recognition, and pave the way for making this technology more accessible to the public.
 
 \bibliography{example_paper}
 \bibliographystyle{icml2013}
