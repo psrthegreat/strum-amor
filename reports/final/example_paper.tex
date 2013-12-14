@@ -128,8 +128,8 @@ With Chroma established as good features for the chord recognition model, we can
 Set & Accuracy \\
 \hline
 \abovespace
-Traning    & Insert\%\\
-Testing & Insert\%\\
+Traning    & 51.2\%\\
+Testing & 32.1\%\\
 \hline
 \end{tabular}
 \end{sc}
@@ -145,14 +145,14 @@ Consider another such model, we call the Independence Mixer model. Let us first 
 \begin{figure}[ht]
 \vskip 0.2in
 \begin{center}
-\centerline{\includegraphics[width=\columnwidth]{f1}}
-\caption{Bayesian network of mixer model}
+\centerline{\includegraphics[width=\columnwidth]{naive}}
+\caption{Bayesian network of Independence Mixer model}
 \label{icml-historical}
 \end{center}
 \vskip -0.2in
 \end{figure}
 \begin{table}[t]
-\caption{Comparisons of accuracies of mixer models}
+\caption{Comparisons of accuracies of mixer models with softmax frame model}
 \label{mfccvschroma}
 \vskip 0.15in
 \begin{center}
@@ -164,9 +164,9 @@ Consider another such model, we call the Independence Mixer model. Let us first 
 Model & Test Accuracy \\
 \hline
 \abovespace
-Middle Frame    & Insert\%\\
-Max Count & Insert\%\\
-Independence Mixer & Insert\%\\
+Middle Frame    & 6.7\%\\
+Max Count & 33.3\%\\
+Independence Mixer & 48.3\%\\
 \hline
 \end{tabular}
 \end{sc}
@@ -176,7 +176,31 @@ Independence Mixer & Insert\%\\
 \end{table}
 \section{Improved models}
 \subsection{Improved frame model}
-Softmax regression is a learning algorithm that models $p(y|x)$, the conditional distribution of the chord given the extracted frame features. We now look at a model that tries to model $p(x|y)$ and $p(y)$: Gaussian Discriminant Analysis (GDA). \url{http://www.mpi-inf.mpg.de/~pgrosche/publications/2011_JiangGroscheKonzMueller_ChordRecognitionEvaluation_AES42-Ilmenau.pdf}. We model $p(x|y)$ using a multivariate normal distribution. Although we model each gaussian with different means, we assume they all share the same covariance matrix: $x|y=i \sim \mathcal{N}$$(\mu_i, \Sigma)$. Since our aim is to make the system independent of any specific genre, we model $p(y) = 1/24$, a model in which all chords are equally likely. With this improved frame model, we achieve a test accuracy of INSERT\%. Figure INSERT shows the confusion matrix. The most common misclassifications are ones between a major chords and its corresponding minor version. This is explained by the fact that a major and a minor chord for any note have two out of three notes in common. 
+Softmax regression is a learning algorithm that models $p(y|x)$, the conditional distribution of the chord given the extracted frame features. We now look at a model that tries to model $p(x|y)$ and $p(y)$: Gaussian Discriminant Analysis (GDA). \url{http://www.mpi-inf.mpg.de/~pgrosche/publications/2011_JiangGroscheKonzMueller_ChordRecognitionEvaluation_AES42-Ilmenau.pdf}. We model $p(x|y)$ using a multivariate normal distribution. Although we model each gaussian with different means, we assume they all share the same covariance matrix: $x|y=i \sim \mathcal{N}$$(\mu_i, \Sigma)$. Since our aim is to make the system independent of any specific genre, we model $p(y) = 1/24$, a model in which all chords are equally likely. 
+\begin{table}[t]
+\caption{GDA frame model accuracies on an 80/20 train/test split}
+\label{mfccvschroma}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{sc}
+\begin{tabular}{lcccr}
+\hline
+\abovespace\belowspace
+Set & Accuracy \\
+\hline
+\abovespace
+Traning    & 67.8\%\\
+Testing & 53.9\%\\
+\hline
+\end{tabular}
+\end{sc}
+\end{small}
+\end{center}
+\vskip -0.1in
+\end{table}
+
+With this improved frame model, we achieve a test accuracy of INSERT\%. Figure INSERT shows the confusion matrix. The most common misclassifications are ones between a major chords and its corresponding minor version. This is explained by the fact that a major and a minor chord for any note have two out of three notes in common. 
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -189,7 +213,7 @@ Softmax regression is a learning algorithm that models $p(y|x)$, the conditional
 \end{figure}
 
 \subsection{Improved mixer model}
-Earlier, we had imposed the constraint that chords could not change in a wav file. Our next model allows us to drop that constraint. We now use a Hidden Markov Model to predict the chord sequence in sound files, allowing us to determine chord changes in a file. http://www.ee.columbia.edu/~dpwe/pubs/ismir03-chords.pdf. Firstly, the emission probabilities $p(x|y)$ are modelled by our GDA frame model. While state transitions are usually learned in chord recognition tasks, \url{https://ccrma.stanford.edu/~kglee/pubs/klee-amcmm06.pdf}, since each genre of music has a different distribution of transitions, assuming uniform state transitions allows us to remain flexible to any genre of music. We determine the most likely state sequence by the Viterbi decoding. Table 4 summarizes the accuracies acheived by the improved mixer model trained on different sets of instruments.
+Earlier, we had imposed the constraint that chords could not change in a wav file. Our next model allows us to drop that constraint. We now use a Hidden Markov Model to predict the chord sequence in sound files, allowing us to determine chord changes in a file. \url{http://www.ee.columbia.edu/~dpwe/pubs/ismir03-chords.pdf}. Firstly, the emission probabilities $p(x|y)$ are modelled by our GDA frame model. While state transitions are usually learned in chord recognition tasks, \url{https://ccrma.stanford.edu/~kglee/pubs/klee-amcmm06.pdf}, since each genre of music has a different distribution of transitions, assuming uniform state transitions allows us to remain flexible to any genre of music. We determine the most likely state sequence by the Viterbi decoding. Table 4 summarizes the accuracies acheived by the improved mixer model trained on different sets of instruments.
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -226,7 +250,7 @@ Guitar & Guitar + ... & Insert\%\\
 
 \section{Improving features}
 
-Chroma features, in their invariance to octave and inversions, make great features for the chord recognition task. To boost the accuracy further would require features were invariant of instruments. CRP (Chroma DCT-Reduced log Pitch) is a chroma-based audio feature that boosts the degree of timbre invariance. The general idea is to extract Chroma features, and then discard timbre-related information similar to that expressed by MFCCs, in effect leaving the information related to pitch. Table 5 summarizes the accuracies achieved by the new CRP features in relation to the Chroma features.
+Chroma features, in their invariance to octave and inversions, make great features for the chord recognition task. To boost the accuracy further would require features were invariant of instruments. \url{http://www.mpi-inf.mpg.de/~pgrosche/publications/2011_JiangGroscheKonzMueller_ChordRecognitionEvaluation_AES42-Ilmenau.pdf} In CRP (Chroma DCT-Reduced log Pitch) is a chroma-based audio feature that boosts the degree of timbre invariance. The general idea is to extract Chroma features, and then discard timbre-related information similar to that expressed by MFCCs, in effect leaving the information related to pitch. Table 5 summarizes the accuracies achieved by the new CRP features in relation to the Chroma features.
 
 INSERT GRAPH SHOWING CHROMA INVARIANCE TO INSTRUMENTS VS CRP INVARIANCE
 
