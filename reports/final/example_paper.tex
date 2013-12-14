@@ -566,7 +566,17 @@ Guitar & Guitar + ... & Insert\%\\
 
 Chroma features, in their invariance to octave and inversions, make great features for the chord recognition task. To boost the accuracy further would require features were invariant of instruments \cite{jiang}. In CRP (Chroma DCT-Reduced log Pitch) is a chroma-based audio feature that boosts the degree of timbre invariance. The general idea is to extract Chroma features, and then discard timbre-related information similar to that expressed by MFCCs, in effect leaving the information related to pitch. Table 5 summarizes the accuracies achieved by the new CRP features in relation to the Chroma features.
 
-INSERT GRAPH SHOWING CHROMA INVARIANCE TO INSTRUMENTS VS CRP INVARIANCE
+
+hi
+\begin{figure}[ht]
+\vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[width=\columnwidth]{chromacrp}}
+\caption{Chroma vs CRP invariance}
+\label{crpchroma}
+\end{center}
+\vskip -0.2in
+\end{figure}
 
 \begin{table}[t]
 \caption{Chroma vs CRP}
@@ -592,7 +602,7 @@ Guitar & Guitar  & Insert\%\\
 \end{table}
 
 \section{Live system consideration}
-
+hi
 A live system presents new challenges for chord recognition, while pushing the extents of possible uses of the system.
 One of the most important considerations for a live system to take into account is noise. It is important for a system to not predict any chord in this timespan. 
 
