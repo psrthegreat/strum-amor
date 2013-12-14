@@ -1,4 +1,4 @@
-\begin{thebibliography}{6}
+\begin{thebibliography}{7}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -35,6 +35,13 @@ K.~Lee, M.~Slanley.
 \newblock Automatic chord recognition from audio using a supervised hmm trained
   with audio-from-symbolic data.
 \newblock Technical report, CCRMA, Stanford University, 2006.
+
+\bibitem[Muller \& Ewert(2011)Muller and Ewert]{muller}
+Muller, M. and Ewert, S.
+\newblock Chroma toolbox: Matlab implementations for extracting variants of
+  chroma-based audio features.
+\newblock In \emph{Proceedings of the International Conference on Musical
+  Information Retrieval (ISMIR)}, 2011.
 
 \bibitem[Young(1994)]{young}
 Young, S.~J.
