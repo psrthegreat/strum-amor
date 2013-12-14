@@ -127,7 +127,7 @@ of chord recognition.
 
 One important difference between the two surfaces in the choice of features for
 the tasks. Mel-frequency cepstrum coefficients (MFCC) have been the dominant
-features used in speech recognition systems. These represent the short-term
+features in speech recognition systems. These represent the short-term
 power spectrum of a sound. It has been found that MFCCs are closely related to
 timbre - a quality that is considered able to distinguish between a voice,
 string instrument, wind instrument, and percussion instrument. These have
@@ -138,17 +138,17 @@ benchmark for such a system.
 Chroma features are commonly used for chord recognition tasks \cite{fujishima}.
 It is a representation in which the the entire spectrum of sound frequencies is
 distributed into 12 bins representing the traditional twelve pitch scale. An
-advantage of Chroma features is that they invariant to octaves and inversions.
+advantage of Chroma features is that they are invariant to octaves and inversions.
 We use the Matlab Chroma Toolbox to extract Chroma features for the frames
 \cite{muller}. Figure 1 shows the extracted Chroma features for the C major
-chord. The energy spikes at C, E, and G, the notes constituting the C major,
-supporting the idea that Chroma encodes the harmonic content of a chord.
+chord. The energy spikes at C, E, and G, the notes constituting the Cmaj chord,
+supporting the idea that Chroma features encode the harmonic content of a chord.
 
 \begin{figure}[ht]
 \vskip 0.2in
 \begin{center}
 \centerline{\includegraphics[width=\columnwidth]{chromac}}
-\caption{Chroma features for C major in various octaves and inversions}
+\caption{Chroma features for Cmaj in various octaves and inversions}
 \label{chroma}
 \end{center}
 \vskip -0.2in
@@ -375,7 +375,7 @@ All & All & 90.68\%\\
 
 Chroma features, in their invariance to octave and inversions, make great
 features for the chord recognition task. To boost the accuracy further would
-require features were invariant of instruments \cite{jiang}. In CRP (Chroma
+require features were invariant of instruments \cite{jiang}. CRP (Chroma
 DCT-Reduced log Pitch) is a chroma-based audio feature that boosts the degree of
 timbre invariance. The general idea is to extract Chroma features, and then
 discard timbre-related information similar to that expressed by MFCCs, in effect
