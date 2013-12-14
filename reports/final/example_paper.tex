@@ -66,7 +66,7 @@ music, such a tool creates the opportunity to play a new pop song without
 meticulously hand-labelled chord tags. Equally useful to a learner is being able
 to receive feedback concerning the accuracy with which a chord was played,
 making such a system a good automated feedback tool, capable of being plugged
-into an MOOC music class. To a song writer, the system is useful for exploring
+into an online music course. To a song writer, the system is useful for exploring
 chords supporting the melodic content of the song.
 
 Furthermore, the use of such a system extends into other machine learning tasks.
@@ -81,13 +81,13 @@ There has been progress in chord recognition research. A few have built
 real-time systems that have shown to achieve promising results \cite{fujishima,
 cho}. However, these have not leveraged the web to make a chord-recognition
 system accessible online. We build a real-time online chord recognition system
-that makes use of the novel HTML5 capabilities such as the WebAudio api and
+that makes use of modern HTML5 capabilities such as the WebAudio API and
 WebSockets, and detail the offline training strategies and online challenges
 posed by the novel adaptation.
 
 \section{Data Generation}
-The chord prediction task is a multiclass classification task. In music, a chord
-is a harmonic set of notes sounding simultaneously. We choose the minor and
+Chord prediction is a multiclass classification task. In music, a chord
+is a set of notes played simultaneously. We choose the minor and
 major chords, the two most common sets of chords in popular music to classify
 on. Using the traditional twelve pitch scale (C, C\#, D, D\#, E, F, F\#, G, G\#,
 A, A\#, B), we have 24 such distinct chords.
@@ -99,24 +99,22 @@ octave, the Cmaj would have the notes C4, E4, G4. It is also possible to play
 Cmaj in with E as the lowest note - E4, G4, C5 (first inversion form) and with G
 as the lowest note G4, C5, E5 (second inversion form).
 
-To train the system, we generate training data programmatically. This has found
-to have advantages over hand-labelling song data in its ability to generate lots
-of training data \cite{lee}. We generate midi files for each of the 24 chords,
+To train the system, we generate training data programmatically. This has been found to have advantages over hand-labelling song data in its ability to generate sufficient training data \cite{lee}. We generate MIDI files for each of the 24 chords,
 taking into account 8 octaves, and 3 inversion forms, to generate a total of 576
-midi files. We then use an audio synthesizer Timidity++ to convert the 576
-generated midi files, in conjunction with 3 soundfonts for piano, guitar, and
-violin, to generate a total of 1728 audio files in wav format.
+MIDI files. We then use an audio synthesizer ``Timidity++'' to convert the 576
+generated MIDI files, in conjunction with 3 soundfonts for piano, guitar, and
+violin, to generate a total of 1728 audio files in WAV format.
 
 In musical chord recognition, feature extraction operates over frames. The
-generated wav files, which are an average of 4 seconds in length, are first
-split into frames of window size 100ms each, and a n-dimensional feature vector
+generated WAV files, which are an average of 4 seconds in length, are first
+split into frames of window size 100ms each, and an n-dimensional feature vector
 is extracted for each frame. We label each frame with the label of the chord on
 its corresponding sound file, to generate 69,120 examples. We use 80\% of the
 data as our training set, and 20\% as our testing set.
 
 \section{Paralleling Speech Recognition}
 
-The pipeline of a chord recognition system is very similar to that of a speech
+The pipeline of a chord recognition system is similar to that of a speech
 recognition one and relies on techniques that were originally applied to speech
 recognition tasks. The use of the Hidden Markov Models \cite{young} , and the
 division of a sound file into frames on which the prediction task is performed,
@@ -311,22 +309,10 @@ Testing & 53.9\%\\
 
 
 \subsection{Improved mixer model}
-Earlier, we had imposed the constraint that chords could not change in a wav
+Earlier, we had imposed the constraint that chords could not change in a WAV
 file. Our next model allows us to drop that constraint. We now use a Hidden
 Markov Model to predict the chord sequence in sound files, allowing us to
 determine chord changes in a file \cite{sheh}. Firstly, the emission
-probabilities $p(x|y)$ are modelled by our GDA frame model. While state
-transitions are usually learned in chord recognition tasks, \cite{lee}, since
-each genre of music has a different distribution of transitions, assuming
-uniform state transitions allows us to remain flexible to any genre of music. We
-determine the most likely state sequence by the Viterbi decoding. Table 4
-summarizes the accuracies acheived by the improved mixer model trained on
-different sets of instruments.
-
-Earlier, we had imposed the constraint that chords could not change in a wav
-file. Our next model allows us to drop that constraint. We now use a Hidden
-Markov Model to predict the chord sequence in sound files, allowing us to
-determine chord changes in a file \cite{lee}. Firstly, the emission
 probabilities $p(x|y)$ are modelled by our GDA frame model. While state
 transitions are usually learned in chord recognition tasks, \cite{lee}, since
 each genre of music has a different distribution of transitions, assuming
@@ -440,8 +426,8 @@ is noise. It is important for a system to not predict any chord in this
 timespan.
 
 Our realtime system makes use of the Web Audio API to capture live audio. Every
-800ms, we encode the audio in wav format, and transfer it to a server using
-WebSockets. We then extract features for every 100ms frame in the wav file, and
+800ms, we encode the audio in WAV format, and transfer it to a server using
+WebSockets. We then extract features for every 100ms frame in the WAV file, and
 predict the most likely chord sequence in the 800ms using the HMM.
 
 \subsection{Handling Noise}
