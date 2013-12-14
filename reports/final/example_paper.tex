@@ -151,6 +151,7 @@ Consider another such model, we call the Independence Mixer model. Let us first 
 \end{center}
 \vskip -0.2in
 \end{figure}
+
 \begin{table}[t]
 \caption{Comparisons of accuracies of mixer models with softmax frame model}
 \label{mfccvschroma}
@@ -178,6 +179,7 @@ Independence Mixer & 48.3\%\\
 \subsection{Improved frame model}
 
 Softmax regression is a learning algorithm that models $p(y|x)$, the conditional distribution of the chord given the extracted frame features. We now look at a model that tries to model $p(x|y)$ and $p(y)$: Gaussian Discriminant Analysis (GDA). \url{http://www.mpi-inf.mpg.de/~pgrosche/publications/2011_JiangGroscheKonzMueller_ChordRecognitionEvaluation_AES42-Ilmenau.pdf}. We model $p(x|y)$ using a multivariate normal distribution. Although we model each gaussian with different means, we assume they all share the same covariance matrix: $x|y=i \sim \mathcal{N}$$(\mu_i, \Sigma)$. Since our aim is to make the system independent of any specific genre, we model $p(y) = 1/24$, a model in which all chords are equally likely. 
+
 \begin{table}[t]
 \caption{GDA frame model accuracies on an 80/20 train/test split}
 \label{mfccvschroma}
