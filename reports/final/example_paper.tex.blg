@@ -3,71 +3,36 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: example_paper.tex.aux
 The style file: icml2013.bst
 Database file #1: example_paper.bib
-I was expecting a `,' or a `}'---line 5 of file example_paper.bib
- :   
- :   title  = {Real-time Implementation of HMM-based Chord Estimation in Musical Audio}
-(Error may have been on previous line)
-I'm skipping whatever remains of this entry
-I was expecting a `,' or a `}'---line 37 of file example_paper.bib
- :   
- :   title = {Analyzing Chroma Feature Types for Automated Chord Recognition}
-(Error may have been on previous line)
-I'm skipping whatever remains of this entry
-I was expecting a `,' or a `}'---line 65 of file example_paper.bib
- :   
- :   title = {The HTK Hidden Markov Model Toolkit: Design and Philosophy}
-(Error may have been on previous line)
-I'm skipping whatever remains of this entry
-Too many commas in name 1 of "N. Jiang, P. Grosche, V. Konz, M. Muller" for entry jiang
-while executing---line 1352 of file icml2013.bst
-Too many commas in name 1 of "N. Jiang, P. Grosche, V. Konz, M. Muller" for entry jiang
-while executing---line 1352 of file icml2013.bst
-Warning--empty title in cho
-Warning--empty institution in cho
-Warning--empty year in cho
-Warning--empty year in cho
-Too many commas in name 1 of "N. Jiang, P. Grosche, V. Konz, M. Muller" for entry jiang
-while executing---line 1434 of file icml2013.bst
-Too many commas in name 1 of "N. Jiang, P. Grosche, V. Konz, M. Muller" for entry jiang
-while executing---line 1434 of file icml2013.bst
-Warning--empty title in jiang
-Warning--empty institution in jiang
-Warning--empty year in jiang
-Warning--empty year in jiang
-Warning--empty title in young
-Warning--empty institution in young
-Warning--empty year in young
-Warning--empty year in young
 You've used 5 entries,
             2773 wiz_defined-function locations,
-            610 strings with 5281 characters,
-and the built_in function-call counts, 1699 in all, are:
-= -- 149
-> -- 61
-< -- 6
-+ -- 23
-- -- 18
-* -- 117
-:= -- 271
-add.period$ -- 12
+            619 strings with 5627 characters,
+and the built_in function-call counts, 1814 in all, are:
+= -- 169
+> -- 81
+< -- 5
++ -- 29
+- -- 24
+* -- 112
+:= -- 301
+add.period$ -- 15
 call.type$ -- 5
-change.case$ -- 22
+change.case$ -- 27
 chr.to.int$ -- 5
-cite$ -- 22
-duplicate$ -- 92
-empty$ -- 146
-format.name$ -- 25
-if$ -- 342
+cite$ -- 10
+duplicate$ -- 93
+empty$ -- 147
+format.name$ -- 31
+if$ -- 376
 int.to.chr$ -- 1
 int.to.str$ -- 1
 missing$ -- 1
-newline$ -- 30
+newline$ -- 33
 num.names$ -- 20
-pop$ -- 54
+pop$ -- 39
 preamble$ -- 1
-purify$ -- 16
+purify$ -- 18
 quote$ -- 0
-skip$ -- 65
+skip$ -- 76
 stack$ -- 0
 substring$ -- 38
 swap$ -- 11
@@ -75,8 +40,7 @@ text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 55
-warning$ -- 12
+warning$ -- 0
 while$ -- 17
 width$ -- 0
-write$ -- 60
-(There were 7 error messages)
+write$ -- 72

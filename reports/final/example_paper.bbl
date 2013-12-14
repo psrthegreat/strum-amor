@@ -1,54 +1,38 @@
-\begin{thebibliography}{8}
+\begin{thebibliography}{5}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[Author(2011)]{anonymous}
-Author, N.~N.
-\newblock Suppressed for anonymity, 2011.
+\bibitem[Cho \& Bello(2009)Cho and Bello]{cho}
+Cho, T. and Bello, J.~P.
+\newblock Real-time implementation of hmm-based chord estimation in musical
+  audio.
+\newblock Technical report, Music and Audio Research Laboratory, New York
+  University, 2009.
 
-\bibitem[Duda et~al.(2000)Duda, Hart, and Stork]{DudaHart2nd}
-Duda, R.~O., Hart, P.~E., and Stork, D.~G.
-\newblock \emph{Pattern Classification}.
-\newblock John Wiley and Sons, 2nd edition, 2000.
+\bibitem[Fujishima(1999)]{fujishima}
+Fujishima, T.
+\newblock Realtime chord recognition of musical sound: a system using common
+  lisp music.
+\newblock In \emph{Proceedings of the 1999 International Computer Music
+  Conference (ICMC 1999)}, pp.\  464--467, 1999.
 
-\bibitem[Kearns(1989)]{kearns89}
-Kearns, M.~J.
-\newblock \emph{Computational Complexity of Machine Learning}.
-\newblock PhD thesis, Department of Computer Science, Harvard University, 1989.
+\bibitem[Jiang et~al.(2011)Jiang, P.~Grosche, and Muller]{jiang}
+Jiang, N., P.~Grosche, V.~Konz, and Muller, M.
+\newblock Analyzing chroma feature types for automated chord recognition.
+\newblock Technical report, Saarland University and MPI Informatik, 2011.
 
-\bibitem[Langley(2000)]{langley00}
-Langley, P.
-\newblock Crafting papers on machine learning.
-\newblock In Langley, Pat (ed.), \emph{Proceedings of the 17th International
-  Conference on Machine Learning (ICML 2000)}, pp.\  1207--1216, Stanford, CA,
-  2000. Morgan Kaufmann.
+\bibitem[K.~Lee(2006)]{lee}
+K.~Lee, M.~Slanley.
+\newblock Automatic chord recognition from audio using a supervised hmm trained
+  with audio-from-symbolic data.
+\newblock Technical report, CCRMA, Stanford University, 2006.
 
-\bibitem[Michalski et~al.(1983)Michalski, Carbonell, and
-  Mitchell]{MachineLearningI}
-Michalski, R.~S., Carbonell, J.~G., and Mitchell, T.~M. (eds.).
-\newblock \emph{Machine Learning: An Artificial Intelligence Approach, Vol. I}.
-\newblock Tioga, Palo Alto, CA, 1983.
-
-\bibitem[Mitchell(1980)]{mitchell80}
-Mitchell, T.~M.
-\newblock The need for biases in learning generalizations.
-\newblock Technical report, Computer Science Department, Rutgers University,
-  New Brunswick, MA, 1980.
-
-\bibitem[Newell \& Rosenbloom(1981)Newell and Rosenbloom]{Newell81}
-Newell, A. and Rosenbloom, P.~S.
-\newblock Mechanisms of skill acquisition and the law of practice.
-\newblock In Anderson, J.~R. (ed.), \emph{Cognitive Skills and Their
-  Acquisition}, chapter~1, pp.\  1--51. Lawrence Erlbaum Associates, Inc.,
-  Hillsdale, NJ, 1981.
-
-\bibitem[Samuel(1959)]{Samuel59}
-Samuel, A.~L.
-\newblock Some studies in machine learning using the game of checkers.
-\newblock \emph{IBM Journal of Research and Development}, 3\penalty0
-  (3):\penalty0 211--229, 1959.
+\bibitem[Young(1994)]{young}
+Young, S.~J.
+\newblock The htk hidden markov model toolkit: Design and philosophy.
+\newblock Technical report, Entropic Cambridge Research Laboratory, Ltd, 1994.
 
 \end{thebibliography}

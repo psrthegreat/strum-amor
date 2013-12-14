@@ -5,9 +5,12 @@
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[Cho \& Bello()Cho and Bello]{cho}
+\bibitem[Cho \& Bello(2009)Cho and Bello]{cho}
 Cho, T. and Bello, J.~P.
-\newblock Technical report.
+\newblock Real-time implementation of hmm-based chord estimation in musical
+  audio.
+\newblock Technical report, Music and Audio Research Laboratory, New York
+  University, 2009.
 
 \bibitem[Fujishima(1999)]{fujishima}
 Fujishima, T.
@@ -16,18 +19,20 @@ Fujishima, T.
 \newblock In \emph{Proceedings of the 1999 International Computer Music
   Conference (ICMC 1999)}, pp.\  464--467, 1999.
 
+\bibitem[Jiang et~al.(2011)Jiang, P.~Grosche, and Muller]{jiang}
+Jiang, N., P.~Grosche, V.~Konz, and Muller, M.
+\newblock Analyzing chroma feature types for automated chord recognition.
+\newblock Technical report, Saarland University and MPI Informatik, 2011.
+
 \bibitem[K.~Lee(2006)]{lee}
 K.~Lee, M.~Slanley.
 \newblock Automatic chord recognition from audio using a supervised hmm trained
   with audio-from-symbolic data.
 \newblock Technical report, CCRMA, Stanford University, 2006.
 
-\bibitem[N.~Jiang()]{jiang}
-N.~Jiang, P.~Grosche, V. Konz M.~Muller.
-\newblock Technical report.
-
-\bibitem[Young()]{young}
+\bibitem[Young(1994)]{young}
 Young, S.~J.
-\newblock Technical report.
+\newblock The htk hidden markov model toolkit: Design and philosophy.
+\newblock Technical report, Entropic Cambridge Research Laboratory, Ltd, 1994.
 
 \end{thebibliography}
