@@ -54,7 +54,7 @@ generate symbolic chord data programmatically. We improve the performance of
 the system by substituting standard Chroma features with a novel set of
 Chroma DCT-Reduced log Pitch features to push test accuracy on clean data to
 99.19\%. We finally propose a set of modifications to have the system predict
-with speed and accuracy in realtime.
+with speed and accuracy in real-time.
 \end{abstract}
 
 \section{Introduction}
@@ -92,12 +92,7 @@ major chords, the two most common sets of chords in popular music to classify
 on. Using the traditional twelve pitch scale (C, C\#, D, D\#, E, F, F\#, G, G\#,
 A, A\#, B), we have 24 such distinct chords.
 
-There are different ways of playing the same chord. The Cmaj chord, for
-instance, is the set of three notes C, E, and G played simultaneously. On a
-piano, these notes can be played on different octaves. Played on the fourth
-octave, the Cmaj would have the notes C4, E4, G4. It is also possible to play
-Cmaj in with E as the lowest note - E4, G4, C5 (first inversion form) and with G
-as the lowest note G4, C5, E5 (second inversion form).
+There are different ways of playing the same chord. The C Major triad, for instance, is the set of three notes C, E, and G played simultaneously. On a piano, these chords can be played on different octaves. For example, C Major in the fourth octave would have the notes C4, E4, and G4. Each chord also has inversions defined by the lowest note of the chord - E4, G4, and C5 make up the first inversion of the same C Major chord, and G4, C5, E5 make up the second inversion.
 
 To train the system, we generate training data programmatically. This has been found to have advantages over hand-labelling song data in its ability to generate sufficient training data \cite{lee}. We generate MIDI files for each of the 24 chords,
 taking into account 8 octaves, and 3 inversion forms, to generate a total of 576
@@ -116,7 +111,7 @@ data as our training set, and 20\% as our testing set.
 
 The pipeline of a chord recognition system is similar to that of a speech
 recognition one and relies on techniques that were originally applied to speech
-recognition tasks. The use of the Hidden Markov Models \cite{young} , and the
+recognition tasks. The use of the Hidden Markov Models \cite{young}, and the
 division of a sound file into frames on which the prediction task is performed,
 are two such techniques which have been reproduced in identifying chords.
 However, the task of finding chords is also different from speech tasks in a few
@@ -128,12 +123,8 @@ of chord recognition.
 One important difference between the two surfaces in the choice of features for
 the tasks. Mel-frequency cepstrum coefficients (MFCC) have been the dominant
 features in speech recognition systems. These represent the short-term
-power spectrum of a sound. It has been found that MFCCs are closely related to
-timbre - a quality that is considered able to distinguish between a voice,
-string instrument, wind instrument, and percussion instrument. These have
-traditionally been seen as poor features for chord recognition, since they
-discard the pitch content of the sound, but are useful in setting a baseline
-benchmark for such a system.
+power spectrum of a sound. It has been found that MFCCs are closely related to timbre - a characteristic that captures the quality or tone of sound, e.g., the tonal difference between an oboe and a cello. Since they
+discard the pitch content of the sound, MFCCs have traditionally been seen as poor features for chord recognition, but are useful in setting a baseline benchmark for such a system.
 
 Chroma features are commonly used for chord recognition tasks \cite{fujishima}.
 It is a representation in which the the entire spectrum of sound frequencies is
@@ -187,9 +178,9 @@ Chroma & 97.7\%\\
 
 \section{Initial Models}
 \subsection{Frame Model}
-With Chroma established as good features for the chord recognition model, we can
+With Chroma established as good features for the chord recognition task, we can
 now extend to the multiclass classification problem of determining the exact
-chord. We first use multinomial logistic regression, also called softmax
+chord played. We first use multinomial logistic regression, also called softmax
 regression, as our initial frame model. The frame model is responsible for
 making predictions on individual frames. Table 2 shows the accuracies achieved
 by the softmax classifier on the training and test set.
@@ -238,7 +229,7 @@ frame. For a test example, our predicted output is $y_p =
 \prod_{i=1}^fp(y | x_i)$.
 
 Note that each $p(y | x_i)$ is given by our softmax frame model. The accuracies
-achieved with different Mixer Models are summarized in Table 3.
+achieved with different mixer models are summarized in Table 3.
 \begin{figure}[ht]
 \vskip 0.2in
 \begin{center}
@@ -276,12 +267,10 @@ Independence Mixer & 48.3\%\\
 \subsection{Improved Frame Model}
 
 Softmax regression is a learning algorithm that models $p(y|x)$, the conditional
-distribution of the chord given the extracted frame features. We now look at a
+distribution of the chord given the extracted frame features. We now look at a frame
 model that tries to model $p(x|y)$ and $p(y)$: Gaussian Discriminant Analysis
-(GDA). \cite{jiang}. We model $p(x|y)$ using a multivariate normal distribution.
-Although we model each gaussian with different means, we assume they all share
-the same covariance matrix: $x|y=i \sim \mathcal{N}$$(\mu_i, \Sigma)$. Since our
-aim is to make the system independent of any specific genre, we model $p(y) =
+(GDA) \cite{jiang}. We assume all of the gaussians share
+the same covariance matrix: $x|y=i \sim \mathcal{N}$$(\mu_i, \Sigma)$. Furthermore, since we aim to make the system independent of any specific genre, we model $p(y) =
 1/24$, a model in which all chords are equally likely. Table 4 summarizes the classification accuracies.
 
 \begin{table}[t]
@@ -311,8 +300,8 @@ Testing & 53.9\%\\
 \subsection{Improved Mixer Model}
 Earlier, we had imposed the constraint that chords could not change in a WAV
 file. Our next model allows us to drop that constraint. We now use a Hidden
-Markov Model to predict the chord sequence in sound files, allowing us to
-determine chord changes in a file \cite{sheh}. 
+Markov Model(HMM) to predict the chord sequence in sound files, allowing us to
+determine chord changes in a file \cite{sheh}.
 
 \begin{figure}[ht]
 \vskip 0.2in
@@ -324,13 +313,12 @@ determine chord changes in a file \cite{sheh}.
 \vskip -0.2in
 \end{figure}
 
-Firstly, the emission
-probabilities $p(x|y)$ are modelled by our GDA frame model. While state
-transitions are usually learned in chord recognition tasks \cite{lee}, since
+Firstly, we use our our GDA frame model to model the emission probabilities $p(x|y)$ for the HMM. While state
+transitions for the HMMs are usually learned in chord recognition tasks \cite{lee}, since
 each genre of music has a different distribution of transitions, assuming
 uniform state transitions allows us to remain flexible to any genre of music. We
 determine the most likely state sequence by Viterbi decoding. Table 5
-summarizes the accuracies acheived by the improved mixer model trained on
+summarizes the accuracies achieved by the improved mixer model trained and tested on
 different sets of instruments.
 
 Figure 4 shows the confusion matrix for the Mixer Model trained and tested on generated Piano audio. The most common misclassifications are ones
@@ -428,7 +416,7 @@ One of the most important considerations for a live system to take into account
 is noise. It is important for a system to not predict any chord in this
 timespan.
 
-Our realtime system makes use of the Web Audio API to capture live audio. Every
+Our real-time system makes use of the Web Audio API to capture live audio. Every
 800ms, we encode the audio in WAV format, and transfer it to a server using
 WebSockets. We then extract features for every 100ms frame in the WAV file, and
 predict the most likely chord sequence in the 800ms using the HMM.
@@ -447,8 +435,7 @@ We found 800ms to be the optimal time interval over which to process the audio. 
 for collecting the recording from 800ms was found to create a noticeable delay in the live system. On the other hand, reducing the window time not only decreased accuracy, but also made it harder to distinguish between noise and chords.
 
 \section{Conclusion}
-In this paper, we present an implementation of a real-time chord recognition system. We show the effectiveness of Hidden Markov Models with Gaussian emissions in classifying chords. Furthermore, we show how timbre-invariant CRP features can improve robustness, compared to Chroma. Integrating noise detection strategies then creates an effective live recognition system.
-that could be start of conclusion, at least a closing sentence?
+In this paper, we present an implementation of a real-time chord recognition system. We show the effectiveness of Hidden Markov Models with Gaussian emissions in classifying chords. Furthermore, we show how timbre-invariant CRP features can improve robustness, compared to Chroma. Integrating noise detection strategies then create an effective live recognition system. With this system, we improve the feasibility of automatic chord recognition, and pave the way for making this technology more accessible to the public.
 
 
 \bibliography{example_paper}
