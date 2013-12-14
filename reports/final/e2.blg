@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d (TeX Live 2013)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: example_paper.aux
+The style file: icml2013.bst
+Database file #1: example_paper.bib
+Too many commas in name 1 of "N. Jiang, P. Grosche, V. Konz, M. Muller" for entry jiang
+while executing---line 1352 of file icml2013.bst
+Too many commas in name 1 of "N. Jiang, P. Grosche, V. Konz, M. Muller" for entry jiang
+while executing---line 1352 of file icml2013.bst
+Too many commas in name 1 of "N. Jiang, P. Grosche, V. Konz, M. Muller" for entry jiang
+while executing---line 1434 of file icml2013.bst
+Too many commas in name 1 of "N. Jiang, P. Grosche, V. Konz, M. Muller" for entry jiang
+while executing---line 1434 of file icml2013.bst
+You've used 5 entries,
+            2773 wiz_defined-function locations,
+            618 strings with 5600 characters,
+and the built_in function-call counts, 1699 in all, are:
+= -- 161
+> -- 61
+< -- 6
++ -- 23
+- -- 18
+* -- 93
+:= -- 283
+add.period$ -- 15
+call.type$ -- 5
+change.case$ -- 25
+chr.to.int$ -- 5
+cite$ -- 10
+duplicate$ -- 92
+empty$ -- 146
+format.name$ -- 25
+if$ -- 354
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 1
+newline$ -- 33
+num.names$ -- 20
+pop$ -- 36
+preamble$ -- 1
+purify$ -- 16
+quote$ -- 0
+skip$ -- 74
+stack$ -- 0
+substring$ -- 38
+swap$ -- 11
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 55
+warning$ -- 0
+while$ -- 17
+width$ -- 0
+write$ -- 72
+(There were 4 error messages)
