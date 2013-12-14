@@ -61,7 +61,7 @@ The chord prediction task is a multiclass classification task. In music, a chord
 
 There are different ways of playing the same chord. The Cmaj chord, for instance, is the set of three notes C, E, and G played simultaneously. On a piano, these notes can be played on different octaves. Played on the fourth octave, the Cmaj would have the notes C4, E4, G4. It is also possible to play Cmaj in with E as the lowest note - E4, G4, C5 (first inversion form) and with G as the lowest note G4, C5, E5 (second inversion form).
 
-To train the system, we generate training data programmatically. This has found to have advantages over hand-labelling song data in its ability to generate lots of training data \cite{lee}. We generate midi files for each of the 24 chords, taking into account 8 octaves, and 3 inversion forms, to generate a total of 576 midi files. We then use an audio synthesizer Timidity++ to convert the 576 generated midi files, in conjunction with 3 soundfonts for piano, guitar, and violin, to generate a total of 1728 audio files in WAVE format.
+To train the system, we generate training data programmatically. This has found to have advantages over hand-labelling song data in its ability to generate lots of training data \cite{lee}. We generate midi files for each of the 24 chords, taking into account 8 octaves, and 3 inversion forms, to generate a total of 576 midi files. We then use an audio synthesizer Timidity++ to convert the 576 generated midi files, in conjunction with 3 soundfonts for piano, guitar, and violin, to generate a total of 1728 audio files in wav format.
 
 In musical chord recognition, feature extraction operates over frames. The generated wav files, which are an average of 4 seconds in length, are first split into frames of window size 100ms each, and a n-dimensional feature vector is extracted for each frame. We label each frame with the label of the chord on its corresponding sound file, to generate 69,120 examples. We use 80% of the data as our training set, and 20% as our testing set. 
 
@@ -71,16 +71,16 @@ The pipeline of a chord recognition system is very similar to that of a speech r
 
 \subsection{Feature Extraction}
 
-One important difference between the two surfaces in the choice of features for the tasks. Mel-frequency cepstrum coefficients (MFCC) have been the dominant features used in speech recognition systems. These represent the short-term power spectrum of a sound. It has been found that MFCCs are closely related to timbre - a quality that is considered able to distinguish between a voice, string instrument, wind instrument, and percussion instrument. These have traditionally been seen as bad features for chord recognition, since they discard the pitch content of the sound, but are useful in setting a baseline benchmark for such a system.
+One important difference between the two surfaces in the choice of features for the tasks. Mel-frequency cepstrum coefficients (MFCC) have been the dominant features used in speech recognition systems. These represent the short-term power spectrum of a sound. It has been found that MFCCs are closely related to timbre - a quality that is considered able to distinguish between a voice, string instrument, wind instrument, and percussion instrument. These have traditionally been seen as poor features for chord recognition, since they discard the pitch content of the sound, but are useful in setting a baseline benchmark for such a system.
 
-Chroma features are commonly used for chord recognition tasks \cite{fujishima}. It is a representation in which the the entire spectrum of sound frequencies is distributed into 12 bins representing the traditional twelve pitch scale. An advantage of Chroma features is that they invariant to octaves and inversions. These features also possess a reasonable level of robustness to changes in instruments. We use the Matlab Chroma Toolbox to extract Chroma features for the frames INSERT CITATION.  Figure 1 shows the extracted Chroma features for C major major. The energy spikes at C, E, and G, the notes constituting the C major, supporting the idea that Chroma encodes the harmonic content of sound.
+Chroma features are commonly used for chord recognition tasks \cite{fujishima}. It is a representation in which the the entire spectrum of sound frequencies is distributed into 12 bins representing the traditional twelve pitch scale. An advantage of Chroma features is that they invariant to octaves and inversions. We use the Matlab Chroma Toolbox to extract Chroma features for the frames INSERT CITATION.  Figure 1 shows the extracted Chroma features for the C major chord. The energy spikes at C, E, and G, the notes constituting the C major, supporting the idea that Chroma encodes the harmonic content of a chord.
 
 \begin{figure}[ht]
 \vskip 0.2in
 \begin{center}
 \centerline{\includegraphics[width=\columnwidth]{chromac}}
 \caption{Chroma features for C major in various octaves and inversions}
-\label{icml-historical}
+\label{chroma}
 \end{center}
 \vskip -0.2in
 \end{figure}
@@ -88,7 +88,7 @@ Chroma features are commonly used for chord recognition tasks \cite{fujishima}. 
 To test the performance of Chroma features against MFCC features, we start with a binary classification problem of distinguishing major chords from minor chords. An SVM with RBF kernel $$ K(x, z) = \exp(-\gamma\lVert{x - y}\rVert^2)$$ is trained, with regularization and kernel parameters ($\gamma = 1$ and $C = 100$). Table 1 summarizes the results, and confirms that chroma features are much better suited to the task of chord recognition than MFCCs.
 
 \begin{table}[t]
-\caption{Classification accuracies for MFCC vs Chroma on binary classification task of distinguishing major and minor chords}
+\caption{Accuracies for MFCC and Chroma on the binary classification task of distinguishing between major and minor chords}
 \label{mfccvschroma}
 \vskip 0.15in
 \begin{center}
@@ -114,8 +114,8 @@ Chroma & 97.7\%\\
 \subsection{Frame Model}
 With Chroma established as good features for the chord recognition model, we can now extend to the multiclass classification problem of determining the exact chord. We first use multinomial logistic regression, also called softmax regression, as our initial frame model. The frame model is responsible for making predictions on individual frames. Table 2 shows the accuracies achieved by the softmax classifier on the training and test set.
 \begin{table}[t]
-\caption{Softmax Regression frame model accuracies on an 80/20 train/test split}
-\label{mfccvschroma}
+\caption{Softmax Regression frame model train and test accuracies}
+\label{softmax}
 \vskip 0.15in
 \begin{center}
 \begin{small}
@@ -137,9 +137,13 @@ Testing & 32.1\%\\
 \end{table}
 
 \subsection{Mixer Model}
-Our frame model outputs a prediction for each frame. Our final classification task, however, is on a sound file, which is a collection of frames. We now define a mixer model, which is a model for collecting and using the results on individuals frames outputted by the frame model. A simple mixer model, the Middle Frame model, outputs the result for the entire file based on the output for middle frame in the file. Another simple model, the Max Count model, counts the most frequent prediction made across all of the frames.
+Our frame model outputs a prediction for each frame. Our final classification task, however, is on an audio file, which consists of a sequence of f frames. Let us first make the simplifying assumption that a test sound file consists of a single chord being played. 
 
-Consider another such model, we call the Independence Mixer model. Let us first assume that a test sound file consists of a single chord being played. We will drop this assumption later, but for now, the simple case allows us to build up to the more complex one. Having imposed the constraint that there are no chord changes within a wave file, we now assume that the prediction on each frame is independent of the prediction on other frames. The probability that chord y is played in the file is calculated by considering the probability that y is the chord at each frame.  For a test example, our predicted output is $y_p = \underset{y}{\operatorname{argmax}} p(y | X) = \prod_{i=1}^fp(y | x_i)$, where f is the number of frames in the file. Note that $p(y | x_i)$ is given by our softmax frame model. The accuracies with different Mixer Models are shown in table 3.
+We now define a mixer model, which is a model for collecting and using the results on individuals frames outputted by the frame model. A simple mixer model, the Middle Frame model, outputs the result for the entire file based on the frame model's output for middle frame in the file. Another simple model, the Max Count model, counts the most frequent prediction made across all of the frames.
+
+Consider another such model, we call the Independence Mixer model, which assumes that the prediction on each frame is independent of the prediction on other frames. The probability that chord y is the single chord played in the file is calculated by considering the probability that y is the chord played at each frame.  For a test example, our predicted output is $y_p = \underset{y}{\operatorname{argmax}} p(y | X) = p(y | x_1, x_2, ... x_f) = \prod_{i=1}^fp(y | x_i)$. 
+
+Note that each $p(y | x_i)$ is given by our softmax frame model. The accuracies achieved with different Mixer Models are summarized in Table 3.
 \begin{figure}[ht]
 \vskip 0.2in
 \begin{center}
