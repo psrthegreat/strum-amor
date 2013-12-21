@@ -1,1 +1,0 @@
-Live Chord Recognition System
