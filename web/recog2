@@ -1,3 +1,0 @@
-for file in ./clientwavs/*; do
-	python ../learning/test-wav.py $file
-done
