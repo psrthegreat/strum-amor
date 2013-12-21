@@ -5,9 +5,9 @@ if [[ -z $1 ]]; then
 	exit 1
 fi
 
-for sfile in midi_files/soundfonts/*.sf2
+for sfile in soundfonts/*.sf2
 do
-	dir=~/Documents/wav-files/${sfile##*/}
+	dir=../wav-files/${sfile##*/}
 	dir=${dir%.*}
 	mkdir "$dir"
 	touch "${dir}/files.txt"
