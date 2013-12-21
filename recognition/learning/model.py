@@ -47,7 +47,7 @@ class SKModel(object):
         Pickle dumps the model
 
         """
-        pickle.dump(self, open("./trained/" + name, "w+"));
+        pickle.dump(self, open("./trainedModels/" + name, "w+"));
 
 class SVM(SKModel):
     """

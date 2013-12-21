@@ -43,7 +43,7 @@ class HMMPredictor(object):
     """
     def __init__(self,
                  feature_type     = "chroma",
-                 model_path       = "../learning/trained/identityChroma",
+                 model_path       = "../learning/trainedModels/identityChroma",
                  variance_filter  = None,
                  min_frames       = None,
                  plot_variance    = False,
@@ -56,7 +56,7 @@ class HMMPredictor(object):
         Initialize parameters:
 
           feature_type     : "chroma" or "crp" (default "chroma")
-          model_path       : path to saved model (default "../learning/trained/identityChroma")
+          model_path       : path to saved model (default "../learning/trainedModels/identityChroma")
           variance_filter  : lower bound on variance in a frame (default None)
           frame_split      : groups of given number of frames to split data into (default None)
           max_count_filter : whether to use maxcount to combine frame groups (default is False)
@@ -175,14 +175,14 @@ class HMMPredictor(object):
 
 def default_crp():
     return HMMPredictor(feature_type    = "crp",
-                        model_path      = "../learning/trained/identitycrp",
+                        model_path      = "../learning/trainedModels/identitycrp",
                         variance_filter = 0.18,
                         frame_split     = 7,
                         group_filter    = 3)
 
 def default_chroma():
     return HMMPredictor(feature_type    = "chroma",
-                        model_path      = "../learning/trained/identityChroma",
+                        model_path      = "../learning/trainedModels/identityChroma",
                         variance_filter = 0.18,
                         frame_split     = 7,
                         group_filter    = 3)
@@ -199,8 +199,8 @@ if "__main__" in __name__:
 
     # does not work!
 
-    #lda = pickle.load(open("../learning/trained/randomlda", "r"))
-    #gaussian = pickle.load(open("../learning/trained/chordgaussian", "r"))
+    #lda = pickle.load(open("../learning/trainedModels/randomlda", "r"))
+    #gaussian = pickle.load(open("../learning/trainedModels/chordgaussian", "r"))
     #mean, covar = gaussian['mean'], gaussian['covar']
     #def pdf(x):
     #    return (2*np.pi)**(-6)*np.linalg.det(covar)**(-1.0/2)*np.exp(-0.5*(x-mean).T.dot(np.linalg.inv(covar)).dot(x-mean))
@@ -216,7 +216,7 @@ if "__main__" in __name__:
 
     # same as model = default_crp()
     model = HMMPredictor(feature_type     = "crp",
-                         model_path       = "../learning/trained/uniformcrp",
+                         model_path       = "../learning/trainedModels/uniformcrp",
                          lda              = None,
                          window_size      = 4410,
                          variance_filter  = 0.16,

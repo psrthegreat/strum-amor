@@ -21,7 +21,7 @@ Usage:
 from multiprocessing.connection import (Client, Listener,
                                         AuthenticationError)
 
-__address = ('localhost', 7000)
+__address = ('localhost', 4000)
 def get_client():
     """
     Gets client to communicate with listener.
