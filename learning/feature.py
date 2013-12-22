@@ -69,6 +69,7 @@ def get_crp(filestr, window_length = None, threshold = None):
     Extract crp.
 
     """
+    return audio.load_crp(filestr)
     data, info = audio.load_wav(filestr)
     commands = ["crp", data, info['fs']]
     if window_length is not None:
