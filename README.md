@@ -1,1 +1,4 @@
-Live Chord Recognition System
+strum-amor
+==========
+
+Love learning music

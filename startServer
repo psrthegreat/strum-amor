@@ -1,0 +1,2 @@
+cd recognition/learning && (python feature.py&)
+cd ../../web && nodemon app.js

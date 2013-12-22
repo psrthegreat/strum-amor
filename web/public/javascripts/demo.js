@@ -155,7 +155,7 @@ function getData(callback){
 	return callback("yo")
 }
 
-var socket = io.connect('https://10.31.225.23/');
+var socket = io.connect('https://localhost/');
 
 socket.on('ready', function (id) {
 	socket.emit('set nickname', id);
