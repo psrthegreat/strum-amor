@@ -51,11 +51,15 @@ def fetch_data(command):
         return "Error: %s" %(str(e))
 
 
-def get_chroma(filestr, window_length = None, threshold = None):
+def get_chroma(filestr, window_length = None, threshold = None, use_matlab = False):
     """
     Extract chroma.
 
     """
+    if not use_matlab:
+        return audio.load_chroma(filestr, crp = False, window_length = window_length,
+                              threshold = threshold).T
+
     data, info = audio.load_wav(filestr)
     commands = ["chroma", data, info['fs']]
     if window_length is not None:
@@ -70,8 +74,8 @@ def get_crp(filestr, window_length = None, threshold = None, use_matlab = False)
 
     """
     if not use_matlab:
-        return audio.load_crp(filestr, window_length = window_length,
-                              threshold = threshold).T
+        return audio.load_chroma(filestr, crp = True, window_length = window_length,
+                                 threshold = threshold).T
 
     data, info = audio.load_wav(filestr)
     commands = ["crp", data, info['fs']]

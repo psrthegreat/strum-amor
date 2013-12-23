@@ -152,10 +152,10 @@ def normalize_feature(data, order, thresh):
             fnorm[:, k] = data[:, k]/n
     return fnorm
 
-def extract_crp(pitch, add_term_logc = 1, factor_logc = 1000,
-                coeffs_keep = None, norm_p = 2, norm_thresh = 1e-6):
+def extract_chroma(pitch, crp_dct = False, add_term_logc = 1, factor_logc = 1000,
+                   coeffs_keep = None, norm_p = 2, norm_thresh = 1e-6):
     """
-    CRP features.
+    CRP or chroma features.
 
     """
     if coeffs_keep is None:
@@ -166,23 +166,27 @@ def extract_crp(pitch, add_term_logc = 1, factor_logc = 1000,
 
     pitch_log = np.log10(add_term_logc + pitch * factor_logc)
 
-    DCT    = internal_DCT(len(pitch))
-    DCTcut = DCT
-    DCTcut[np.setdiff1d(range(0, 120), coeffs_keep), :] = 0
+    if crp_dct:
+        DCT    = internal_DCT(len(pitch))
+        DCTcut = DCT
+        DCTcut[np.setdiff1d(range(0, 120), coeffs_keep), :] = 0
+        
+        DCT_filter    = np.dot(DCT.T, DCTcut)
+        pitch_log_DCT = np.dot(DCT_filter, pitch_log)
 
-    DCT_filter    = np.dot(DCT.T, DCTcut)
-    pitch_log_DCT = np.dot(DCT_filter, pitch_log)
+    else:
+        pitch_log_DCT = pitch_log
 
-    crp = np.zeros((12, seg_num))
+    chroma = np.zeros((12, seg_num))
 
     for p in range(0, 120):
         # p+1 to align bin with matlab extraction
-        chroma = np.mod(p + 1, 12)
-        crp[chroma, :] += pitch_log_DCT[p, :]
+        c_bin = np.mod(p + 1, 12)
+        chroma[c_bin, :] += pitch_log_DCT[p, :]
 
-    crp = normalize_feature(crp, norm_p, norm_thresh)
+    chroma = normalize_feature(chroma, norm_p, norm_thresh)
 
-    return crp
+    return chroma
 
 def load_pitch(filename, window_length = None, **audio_args):
     """
@@ -203,14 +207,15 @@ def load_pitch(filename, window_length = None, **audio_args):
         return np.zeros((120, 1))
 
 
-def load_crp(filename, threshold = None, **pitch_args):
+def load_chroma(filename, crp = False, threshold = None, **pitch_args):
     """
-    Load CRP features from file.
+    Load chroma or CRP features from file.
 
     """
     # arguments.
     args = {}
     if threshold is not None:
         args['norm_thresh'] = threshold
+    args['crp_dct'] = crp
 
-    return extract_crp(load_pitch(filename, **pitch_args), **args)
+    return extract_chroma(load_pitch(filename, **pitch_args), **args)
