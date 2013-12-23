@@ -130,7 +130,7 @@ io.sockets.on('connection', function(socket) {
 				file = prefix + name
 				fs.writeFile(file, buf, function(err) {
 					if (err) socket.emit('res', 'something blew up')
-					var child = exec("python ../learning/predict.py " + file, function(error, stdout, stderr) {
+					var child = exec("python ../recognition/learning/predict.py " + file, function(error, stdout, stderr) {
 						console.log(stderr.toString('utf8'));
 						socket.emit('res', stdout)
 					});

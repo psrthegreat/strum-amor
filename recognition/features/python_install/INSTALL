@@ -1,0 +1,40 @@
+Installation instructions for Python feature extraction dependencies.
+
+Python library is https://pypi.python.org/pypi/scikits.samplerate/0.3.3.
+It is a wrapper around http://www.mega-nerd.com/SRC/.
+
+LINUX / Cygwin
+---------------
+* libsamplerate
+From source:
+    >>> tar xzf libsamplerate-0.1.8.tar.gz
+    >>> cd libsamplerate-0.1.8
+    >>> make
+    >>> make install
+
+* scikits.samplerate
+With easy_install:
+    >>> easy_install scikits.samplerate
+
+From source:
+    >>> tar xzf scikits.samplerate-0.3.3.tar.gz
+    >>> cd scikits.samplerate-0.3.3
+    >>> python setup.py install
+
+Windows
+---------
+* libsndfile
+   - Run installer and note location installed to.
+
+* libsamplerate
+   - Extract files.
+   - Copy libsndfile-1.def, libsndfile-1.dll, libsndfile-1.lib from install location into libsamplerate-0.1.8/
+   - Copy sndfile.h into libsamplerate-0.1.8/Win32
+   - Open Visual Studio Command Prompt
+   - Run libsamplerate-0.1.8/make.bat
+
+* scikits.samplerate
+   - Copy libsamplerate-0.1.8/libsamplerate-0.lib to C:\Python27\libs\samplerate.lib
+   - Copy libsamplerate-0.1.8/src/samplerate.h into C:\Python27\include
+   - Run easy_install or install from source like in Linux/Cygwin instructions
+   - Copy libsamplerate-0.1.8/libsamplerate-0.dll into C:\Python27\Lib\site-packages\scikits.samplerate-0.3.3-py2.7-win32.egg\scikits\samplerate

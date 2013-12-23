@@ -64,12 +64,15 @@ def get_chroma(filestr, window_length = None, threshold = None):
             commands.append(threshold)
     return ipc.get_response(commands) 
 
-def get_crp(filestr, window_length = None, threshold = None):
+def get_crp(filestr, window_length = None, threshold = None, use_matlab = False):
     """
     Extract crp.
 
     """
-    return audio.load_crp(filestr)
+    if not use_matlab:
+        return audio.load_crp(filestr, window_length = window_length,
+                              threshold = threshold).T
+
     data, info = audio.load_wav(filestr)
     commands = ["crp", data, info['fs']]
     if window_length is not None:

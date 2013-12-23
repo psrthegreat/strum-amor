@@ -5,6 +5,7 @@ Chord Predictor.
 import itertools
 import pickle
 import sys
+import os
 
 import numpy as np
 import scipy.stats
@@ -12,6 +13,8 @@ import scipy.stats
 import chord
 import feature
 import mixer
+
+MODEL_DIR = os.path.join(os.path.dirname(__file__), 'trainedModels/')
 
 class HMMPredictor(object):
     """
@@ -43,7 +46,7 @@ class HMMPredictor(object):
     """
     def __init__(self,
                  feature_type     = "chroma",
-                 model_path       = "../learning/trainedModels/identityChroma",
+                 model_path       = os.path.join(MODEL_DIR, "identityChroma"),
                  variance_filter  = None,
                  min_frames       = None,
                  plot_variance    = False,
@@ -56,11 +59,14 @@ class HMMPredictor(object):
         Initialize parameters:
 
           feature_type     : "chroma" or "crp" (default "chroma")
-          model_path       : path to saved model (default "../learning/trainedModels/identityChroma")
+          model_path       : path to saved model (default MODEL_DIR/identityChroma)
           variance_filter  : lower bound on variance in a frame (default None)
-          frame_split      : groups of given number of frames to split data into (default None)
-          max_count_filter : whether to use maxcount to combine frame groups (default is False)
-          group_filter     : minimum number of frames in a row with chord to keep prediction (default None)
+          frame_split      : groups of given number of frames to split data into
+                             (default None)
+          max_count_filter : whether to use maxcount to combine frame groups
+                             (default is False)
+          group_filter     : minimum number of frames in a row with chord to keep
+                             prediction (default None)
 
         """
         self.mixer            = None
@@ -94,10 +100,14 @@ class HMMPredictor(object):
         Extract features.
 
         """
-        if self.feature_type == "chroma":
-            self._features = feature.get_chroma(input_file)
-        else:
-            self._features = feature.get_crp(input_file, self.window_size, 0.001)
+        try:
+            if self.feature_type == "chroma":
+                self._features = feature.get_chroma(input_file)
+            else:
+                self._features = feature.get_crp(input_file, self.window_size, 0.001)
+        except IOError as e:
+            self._features = None
+            return
 
         if isinstance(self._features, basestring):
             error          = self._features
@@ -112,8 +122,13 @@ class HMMPredictor(object):
         Process loaded features. load_features must have been called.
 
         """
+        if self._features is None:
+            self.features = None
+            return
+
         if self.variance_filter is not None:
-            self._filtered_feat = feature.filter_variance(self._features, self.variance_filter,
+            self._filtered_feat = feature.filter_variance(self._features,
+                                                          self.variance_filter,
                                                           self.plot_variance)
         else:
             self._filtered_feat = self._features
@@ -121,8 +136,9 @@ class HMMPredictor(object):
 
         if self.lda is not None:
             noise = self.lda.predict(self._filtered_feat)
-            self._filtered_feat = [elem for elem, n in itertools.izip(self._filtered_feat,
-                                                                      noise) if n == 0]
+            self._filtered_feat = [elem for elem, n in
+                                   itertools.izip(self._filtered_feat, noise)
+                                   if n == 0]
 
         if self.min_frames is not None:
             if len(self._filtered_feat) < self.min_frames:
@@ -139,7 +155,8 @@ class HMMPredictor(object):
 
     def predict(self):
         """
-        Predict with loaded model. load_features and process_features must have been called.
+        Predict with loaded model. load_features and process_features must have
+        been called.
 
         """
         if not self.features:
@@ -156,7 +173,8 @@ class HMMPredictor(object):
             self._combined_predict = feature.combine_concat(self._prediction)
 
         if self.group_filter is not None:
-            self.prediction = feature.filter_groups(self._combined_predict, self.group_filter)
+            self.prediction = feature.filter_groups(self._combined_predict,
+                                                    self.group_filter)
             if self.max_count_filter is not None and len(self.prediction):
                 self.prediction = feature.combine_maxcount([self.prediction])
         else:
@@ -166,7 +184,8 @@ class HMMPredictor(object):
 
     def run(self, input_file):
         """
-        Runs a full feature extraction and prediction pipeline with current parameters.
+        Runs a full feature extraction and prediction pipeline with current
+        parameters.
 
         """
         self.load_features(input_file)
@@ -175,14 +194,15 @@ class HMMPredictor(object):
 
 def default_crp():
     return HMMPredictor(feature_type    = "crp",
-                        model_path      = "../learning/trainedModels/identitycrp",
-                        variance_filter = 0.18,
-                        frame_split     = 7,
-                        group_filter    = 3)
+                        model_path      = os.path.join(MODEL_DIR, "uniformcrp"),
+                        variance_filter = 0.16,
+                        min_frames       = 4,
+                        group_filter     = 4,
+                        max_count_filter = True)
 
 def default_chroma():
     return HMMPredictor(feature_type    = "chroma",
-                        model_path      = "../learning/trainedModels/identityChroma",
+                        model_path      = os.path.join(MODEL_DIR, "identityChroma"),
                         variance_filter = 0.18,
                         frame_split     = 7,
                         group_filter    = 3)
@@ -196,27 +216,9 @@ if "__main__" in __name__:
     else:
         input_file = sys.argv[1]
 
-
-    # does not work!
-
-    #lda = pickle.load(open("../learning/trainedModels/randomlda", "r"))
-    #gaussian = pickle.load(open("../learning/trainedModels/chordgaussian", "r"))
-    #mean, covar = gaussian['mean'], gaussian['covar']
-    #def pdf(x):
-    #    return (2*np.pi)**(-6)*np.linalg.det(covar)**(-1.0/2)*np.exp(-0.5*(x-mean).T.dot(np.linalg.inv(covar)).dot(x-mean))
-
-    #threshold = 1e-60
-    #def predict(frames):
-    #    print np.mean(map(pdf, frames))
-    #    return [0 if pdf(x) > threshold else 1 for x in frames]
-
-    #class Test(object):
-    #    def predict(self, x):
-    #        return predict(x)
-
     # same as model = default_crp()
     model = HMMPredictor(feature_type     = "crp",
-                         model_path       = "../learning/trainedModels/uniformcrp",
+                         model_path       = os.path.join(MODEL_DIR, "uniformcrp"),
                          lda              = None,
                          window_size      = 4410,
                          variance_filter  = 0.16,
@@ -227,6 +229,11 @@ if "__main__" in __name__:
                          max_count_filter = True)
     
     predictions = model.run(input_file)
+
+    if predictions:
+        print chord.decode(int(predictions[0]));
+    else:
+        print ""
 
     # parameters can be changed here and parts of the model rerun.
     #
@@ -244,7 +251,3 @@ if "__main__" in __name__:
     # can look at these for debugging:
     # _raw_predictions    = model._predictions
     # _merged_predictions = model._combined_predict
-    if predictions is not None and len(predictions):
-        print chord.decode(int(predictions[0]));
-    else:
-        print ""

@@ -3,192 +3,73 @@ from __future__ import division
 import os
 
 import numpy as np
+import scipy.io.matlab
 import scipy.io.wavfile
 import scipy.signal
-import scipy.io.matlab
 
-from fractions import gcd
-#from upfirdn import upfirdn
-from scikits.samplerate import resample as _resample
+# stored coefficients for pitch filtering.
+h = scipy.io.matlab.loadmat('MIDI_FB_ellip_pitch_60_96_22050_Q25.mat',
+                            squeeze_me = True)['h']
 
-convert_to_mono  = True
-use_resampling   = True
-dest_sample_rate = 22050
-
-def load_wav(filestr):
+def load_audio(filename, convert_to_mono = True, resampled_rate = 22050):
     """
-    Loads wav file.
+    Loads audio from wav file and does preliminary processing.
 
     """
-    rate, audio = scipy.io.wavfile.read(filestr)
+    # load wavfile
+    rate, audio = scipy.io.wavfile.read(filename)
 
-    # scale to [-1, 1). assumes 16bit wav!
-    audio = audio / 32768
+    # scale to [-1, 1). assumes dtype is correctly set for input array
+    # (scipy sets dtype correctly).
+    audio = audio / (-np.iinfo(audio.dtype).min)
 
-    info = {}
-    info['fs'] = rate
-    audio = process_audio(audio, info)
+    # make at least 2-d (so shape of second dimension is number of channels).
+    audio = np.atleast_2d(audio)
 
-    return audio, info
+    # sum energy in each channel to convert to mono.
+    if convert_to_mono and audio.shape[1] > 1:
+        audio = audio.sum(axis = 1) / audio.shape[1]
 
-def resample(x, p, q, n):
+    # resample to target rate if requested (don't if empty).
+    if resampled_rate is not None and resampled_rate != rate and audio.shape[0]:
+        audio = resample(audio, resampled_rate, rate)
+        rate  = resampled_rate
+
+    return rate, audio
+
+def resample(x, p, q):
     """
-    n parameter ignored.
-
-    """
-    return _resample(x, p/q, 'sinc_medium')
-
-def resample_slow(x, p, q, n):
-    """
-    Replace similar matlab resample function.
-
-    x: audio
-    p: target
-    q: original
-
-    n parameter ignored
+    Replace similar matlab resample function. Internal algorithm is
+    different from Matlab (SRC library here vs polyphase in Matlab).
 
     """
-    great_common_divisor = gcd(p, q)
-    if great_common_divisor > 1:
-        p = float(p) / great_common_divisor
-        q = float(q) / great_common_divisor
-
-    # filter design.
-    log10_rejection = -3.0
-    stopband_cutoff_f = 1 / (2 * max(p, q))
-    roll_off_width = stopband_cutoff_f / 10.0
-
-    rejection_dB = -20.0*log10_rejection
-    L = np.ceil((rejection_dB - 8.0) / (28.714 * roll_off_width))
-
-    t = np.arange(-L, L + 1)
-    ideal_filter = 2 * p * stopband_cutoff_f * np.sinc(2 * stopband_cutoff_f * t)
-
-    # param of Kaiser window
-    if rejection_dB >= 21 and rejection_dB <= 50:
-        base = 0.5842 * (rejection_dB - 21.0) ** 0.4 + 0.07886 * (rejection_dB - 21.0)
-    elif rejection_dB > 50:
-        beta = 0.1102 * (rejection_dB - 8.7)
-    else:
-        beta = 0.0
-
-    h = scipy.signal.kaiser(2 * L + 1, beta) * ideal_filter
-
-    # padding
-    Lx = x.shape[0]
-    Lh = len(h)
-    L = (Lh - 1) / 2.0
-    Ly = np.ceil(Lx * p / q)
-
-    nz_pre = np.floor(q - np.mod(L, q))
-    hpad = np.concatenate([np.zeros(nz_pre), h])
-
-    offset = np.floor(L + nz_pre / q)
-    nz_post = 0
-    while np.ceil(((Lx - 1) * p + nz_pre + Lh + nz_post) / q) - offset < Ly:
-        nz_post += 1
-
-    hpad = np.concatenate([hpad, np.zeros(nz_post)])
-
-    # resample with upfirdn
-    xfilt = upfirdn(x, hpad, int(p), int(q))
-
-    if len(xfilt.shape) < 2:
-        xfilt = xfilt.reshape(xfilt.shape[0], 1)
-    y = xfilt[offset + 1: offset + Ly, :]
-
-    return y
-
-    # r = p / q
-    # if r < 1:
-    #     #b = fir1(2*n+1, r)
-    #     #x = fftfilt(b, audio)
-    #     b = scipy.signal.firwin(2 * n + 1, r)
-    #     x = scipy.signal.lfilter(b, np.ones(len(b)), x)
-
-    # t   = np.arange(0, len(x) + 1 - 1/r, 1/r)
-    # idx = np.fix(t).astype(int)
-    # t   = t - idx
-
-    # if len(x.shape) < 2:
-    #     x   = x.reshape(x.shape[0], 1)
-    # col = x.shape[1]
-
-    # x = np.vstack([np.zeros((n, col)), x, np.zeros((n, col))])
-    # y = np.zeros((len(idx), col))
-
-    # widx = np.ones(x.shape[1], dtype = 'int')
-
-    # for i in xrange(-n, n + 1):
-    #     w = np.sinc(t - i) * (0.5 + 0.5*np.cos(np.pi * (t-i)/(n+0.5)))
-    #     y = y + x[idx + i + n,:] * w[:, widx]
-
-    # return y
-
-    # print "Warning! Gives different results from Matlab."
-    # ratio  = target / original
-    # chunks = [audio[i:i+n] for i in xrange(0, len(audio), n)]
-    # return np.hstack([scipy.signal.resample(chunk, len(chunk) * ratio)
-    #                   for chunk in chunks])
-
-def process_audio(audio, info):
+    from scikits.samplerate import resample as _resample
+    return _resample(x, p / q, 'sinc_fastest')
+    
+def extract_pitch(audio, rate, window_length = 4410, midi_min = 20, midi_max = 108):
     """
-    Process WAV audio.
+    Extract pitch.
+
+    rate must be 22050. returns array of [pitch, frame] energy levels.
 
     """
-    audio = np.asarray(audio)
+    if rate != 22050:
+        raise ValueError("Sample rates other than 22050 not implemented in extract_pitch")
 
-    try:
-        nchannels = audio.shape[1]
-    except IndexError:
-        nchannels = 1
+    if midi_min < 20:
+        print "Warning: MIDI pitches less than 20 not implemented."
+        midi_min = 20
 
-    is_converted = False
-    if nchannels > 1 and convert_to_mono:
-        # energy loss due to differences in phase when using
-        # this method
-        audio = audio.sum(axis = 1) / nchannels
-        nchannels = 1
-        is_converted = True
-
-    rate = info['fs']
-    is_resampled = False
-    if use_resampling:
-        if rate != dest_sample_rate:
-            if audio.shape[0] > 0:
-                audio = resample(audio, dest_sample_rate, rate, 100)
-
-            rate  = dest_sample_rate
-            is_resampled = True
-
-    # audio information (same format as Matlab audio toolkit)
-    if info is None:
-        info = {}
-
-    info['version']  = 1
-    info['size']     = audio.shape[0]
-    info['duration'] = info['size'] / rate
-    info['energy']   = audio * audio
-    info['fs']       = rate
-    info['nbits']    = 16
-    info['channels'] = nchannels
-
-    info['resampled']     = is_resampled
-    info['monoConverted'] = is_converted
-
-    return audio
-
-h = scipy.io.matlab.loadmat('MIDI_FB_ellip_pitch_60_96_22050_Q25.mat')['h'].squeeze()
-
-def extract_pitch(audio, param, info):
+    if midi_max > 108:
+        print "Warning: MIDI pitches greater than 108 not implemented."
+        midi_max = 108
 
     fs_pitch = np.zeros(128)
-    fs_index = np.zeros(128)
+    fs_index = np.zeros(128, dtype = 'int')
 
-    fs_pitch[20:59]  = 882
-    fs_pitch[59:95]  = 4410
-    fs_pitch[95:120] = 22050
+    fs_pitch[20:59]  = rate / 5 / 5
+    fs_pitch[59:95]  = rate / 5
+    fs_pitch[95:120] = rate
 
     fs_index[20:59]  = 2
     fs_index[59:95]  = 1
@@ -196,61 +77,73 @@ def extract_pitch(audio, param, info):
 
     pcm_ds = []
     pcm_ds.append(audio)
-    pcm_ds.append(resample(pcm_ds[0], 1, 5, 100))
-    pcm_ds.append(resample(pcm_ds[1], 1, 5, 100))
+    pcm_ds.append(resample(pcm_ds[0], 1, 5))
+    pcm_ds.append(resample(pcm_ds[1], 1, 5))
 
-    fs = param.get('fs', 22050)
-
-    win_len_stmsp = param.get('winLenSTMSP', np.array([4410]))
-    win_ov_stmsp  = np.round(win_len_stmsp / 2.0)
-    feature_rate  = fs / (win_len_stmsp - win_ov_stmsp)
+    window_length = np.atleast_1d(window_length)
+    window_ov_len = np.round(window_length / 2)
+    feature_rate  = rate / (window_length - window_ov_len)
     wav_size      = len(audio)
 
-    num_window    = len(win_len_stmsp)
+    num_window    = len(window_length)
     pitch_energy  = [[] for unused in xrange(num_window)]
     seg_pcm_num   = [[] for unused in xrange(num_window)]
     seg_pcm_start = [[] for unused in xrange(num_window)]
     seg_pcm_stop  = [[] for unused in xrange(num_window)]
 
+    # setup bin sample sizes.
     for w in xrange(num_window):
-        step_size   = int(win_len_stmsp[w] - win_ov_stmsp[w])
-        group_delay = round(win_len_stmsp[w] / 2.0)
-        seg_pcm_start[w] = np.concatenate([[0], range(0, wav_size, step_size)])
-        seg_pcm_stop[w]  = np.minimum(seg_pcm_start[w] + win_len_stmsp[w], wav_size)
-        seg_pcm_stop[w][1] = min(group_delay, wav_size)
-        seg_pcm_num[w] = len(seg_pcm_start[w])
-        pitch_energy[w] = np.zeros((120, seg_pcm_num[w]))
+        step_size   = int(window_length[w] - window_ov_len[w])
+        group_delay = window_ov_len[w] #np.round(win_len_stmsp[w] / 2.0)
 
-    for p in xrange(param.get('midiMin', 21), param.get('midiMax', 108)):
-        index    = int(fs_index[p])
-        filtfilt = scipy.signal.filtfilt(h[p]['b'][0], h[p]['a'][0],
+        seg_pcm_start[w]   = np.concatenate(([0], range(0, wav_size, step_size)))
+        seg_pcm_stop[w]    = np.minimum(seg_pcm_start[w] + window_length[w], wav_size)
+        seg_pcm_stop[w][1] = min(group_delay, wav_size)
+        seg_pcm_num[w]     = len(seg_pcm_start[w])
+
+        pitch_energy[w]    = np.zeros((120, seg_pcm_num[w]))
+
+    # filter for each pitch and compute energies.
+    for p in xrange(midi_min, midi_max):
+        index    = fs_index[p]
+        filtfilt = scipy.signal.filtfilt(h[p]['b'], h[p]['a'],
                                          pcm_ds[index])
         square   = np.square(filtfilt)
 
         for w in xrange(num_window):
-            factor = fs / fs_pitch[p]
+            rate_factor = rate / fs_pitch[p]
             for k in xrange(seg_pcm_num[w]):
-                start = np.ceil(seg_pcm_start[w][k]/fs * fs_pitch[p])
-                stop  = np.floor(seg_pcm_stop[w][k]/fs * fs_pitch[p])
-                pitch_energy[w][p][k] = np.sum(square[start:stop + 1]) * factor
+                start = np.ceil(seg_pcm_start[w][k] / rate_factor)
+                stop  = np.floor(seg_pcm_stop[w][k] / rate_factor)
+                pitch_energy[w][p][k] = np.sum(square[start:stop + 1]) * rate_factor
 
+    # return last window.
     return pitch_energy[-1]
 
 
-def internal_DCT(l):
-    mat = np.zeros((l, l))
+def internal_DCT(dim):
+    """
+    Generates DCT filter (type III?). Look into replacing with scipy.fftpack.dct.
 
-    for m in xrange(0, l):
-        for n in xrange(0, l):
-            mat[m, n] = np.sqrt(2/l)*np.cos((m*(n+0.5)*np.pi)/l)
+    """
+    mat = np.zeros((dim, dim))
+
+    for m in xrange(0, dim):
+        for n in xrange(0, dim):
+            mat[m, n] = np.sqrt(2 / dim) * np.cos((m * (n + 0.5) * np.pi) / dim)
 
     mat[0, :] = mat[0, :] / np.sqrt(2)
+
     return mat
 
-def normalizeFeature(data, order, thresh):
-    fnorm = np.zeros(data.shape)
+def normalize_feature(data, order, thresh):
+    """
+    Normalize chroma/crp for given unit norm with threshold.
+
+    """
+    fnorm    = np.zeros(data.shape)
     unit_vec = np.ones((1, 12))
-    unit_vec = unit_vec/np.linalg.norm(unit_vec, order)
+    unit_vec = unit_vec / np.linalg.norm(unit_vec, order)
     for k in xrange(0, data.shape[1]):
         n = np.linalg.norm(data[:, k], order)
         if n < thresh:
@@ -259,21 +152,25 @@ def normalizeFeature(data, order, thresh):
             fnorm[:, k] = data[:, k]/n
     return fnorm
 
-def extract_crp(pitch, param, info):
+def extract_crp(pitch, add_term_logc = 1, factor_logc = 1000,
+                coeffs_keep = None, norm_p = 2, norm_thresh = 1e-6):
     """
     CRP features.
 
     """
-    if len(pitch.shape) < 2:
-        pitch = pitch.reshape(len(pitch), 1)
+    if coeffs_keep is None:
+        coeffs_keep = range(54, 120)
+
+    pitch   = np.atleast_2d(pitch)
     seg_num = pitch.shape[1]
 
-    pitch_log = np.log10(param.get('addTermLogCompr', 1) + pitch * param.get('factorLogCompr', 1000))
+    pitch_log = np.log10(add_term_logc + pitch * factor_logc)
 
-    DCT = internal_DCT(len(pitch))
+    DCT    = internal_DCT(len(pitch))
     DCTcut = DCT
-    DCTcut[np.setdiff1d(range(0, 120), param.get('coeffsToKeep', range(54, 120))), :] = 0
-    DCT_filter = np.dot(DCT.T, DCTcut)
+    DCTcut[np.setdiff1d(range(0, 120), coeffs_keep), :] = 0
+
+    DCT_filter    = np.dot(DCT.T, DCTcut)
     pitch_log_DCT = np.dot(DCT_filter, pitch_log)
 
     crp = np.zeros((12, seg_num))
@@ -283,17 +180,37 @@ def extract_crp(pitch, param, info):
         chroma = np.mod(p + 1, 12)
         crp[chroma, :] += pitch_log_DCT[p, :]
 
-    crp = normalizeFeature(crp, param.get('normP', 2), param.get('normThresh', 1e-6))
-
-    #crp, crpfeaturerate = smoothDownsampleFeature(crp, param)
-    #crp = normalizeFeature(crp, param['normP'], param['normThresh'])
+    crp = normalize_feature(crp, norm_p, norm_thresh)
 
     return crp
 
-def load_crp(filename):
-    audio, info = load_wav(filename)
-    if audio.shape[0] > 0:
-        return extract_crp(extract_pitch(audio, info, info), info, info).T
-    else:
-        return np.zeros((1,12))
+def load_pitch(filename, window_length = None, **audio_args):
+    """
+    Load pitch features from file.
 
+    """
+    rate, audio = load_audio(filename, **audio_args)
+
+    # arguments.
+    args = {}
+    if window_length is not None:
+        args['window_length'] = window_length
+
+    # check for empty WAV.
+    if audio.shape[0] > 0:
+        return extract_pitch(audio, rate, **args)
+    else:
+        return np.zeros((120, 1))
+
+
+def load_crp(filename, threshold = None, **pitch_args):
+    """
+    Load CRP features from file.
+
+    """
+    # arguments.
+    args = {}
+    if threshold is not None:
+        args['norm_thresh'] = threshold
+
+    return extract_crp(load_pitch(filename, **pitch_args), **args)
