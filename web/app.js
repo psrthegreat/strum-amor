@@ -43,34 +43,6 @@ app.get('/', function(req, res) {
 	res.redirect('main');
 });
 
-//get predictions
-app.post('/main', function(req, res) {
-	var str = req.body.data.split(",")[1]
-	var buf = new Buffer(str, 'base64');
-	fs.writeFile("hello.wav", buf, function(err) {
-		if (err)
-			res.send(500, {
-				error : 'something blew up'
-			})
-		var child = exec("./recog", function(error, stdout, stderr) {
-			res.send(stdout);
-		});
-	});
-});
-
-function writeSegment(){
-	fs.writeFile("hello.wav", buf, function(err) {
-		if (err)
-			res.send(500, {
-				error : 'something blew up'
-			})
-		var child = exec("./recog", function(error, stdout, stderr) {
-			console.log('stdout: ' + stdout);
-			res.send(stdout);
-		});
-	});
-}
-
 //app specific gets here
 var executeTests = false;
 
@@ -84,7 +56,7 @@ if (executeTests) {
 			var result = (user === 'psr' && pass === 'psr2');
 			callback(null/* error */, result);
 		});
-		app.get('/testusers', auth, tests.testUser);
+		//app.get('/testusers', auth, tests.testUser);
 	}
 }
 
@@ -140,16 +112,22 @@ io.sockets.on('connection', function(socket) {
 	});
 
 	socket.on('disconnect',function(){
-		console.log('User Disconnect. Removing files!')
-	   	socket.get('id', function(err, id){
-	   		fs.readdir('./clientwavs/', function(e,files){
-	   			for (var i = 0; i < files.length; i++) {
-					if (!files[i].match(new RegExp('^'+id))) continue;
-	   				fs.unlink('./clientwavs/'+files[i], function(err){
-	   					if (err) throw err;
-	   				});
-	   			}
-	   		})
-	   	});
-	 });
+        console.log('User Disconnect. Removing files!')
+        socket.get('id', function(err, id){
+            var child = exec("cd clientwavs && rm -rf " + id + "*", function(err){
+                if (err) throw err;
+            });
+        })
+    });
+});
+
+
+process.on('SIGINT', function() {
+    console.log("here");
+    var child = exec("cd clientwavs && rm -rf *", function(err){
+        if(err)
+        console.log(error)
+    });
+    server.close();
+    process.exit();
 });
