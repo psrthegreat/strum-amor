@@ -103,10 +103,10 @@ def read(file):
       data-type determined from the file.
 
     """
-    #if hasattr(file,'read'):
-    fid = file
-    #else:
-    #    fid = open(file, 'rb')
+    if hasattr(file,'read'):
+        fid = file
+    else:
+        fid = open(file, 'rb')
 
     fsize = _read_riff_chunk(fid)
     noc = 1

@@ -236,4 +236,4 @@ if "__main__" in __name__:
     else:
         input_file = sys.argv[1]
 
-    predict(input_file)
+    print predict(input_file)
