@@ -218,8 +218,10 @@ def predict(input_file):
                          frame_split      = None,
                          group_filter     = 4,
                          max_count_filter = True)
+
     predictions = model.run(input_file)
-    if predictions:
+
+    if predictions is not None and len(predictions):
         return chord.decode(int(predictions[0]));
     else:
         return ""
@@ -234,38 +236,4 @@ if "__main__" in __name__:
     else:
         input_file = sys.argv[1]
 
-    # same as model = default_crp()
-    model = HMMPredictor(feature_type     = "crp",
-                         model_path       = os.path.join(MODEL_DIR, "uniformcrp"),
-                         lda              = None,
-                         window_size      = 4410,
-                         variance_filter  = 0.16,
-                         min_frames       = 3,
-                         plot_variance    = False,
-                         frame_split      = None,
-                         group_filter     = 3,
-                         max_count_filter = True)
-    
-    predictions = model.run(input_file)
-
-    if predictions:
-        print chord.decode(int(predictions[0]));
-    else:
-        print ""
-
-    # parameters can be changed here and parts of the model rerun.
-    #
-    # update number of frames to group:
-    #
-    # predictions.frame_split = 7
-    # predictions.process_features()
-    # predictions.predict()
-    # 
-    # update group filter:
-    #
-    # predictions.group_filter = 5
-    # predictions.predict()
-
-    # can look at these for debugging:
-    # _raw_predictions    = model._predictions
-    # _merged_predictions = model._combined_predict
+    predict(input_file)

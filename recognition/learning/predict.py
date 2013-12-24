@@ -230,7 +230,7 @@ if "__main__" in __name__:
     
     predictions = model.run(input_file)
 
-    if predictions:
+    if predictions is not None and len(predictions):
         print chord.decode(int(predictions[0]));
     else:
         print ""
