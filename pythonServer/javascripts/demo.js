@@ -166,7 +166,7 @@ $(document).ready(function() {
 				sendFile(str);
 				i++;
 		    });
-		}, 600);
+		}, 400);
 	});
 });
 

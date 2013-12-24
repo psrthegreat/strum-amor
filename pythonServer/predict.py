@@ -240,10 +240,10 @@ if "__main__" in __name__:
                          lda              = None,
                          window_size      = 4410,
                          variance_filter  = 0.16,
-                         min_frames       = 4,
+                         min_frames       = 3,
                          plot_variance    = False,
                          frame_split      = None,
-                         group_filter     = 4,
+                         group_filter     = 3,
                          max_count_filter = True)
     
     predictions = model.run(input_file)
