@@ -130,10 +130,13 @@ function stopRecording() {
 	});
 }
 
+var count = 0;
+var num = 5;
 function freezeRecording(callback) {
 	recorder.stop();
 	recorder.exportWAV(function(s) {
-		recorder.clear();
+	    count = (count + 1)%num;
+		if(count == 0) recorder.clear();
 		recorder.record();
 		//var url = window.URL.createObjectURL(s);
 		///$("#audio").get(0).src = url;
