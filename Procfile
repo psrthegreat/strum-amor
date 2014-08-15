@@ -1,1 +1,0 @@
-web: cd pythonServer && python server.py
