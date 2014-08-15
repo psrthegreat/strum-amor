@@ -1,12 +1,12 @@
 #!/usr/bin/python
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
-from os import curdir, sep
+from os import curdir, environ, sep
 import cgi
 from cStringIO import StringIO
 import predict
 import json
 
-PORT_NUMBER = 8000
+PORT_NUMBER = int(environ.get('PORT', 8000))
 
 #This class will handles any incoming request from
 #the browser 
