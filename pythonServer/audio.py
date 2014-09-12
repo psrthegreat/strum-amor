@@ -4,8 +4,8 @@ import os
 
 import numpy as np
 import scipy.io.matlab
+import scipy.io.wavfile as wavfile
 import scipy.signal
-import wavfile
 
 # stored coefficients for pitch filtering.
 h = scipy.io.matlab.loadmat('pitch-stored.mat',
