@@ -27,6 +27,10 @@ Windows
    - Run installer and note location installed to.
 
 * libsamplerate
+Prebuilt binaries:
+   - Use binary files in libsamplerate_windows/
+
+From source:
    - Extract files.
    - Copy libsndfile-1.def, libsndfile-1.dll, libsndfile-1.lib from install location into libsamplerate-0.1.8/
    - Copy sndfile.h into libsamplerate-0.1.8/Win32
